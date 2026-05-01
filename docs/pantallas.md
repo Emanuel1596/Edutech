@@ -20,10 +20,10 @@
 - Historial de pedidos: Lista de ordenes con estado pendiente, aprobado, rechazado o cancelado.
 
 ## Pantallas de cursos del alumno.
-*Mis cursos: Cursos comprados y liberados tras pago aprobado.
-*Pantalla de modulo: Organizacion de lecciones dentro de cada curso.
-*Pantalla de leccion: Titulo, descripcion, video embebido/local, recursos adicionales y boton "Marcar como completada".
-*Pantalla de progreso: Porcentaje de avance y lecciones completadas.
+- Mis cursos: Cursos comprados y liberados tras pago aprobado.
+- Pantalla de modulo: Organizacion de lecciones dentro de cada curso.
+- Pantalla de leccion: Titulo, descripcion, video embebido/local, recursos adicionales y boton "Marcar como completada".
+- Pantalla de progreso: Porcentaje de avance y lecciones completadas.
 
 ## Pantallas de evaluacion.
 - Examen final: Preguntas de opcion multiple, tiempo limite, intentos, calificacion automatica y resultados.
@@ -43,5 +43,5 @@
 - Gestion de usuarios y roles: Activar, desativar y asignar roles.
 - Supervision y publicacion de cursos: Revisar y publicar/despublicar cursos.
 - Consulta de pagos e inscripciones: Ordenes, estados de pago y alumnos inscritos.
--Configuracion de pasarela de pago: Validacion de credenciales sandbox.
-  - upervision de seguridad: Control de accesos y reglas de seguridad.
+-Configuracion de pasarela de pago: Validacion de credenciales sandbox. 
+- Supervision de seguridad: Control de accesos y reglas de seguridad.
