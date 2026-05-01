@@ -2,7 +2,7 @@
 
 Este documento contiene los requerimientos funcionales y no funcionales del sistema **EduTech**, una plataforma web para la venta de cursos en línea.
 
----
+
 
 ## Índice
 
@@ -18,7 +18,7 @@ Este documento contiene los requerimientos funcionales y no funcionales del sist
 - [J. Administrador](#j-administrador)
 - [3. Requerimientos no funcionales](#3-requerimientos-no-funcionales)
 
----
+
 
 # A. Usuarios, registro y acceso
 
