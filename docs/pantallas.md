@@ -40,7 +40,7 @@
 - Consulta de resultados: Calificaciones y aprobacion de examenes.
 
 ## Pantallas del administrador.
-- Gestion de usuarios y roles: Activar, desativar y asignar roles.
+- Gestion de usuarios y roles: Activar, desactivar y asignar roles.
 - Supervision y publicacion de cursos: Revisar y publicar/despublicar cursos.
 - Consulta de pagos e inscripciones: Ordenes, estados de pago y alumnos inscritos.
 - Configuracion de pasarela de pago: Validacion de credenciales sandbox. 
