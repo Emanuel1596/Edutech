@@ -1,4 +1,4 @@
-# pantallas del sistema
+# Pantallas del sistema
 
 ## Pantallas de acceso y roles
 - Pantalla de registro de alumno: Formulario para crear cuenta con validaciones de nombre, correo y contraseña.
@@ -43,5 +43,5 @@
 - Gestion de usuarios y roles: Activar, desativar y asignar roles.
 - Supervision y publicacion de cursos: Revisar y publicar/despublicar cursos.
 - Consulta de pagos e inscripciones: Ordenes, estados de pago y alumnos inscritos.
--Configuracion de pasarela de pago: Validacion de credenciales sandbox. 
+- Configuracion de pasarela de pago: Validacion de credenciales sandbox. 
 - Supervision de seguridad: Control de accesos y reglas de seguridad.
