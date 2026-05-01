@@ -65,6 +65,7 @@ La documentación del proyecto se encuentra dentro de la carpeta `docs`.
 | [Estructura de carpetas](docs/estructura-carpetas.md) | Organización inicial del proyecto |
 | [Frontend visual](docs/frontend-visual.md) | Avance visual de las pantallas principales |
 | [Base de datos](docs/base-datos.md) | Script o estructura inicial de la base de datos |
+| [Seguimiento de entregas](docs/seguimiento-entregas.md) | Control del estado de cada entrega del Sprint 1 |
 
 ---
 
