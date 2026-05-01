@@ -54,7 +54,7 @@ La documentación del proyecto se encuentra dentro de la carpeta `docs`.
 |---|---|
 | [Sprint 1](docs/sprint-1.md) | Plan de trabajo, fechas, horas y entregables |
 | [Actores del sistema](docs/actores.md) | Actores principales del sistema y su descripción |
-| [Acciones de actores](docs/acciones-actores.md) | Acciones que puede realizar cada actor |
+| [Acciones de actores](docs/Acciones-actores.pdf) | Acciones que puede realizar cada actor |
 | [Requerimientos](docs/requerimientos.md) | Requerimientos funcionales y no funcionales |
 | [Mapa de navegación](docs/mapa-navegacion.md) | Estructura de navegación del sistema |
 | [Pantallas](docs/pantallas.md) | Pantallas necesarias para el sistema |
