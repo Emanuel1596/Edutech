@@ -59,7 +59,7 @@ La documentación del proyecto se encuentra dentro de la carpeta `docs`.
 | [Mapa de navegación](docs/mapa-navegacion.md) | Estructura de navegación del sistema |
 | [Pantallas](docs/pantallas.md) | Pantallas necesarias para el sistema |
 | [Wireframes](docs/wireframes.md) | Bocetos iniciales de las pantallas |
-| [Modelo de base de datos](docs/modelo-base-datos.md) | Entidades, atributos y relaciones principales |
+| [Modelo de base de datos](docs/modelo-base-datos.md) | Entidades y atributos |
 | [Diagrama entidad-relación](docs/diagrama-er.md) | Diagrama ER del sistema |
 | [Tecnologías](docs/tecnologias.md) | Tecnologías seleccionadas para el proyecto |
 | [Estructura de carpetas](docs/estructura-carpetas.md) | Organización inicial del proyecto |
