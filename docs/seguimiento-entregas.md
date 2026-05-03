@@ -21,8 +21,8 @@ Las actividades de este seguimiento corresponden al primer sprint del proyecto E
 
 | Integrante | Actividad | Entregable | Estado |
 |---|---|---|---|
-| Mejia Osornio Valeria | Actores del sistema | Lista de actores y descripción | Aceptado con correcciones |
-| Huerta Ruiz Diego Rafael | Acciones de los actores | Tabla de actores y acciones | Aceptado con correciones |
+| Mejia Osornio Valeria | Actores del sistema | Lista de actores y descripción | Validado |
+| Huerta Ruiz Diego Rafael | Acciones de los actores | Tabla de actores y acciones | Validado |
 | Villanueva Garcia Emanuel | Requerimientos funcionales y no funcionales | Lista de RF y RNF | Validado |
 | Romero Palacios Randy | Mapa de navegación | Diagrama o esquema de navegación | Aceptado con correciones |
 | Martinez Mejia Edgar | Pantallas del sistema | Lista de pantallas con explicación | Aceptado con correciones |
