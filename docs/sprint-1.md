@@ -22,7 +22,7 @@ Organizar y construir la base inicial del proyecto, definiendo actores, requerim
 | Viernes 1 mayo | 6:00 p. m. | Randy | Hacer el mapa de navegación | Diagrama o esquema que muestre cómo se conectan las páginas |
 | Viernes 1 mayo | 8:00 p. m. | Edgar | Definir las pantallas que se van a diseñar | Lista de pantallas necesarias con una breve explicación de cada una |
 | Sábado 2 mayo | 5:00 p. m. | André | Hacer wireframes o bocetos | Bocetos de las pantallas principales del sistema |
-| Sábado 2 mayo | 8:00 p. m. | Emanuel | Hacer el modelo de base de datos | Lista de entidades, atributos y relaciones principales |
+| Sábado 2 mayo | 8:00 p. m. | Emanuel | Hacer el modelo de base de datos | Lista de entidades y atributos |
 | Domingo 3 mayo | 5:00 p. m. | Valeria | Hacer el diagrama entidad-relación | Diagrama ER limpio y entendible |
 | Domingo 3 mayo | 7:00 p. m. | Randy | Elegir las tecnologías | Lista de tecnologías elegidas y explicación breve de para qué se usará cada una |
 | Lunes 4 mayo | 6:00 p. m. | Edgar | Crear la estructura de carpetas | Carpeta inicial del proyecto organizada correctamente |
