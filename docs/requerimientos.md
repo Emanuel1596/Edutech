@@ -16,6 +16,7 @@ Este documento contiene los requerimientos funcionales y no funcionales del sist
 - [H. Finalización y certificado](#h-finalización-y-certificado)
 - [I. Instructor](#i-instructor)
 - [J. Administrador](#j-administrador)
+- [K. Cuenta y solicitudes](#k-cuenta-y-solicitudes)
 - [3. Requerimientos no funcionales](#3-requerimientos-no-funcionales)
 
 ---
@@ -24,10 +25,10 @@ Este documento contiene los requerimientos funcionales y no funcionales del sist
 
 ## RF-01. Registro de alumno
 
-El sistema debe permitir que un alumno cree una cuenta proporcionando nombre, apellidos, correo electrónico, confirmación de correo, contraseña y confirmación de contraseña.
+El sistema debe permitir que un visitante cree una cuenta con rol de Alumno proporcionando nombre, apellidos, correo electrónico, confirmación de correo, contraseña y confirmación de contraseña.
 
 **Ejemplo de uso:**  
-Un alumno entra a la página de registro, escribe su nombre, apellidos, correo y contraseña. Después presiona “Registrarse” y el sistema crea su cuenta.
+Un visitante entra a la página de registro, escribe su nombre, apellidos, correo y contraseña. Después presiona “Registrarse” y el sistema crea su cuenta con rol de Alumno.
 
 ---
 
@@ -76,18 +77,27 @@ Un alumno no debe poder entrar al panel del instructor ni al panel del administr
 
 ---
 
-# B. Cursos
+## RF-07. Edición de información de cuenta
 
-## RF-07. Catálogo de cursos
-
-El sistema debe permitir que los alumnos consulten los cursos disponibles.
+El sistema debe permitir que los usuarios autenticados editen información personal permitida, como nombre, apellidos, teléfono o contraseña.
 
 **Ejemplo de uso:**  
-El alumno entra a la sección “Cursos” y ve una lista de cursos publicados disponibles para compra.
+Un alumno entra a “Mi cuenta” y actualiza su teléfono. El sistema guarda el cambio.
 
 ---
 
-## RF-08. Información visible del curso
+# B. Cursos
+
+## RF-08. Catálogo de cursos
+
+El sistema debe permitir que visitantes y alumnos consulten los cursos publicados disponibles para compra.
+
+**Ejemplo de uso:**  
+Una persona entra a la sección “Cursos” y ve una lista de cursos publicados con su información principal y precio.
+
+---
+
+## RF-09. Información visible del curso
 
 El sistema debe mostrar por cada curso imagen de portada, nombre, descripción, instructor, nivel, número de lecciones y precio en pesos mexicanos.
 
@@ -96,7 +106,7 @@ En el catálogo aparece una tarjeta con el curso “Programación Orientada a Ob
 
 ---
 
-## RF-09. Detalle del curso
+## RF-10. Detalle del curso
 
 El sistema debe permitir consultar el detalle de un curso, incluyendo descripción, módulos, lecciones, instructor, nivel y precio.
 
@@ -105,7 +115,7 @@ Antes de comprar, el alumno abre el curso y revisa qué temas contiene, quién l
 
 ---
 
-## RF-10. Cursos únicamente de pago
+## RF-11. Cursos únicamente de pago
 
 El sistema debe manejar únicamente cursos de pago.
 
@@ -114,7 +124,7 @@ El alumno no puede inscribirse directamente a un curso sin pagar; primero debe c
 
 ---
 
-## RF-11. Precio en pesos mexicanos
+## RF-12. Precio en pesos mexicanos
 
 El sistema debe registrar y mostrar el precio de los cursos en pesos mexicanos.
 
@@ -125,25 +135,27 @@ Un curso aparece con precio de `$299 MXN` en el catálogo y en el resumen del pe
 
 # C. Compra, orden y pago
 
-## RF-12. Inicio de compra
+## RF-13. Inicio de compra
 
-El sistema debe permitir que un alumno inicie la compra de un curso.
+El sistema debe permitir que un alumno autenticado inicie la compra de un curso. Si un visitante intenta comprar, el sistema debe solicitarle iniciar sesión o registrarse primero.
 
 **Ejemplo de uso:**  
-El alumno selecciona un curso y presiona el botón “Comprar” para iniciar el proceso de adquisición.
+El visitante presiona “Comprar” en un curso. El sistema lo dirige a iniciar sesión o registrarse antes de continuar con la compra.
 
 ---
 
-## RF-13. Información de contacto para compra
+## RF-14. Información de contacto para compra
 
-El sistema debe solicitar datos de contacto para la compra, como nombre, apellidos, correo electrónico y teléfono. Los datos como dirección, ciudad, estado y código postal pueden manejarse como información opcional de facturación.
+El sistema debe solicitar datos de contacto para la compra, como nombre, apellidos, correo electrónico y teléfono. Si el alumno ya tiene esos datos registrados, el sistema puede precargarlos para facilitar el proceso.
+
+Los datos como dirección, ciudad, estado y código postal pueden manejarse como información opcional de facturación.
 
 **Ejemplo de uso:**  
-Antes de pagar, el alumno llena su nombre, correo y teléfono. Si se requiere facturación, también puede escribir dirección, ciudad, estado y código postal.
+Antes de pagar, el alumno revisa su nombre, correo y teléfono. Si necesita facturación, también puede capturar dirección, ciudad, estado y código postal.
 
 ---
 
-## RF-14. Resumen del pedido
+## RF-15. Resumen del pedido
 
 El sistema debe mostrar un resumen del pedido antes de pagar, incluyendo curso seleccionado, precio, total y método de pago.
 
@@ -152,16 +164,16 @@ Antes de ir a PayPal, el alumno ve que comprará el curso “Java desde cero” 
 
 ---
 
-## RF-15. Creación de orden pendiente
+## RF-16. Creación de orden pendiente
 
-El sistema debe crear una orden con estado pendiente cuando el alumno inicia el proceso de compra.
+El sistema debe crear una orden con estado pendiente cuando el alumno autenticado inicia el proceso de compra. La orden debe tener un número visible generado por el sistema.
 
 **Ejemplo de uso:**  
-El alumno presiona “Comprar” y el sistema genera la orden `#120879` con estado “pendiente” mientras espera la confirmación de PayPal o Stripe.
+El alumno presiona “Comprar” y el sistema genera la orden `ORD-2026-000015` con estado `pendiente` mientras espera la confirmación de PayPal o Stripe.
 
 ---
 
-## RF-16. Botón de pago externo
+## RF-17. Botón de pago externo
 
 El sistema debe mostrar un botón de pago con PayPal Sandbox o Stripe Sandbox.
 
@@ -170,7 +182,7 @@ En la pantalla de compra aparece un botón que dice “Pagar con PayPal” o “
 
 ---
 
-## RF-17. Procesamiento del pago en Sandbox
+## RF-18. Procesamiento del pago en Sandbox
 
 El sistema debe enviar la solicitud de pago a la pasarela externa en ambiente Sandbox.
 
@@ -179,7 +191,7 @@ El alumno presiona “Pagar con PayPal”, inicia sesión en PayPal Sandbox y re
 
 ---
 
-## RF-18. Webhook de confirmación de pago
+## RF-19. Webhook de confirmación de pago
 
 El sistema debe recibir una notificación automática mediante webhook cuando PayPal o Stripe confirme el resultado del pago.
 
@@ -188,7 +200,7 @@ Después de que PayPal aprueba el pago, PayPal envía una notificación automát
 
 ---
 
-## RF-19. Validación del pago
+## RF-20. Validación del pago
 
 El sistema debe validar que el pago recibido corresponda al alumno, curso, orden, monto y moneda correctos.
 
@@ -197,43 +209,52 @@ Si la orden era por `$299 MXN`, el sistema debe comprobar que PayPal confirmó e
 
 ---
 
-## RF-20. Estados de pago
+## RF-21. Estados de pago
 
 El sistema debe manejar estados de pago como pendiente, aprobado, rechazado o cancelado.
 
 **Ejemplo de uso:**  
-Si el alumno abandona PayPal antes de pagar, la orden queda pendiente o cancelada. Si el pago se completa correctamente, queda aprobada.
+Si PayPal confirma correctamente la transacción, el pago queda como `aprobado`. Si PayPal rechaza la transacción, el pago queda como `rechazado`. Si el alumno cancela el proceso en PayPal, el pago queda como `cancelado`.
 
 ---
 
-## RF-21. Liberación automática del curso
+## RF-22. Estados de orden
 
-El sistema debe liberar automáticamente el acceso al curso cuando el pago sea confirmado como aprobado.
+El sistema debe manejar estados de orden como pendiente, completada, cancelada, fallida o expirada.
 
 **Ejemplo de uso:**  
-Cuando PayPal confirma el pago, EduTech crea la inscripción y el curso aparece en “Mis cursos”.
+Cuando el alumno inicia una compra, EduTech crea una orden con estado `pendiente`. Si el pago es aprobado, la orden cambia a `completada`. Si el pago es rechazado, la orden cambia a `fallida`. Si el alumno cancela el pago, la orden cambia a `cancelada`. Si la orden queda mucho tiempo sin pago confirmado, puede cambiar a `expirada`.
 
 ---
 
-## RF-22. Bloqueo por pago no aprobado
+## RF-23. Liberación automática del curso
 
-El sistema no debe permitir que el alumno acceda al curso si el pago está pendiente, rechazado o cancelado.
+El sistema debe liberar el acceso al curso únicamente cuando el pago sea confirmado como aprobado y la orden quede completada.
 
 **Ejemplo de uso:**  
-Si el alumno tiene una orden pendiente, puede verla en su historial de pedidos, pero no puede entrar al contenido del curso.
+Cuando PayPal confirma el pago, EduTech actualiza el pago como `aprobado`, cambia la orden a `completada`, crea la inscripción y muestra el curso en “Mis cursos”.
 
 ---
 
-## RF-23. Historial de pedidos
+## RF-24. Bloqueo por pago no aprobado
 
-El sistema debe permitir que el alumno consulte su historial de pedidos, incluyendo órdenes pendientes, aprobadas, rechazadas o canceladas.
+El sistema no debe permitir que el alumno acceda al curso si el pago está pendiente, rechazado o cancelado, o si la orden está pendiente, fallida, cancelada o expirada.
 
 **Ejemplo de uso:**  
-El alumno entra a “Historial de pedidos” y ve la orden `#120879`, su fecha, total y estado de pago.
+Si el alumno tiene una orden pendiente o un pago rechazado, puede ver el registro en su historial de pedidos, pero no puede entrar al contenido del curso.
 
 ---
 
-## RF-24. Mis cursos
+## RF-25. Historial de pedidos
+
+El sistema debe permitir que el alumno consulte su historial de pedidos, incluyendo número de orden, curso, fecha, total, estado de la orden y estado del pago cuando exista.
+
+**Ejemplo de uso:**  
+El alumno entra a “Historial de pedidos” y ve la orden `ORD-2026-000015`, el curso comprado, el total de `$299 MXN`, el estado de orden `completada` y el estado de pago `aprobado`.
+
+---
+
+## RF-26. Mis cursos
 
 El sistema debe mostrar en “Mis cursos” únicamente los cursos cuya compra fue aprobada y cuya inscripción está activa.
 
@@ -244,16 +265,16 @@ Una orden pendiente aparece en “Historial de pedidos”, pero el curso solo ap
 
 # D. Inscripción y acceso
 
-## RF-25. Inscripción automática
+## RF-27. Inscripción automática
 
-El sistema debe crear automáticamente la inscripción del alumno al curso cuando el pago sea aprobado.
+El sistema debe crear automáticamente la inscripción del alumno al curso cuando el pago sea aprobado y la orden quede completada.
 
 **Ejemplo de uso:**  
-Después de que PayPal confirma el pago, EduTech registra que el alumno ya está inscrito en el curso comprado.
+Después de que PayPal confirma el pago, EduTech registra que el alumno ya tiene acceso al curso comprado.
 
 ---
 
-## RF-26. Acceso solo a cursos comprados
+## RF-28. Acceso solo a cursos comprados
 
 El sistema debe permitir que el alumno acceda únicamente a los cursos que haya comprado correctamente.
 
@@ -262,18 +283,9 @@ Si el alumno compró el curso de Java, puede entrar a ese curso, pero no al curs
 
 ---
 
-## RF-27. Instructor solo ve sus cursos
-
-El sistema debe permitir que el instructor vea y administre únicamente los cursos que le pertenecen.
-
-**Ejemplo de uso:**  
-La instructora Luisa puede editar sus cursos, pero no puede modificar cursos creados por otro instructor.
-
----
-
 # E. Módulos y lecciones
 
-## RF-28. Organización por módulos
+## RF-29. Organización por módulos
 
 El sistema debe permitir que cada curso esté organizado en módulos.
 
@@ -282,7 +294,7 @@ Un curso puede tener módulos como “Introducción”, “Variables”, “Func
 
 ---
 
-## RF-29. Datos del módulo
+## RF-30. Datos del módulo
 
 Cada módulo debe tener título y número de orden dentro del curso.
 
@@ -291,7 +303,7 @@ El módulo 1 se llama “Introducción a la programación” y aparece antes del
 
 ---
 
-## RF-30. Organización por lecciones
+## RF-31. Organización por lecciones
 
 El sistema debe permitir que cada módulo tenga varias lecciones.
 
@@ -300,7 +312,7 @@ El módulo “Branches” puede contener las lecciones “¿Qué son las branche
 
 ---
 
-## RF-31. Datos de la lección
+## RF-32. Datos de la lección
 
 Cada lección debe tener título, número de orden, texto descriptivo, video y recursos adicionales cuando correspondan.
 
@@ -309,7 +321,7 @@ Una lección llamada “Entidades y Atributos” puede tener una explicación es
 
 ---
 
-## RF-32. Visualización de lecciones
+## RF-33. Visualización de lecciones
 
 El sistema debe permitir que el alumno visualice las lecciones de los cursos a los que tiene acceso.
 
@@ -318,7 +330,7 @@ El alumno entra a una lección y puede ver el video, leer el texto descriptivo y
 
 ---
 
-## RF-33. Videos de lección
+## RF-34. Videos de lección
 
 El sistema debe permitir videos embebidos desde YouTube o Vimeo, o videos cargados localmente de forma optimizada.
 
@@ -327,18 +339,18 @@ El instructor agrega un enlace de YouTube y el video se reproduce dentro de EduT
 
 ---
 
-## RF-34. Recursos adicionales
+## RF-35. Recursos adicionales
 
-El sistema debe permitir agregar recursos adicionales a las lecciones, como enlaces, archivos o materiales de apoyo.
+El sistema debe permitir agregar recursos adicionales a las lecciones, como enlaces, archivos descargables o repositorios.
 
 **Ejemplo de uso:**  
-Una lección puede incluir un PDF, un enlace a documentación o un archivo descargable de práctica.
+Una lección puede incluir un PDF descargable, un enlace a documentación, un archivo de práctica o un repositorio de GitHub.
 
 ---
 
 # F. Progreso del curso
 
-## RF-35. Marcar lección como completada
+## RF-36. Marcar lección como completada
 
 El sistema debe permitir que el alumno marque una lección como completada.
 
@@ -347,7 +359,7 @@ Después de ver una lección, el alumno presiona “Marcar como completada” y 
 
 ---
 
-## RF-36. Avance secuencial obligatorio
+## RF-37. Avance secuencial obligatorio
 
 El sistema debe bloquear la siguiente lección hasta que el alumno complete la anterior.
 
@@ -356,7 +368,7 @@ El alumno no puede abrir la lección 3 si todavía no ha completado la lección 
 
 ---
 
-## RF-37. Registro de progreso
+## RF-38. Registro de progreso
 
 El sistema debe guardar el progreso del alumno en cada curso.
 
@@ -365,7 +377,7 @@ Si el alumno completó 5 lecciones y cierra sesión, al volver el sistema debe c
 
 ---
 
-## RF-38. Consulta de progreso
+## RF-39. Consulta de progreso
 
 El sistema debe mostrar cuántas lecciones ha completado el alumno y el porcentaje de avance del curso.
 
@@ -376,7 +388,7 @@ El sistema muestra “8 de 20 lecciones completadas”, equivalente al 40% del c
 
 # G. Examen final
 
-## RF-39. Examen final por curso
+## RF-40. Examen final por curso
 
 El sistema debe permitir que cada curso tenga un examen final.
 
@@ -385,7 +397,7 @@ Al terminar las lecciones, el alumno encuentra un módulo llamado “Examen fina
 
 ---
 
-## RF-40. Banco de preguntas
+## RF-41. Banco de preguntas
 
 El sistema debe permitir que el instructor cree un banco de preguntas para el examen final.
 
@@ -394,7 +406,7 @@ El instructor registra 40 preguntas, aunque cada alumno solo responderá 20 en s
 
 ---
 
-## RF-41. Preguntas de opción múltiple
+## RF-42. Preguntas de opción múltiple
 
 El sistema debe permitir preguntas de opción múltiple.
 
@@ -403,7 +415,7 @@ Una pregunta puede tener cuatro posibles respuestas y el alumno debe seleccionar
 
 ---
 
-## RF-42. Opciones de respuesta
+## RF-43. Opciones de respuesta
 
 Cada pregunta debe tener varias opciones de respuesta.
 
@@ -412,7 +424,7 @@ La pregunta “¿Qué es Git?” puede tener opciones como “Sistema de control
 
 ---
 
-## RF-43. Respuesta correcta
+## RF-44. Respuesta correcta
 
 El sistema debe permitir que el instructor defina cuál opción es la correcta.
 
@@ -421,7 +433,7 @@ En la pregunta “¿Qué es Git?”, el instructor marca “Sistema de control d
 
 ---
 
-## RF-44. Generación aleatoria del examen
+## RF-45. Generación aleatoria del examen
 
 El sistema debe generar el examen seleccionando preguntas aleatorias desde el banco de preguntas.
 
@@ -430,7 +442,7 @@ Dos alumnos presentan el mismo examen final, pero cada uno recibe preguntas dife
 
 ---
 
-## RF-45. Cantidad de preguntas por examen
+## RF-46. Cantidad de preguntas por examen
 
 El sistema debe permitir configurar cuántas preguntas aparecerán en cada intento.
 
@@ -439,7 +451,7 @@ El instructor configura que el examen muestre 20 preguntas aleatorias de un banc
 
 ---
 
-## RF-46. Tiempo límite programable
+## RF-47. Tiempo límite programable
 
 El sistema debe permitir configurar el tiempo límite del examen.
 
@@ -448,7 +460,7 @@ El instructor configura que el examen final tenga una duración máxima de 20 mi
 
 ---
 
-## RF-47. Número máximo de intentos
+## RF-48. Número máximo de intentos
 
 El sistema debe permitir configurar el número máximo de intentos.
 
@@ -457,7 +469,7 @@ El instructor configura que el alumno solo pueda presentar el examen final dos v
 
 ---
 
-## RF-48. Calificación mínima aprobatoria
+## RF-49. Calificación mínima aprobatoria
 
 El sistema debe permitir definir la calificación mínima aprobatoria.
 
@@ -466,16 +478,16 @@ El instructor define que el alumno necesita mínimo 70% de respuestas correctas 
 
 ---
 
-## RF-49. Registro de intento
+## RF-50. Registro y estados del intento
 
-El sistema debe guardar cada intento del alumno en el examen final.
+El sistema debe guardar cada intento del alumno en el examen final, incluyendo número de intento, fecha de inicio, fecha de finalización, estado del intento, calificación y aprobación. Los estados del intento pueden ser `en_progreso`, `finalizado`, `invalidado` o `abandonado`.
 
 **Ejemplo de uso:**  
-Si el alumno presenta el examen por primera vez, el sistema guarda el intento número 1 con fecha de inicio, fecha de finalización y calificación.
+Cuando el alumno inicia el examen, el intento queda en estado `en_progreso`. Cuando envía sus respuestas, queda `finalizado` con su calificación. Si cierra el examen antes de terminar, puede quedar como `abandonado`.
 
 ---
 
-## RF-50. Registro de respuestas
+## RF-51. Registro de respuestas
 
 El sistema debe guardar las respuestas seleccionadas por el alumno.
 
@@ -484,7 +496,7 @@ Si el alumno selecciona la opción B en una pregunta, el sistema guarda esa resp
 
 ---
 
-## RF-51. Cálculo automático de calificación
+## RF-52. Cálculo automático de calificación
 
 El sistema debe calcular automáticamente la calificación obtenida.
 
@@ -493,7 +505,7 @@ Si el alumno responde correctamente 14 de 20 preguntas, el sistema calcula una c
 
 ---
 
-## RF-52. Validación de aprobación
+## RF-53. Validación de aprobación
 
 El sistema debe determinar si el alumno aprobó o no el examen final.
 
@@ -502,7 +514,7 @@ Si la calificación mínima es 70% y el alumno obtiene 65%, el sistema marca el 
 
 ---
 
-## RF-53. Bloqueo por intentos agotados
+## RF-54. Bloqueo por intentos agotados
 
 El sistema no debe permitir más intentos si el alumno ya usó el máximo permitido.
 
@@ -513,7 +525,7 @@ Si el examen permite 2 intentos y el alumno ya usó ambos, el sistema no debe mo
 
 # H. Finalización y certificado
 
-## RF-54. Finalización del curso
+## RF-55. Finalización del curso
 
 El sistema debe registrar la fecha y hora en que el alumno completa el curso.
 
@@ -522,7 +534,7 @@ Cuando el alumno termina todas las lecciones y aprueba el examen final, el siste
 
 ---
 
-## RF-55. Condiciones para completar curso
+## RF-56. Condiciones para completar curso
 
 El curso se considera completado cuando el alumno termina todas las lecciones y aprueba el examen final.
 
@@ -531,16 +543,16 @@ Aunque el alumno haya visto todas las lecciones, el curso no se marca como compl
 
 ---
 
-## RF-56. Certificado
+## RF-57. Certificado
 
-El sistema debe permitir generar o consultar un certificado cuando el alumno complete el curso.
+El sistema debe permitir generar o consultar un certificado cuando el alumno complete el curso. Cada certificado debe tener un código único visible generado por el sistema.
 
 **Ejemplo de uso:**  
-Después de aprobar el examen final, el alumno puede entrar a “Mis certificados” y consultar su certificado.
+Después de aprobar el examen final, el alumno puede entrar a “Mis certificados” y consultar su certificado con código `EDU-2026-000008`.
 
 ---
 
-## RF-57. Bloqueo de certificado
+## RF-58. Bloqueo de certificado
 
 El sistema no debe permitir certificado si el alumno no completó todas las lecciones o no aprobó el examen final.
 
@@ -551,7 +563,7 @@ Si el alumno reprueba el examen final, el sistema no genera certificado aunque h
 
 # I. Instructor
 
-## RF-58. Gestión de cursos propios
+## RF-59. Gestión de cursos propios
 
 El instructor debe poder crear y administrar únicamente sus propios cursos.
 
@@ -560,7 +572,7 @@ Un instructor puede editar el curso que él creó, pero no puede modificar curso
 
 ---
 
-## RF-59. Gestión de módulos
+## RF-60. Gestión de módulos
 
 El instructor debe poder crear, editar y ordenar módulos en sus cursos.
 
@@ -569,7 +581,7 @@ El instructor crea un módulo llamado “Git y GitHub” y lo coloca como módul
 
 ---
 
-## RF-60. Gestión de lecciones
+## RF-61. Gestión de lecciones
 
 El instructor debe poder crear, editar y ordenar lecciones en sus cursos.
 
@@ -578,7 +590,7 @@ El instructor agrega una lección llamada “Git Diff + Merge” dentro del mód
 
 ---
 
-## RF-61. Gestión de contenido
+## RF-62. Gestión de contenido
 
 El instructor debe poder agregar texto, videos y recursos a sus lecciones.
 
@@ -587,7 +599,7 @@ El instructor escribe una explicación, agrega un video de YouTube y adjunta un 
 
 ---
 
-## RF-62. Gestión del examen final
+## RF-63. Gestión del examen final
 
 El instructor debe poder crear y configurar el examen final de sus cursos.
 
@@ -596,7 +608,7 @@ El instructor crea un examen final, define duración, intentos, calificación m�
 
 ---
 
-## RF-63. Gestión del banco de preguntas
+## RF-64. Gestión del banco de preguntas
 
 El instructor debe poder crear, editar y eliminar preguntas y opciones de respuesta.
 
@@ -605,7 +617,7 @@ El instructor agrega una nueva pregunta al banco y marca cuál opción será la 
 
 ---
 
-## RF-64. Consulta de alumnos inscritos
+## RF-65. Consulta de alumnos inscritos
 
 El instructor debe poder consultar los alumnos inscritos en sus cursos.
 
@@ -614,7 +626,7 @@ El instructor entra a su panel y revisa la lista de alumnos inscritos en su curs
 
 ---
 
-## RF-65. Consulta de progreso
+## RF-66. Consulta de progreso
 
 El instructor debe poder consultar el progreso de los alumnos en sus cursos.
 
@@ -623,7 +635,7 @@ El instructor ve que un alumno lleva 60% de avance en el curso.
 
 ---
 
-## RF-66. Consulta de resultados
+## RF-67. Consulta de resultados
 
 El instructor debe poder consultar los resultados del examen final de sus alumnos.
 
@@ -634,25 +646,25 @@ El instructor revisa qué alumnos aprobaron, reprobaron y qué calificación obt
 
 # J. Administrador
 
-## RF-67. Gestión de usuarios
+## RF-68. Gestión de usuarios
 
-El administrador debe poder consultar, activar, desactivar y modificar usuarios.
+El administrador debe poder consultar usuarios, activar cuentas y desactivar cuentas sin eliminar el historial del usuario.
 
 **Ejemplo de uso:**  
-El administrador desactiva una cuenta sospechosa o corrige los datos de un usuario.
+El administrador desactiva una cuenta sospechosa. El usuario ya no puede iniciar sesión, pero sus compras, pagos, inscripciones y certificados se conservan.
 
 ---
 
-## RF-68. Asignación de roles
+## RF-69. Asignación de roles
 
-El administrador debe poder asignar o modificar roles de usuario.
+El administrador debe poder asignar o modificar el rol de un usuario cuando corresponda.
 
 **Ejemplo de uso:**  
-El administrador cambia un usuario de Alumno a Instructor.
+El administrador aprueba una solicitud de instructor y cambia el rol del usuario de Alumno a Instructor.
 
 ---
 
-## RF-69. Supervisión de cursos
+## RF-70. Supervisión de cursos
 
 El administrador debe poder supervisar todos los cursos registrados.
 
@@ -661,25 +673,24 @@ El administrador puede revisar cursos creados por cualquier instructor.
 
 ---
 
-## RF-70. Publicación de cursos
+## RF-71. Publicación y despublicación de cursos
 
-El administrador debe poder publicar o despublicar cursos.
+El administrador debe poder publicar o despublicar cursos. Publicar un curso permite que aparezca en el catálogo y pueda venderse. Despublicar un curso lo retira del catálogo para nuevas compras, pero no debe quitar el acceso a los alumnos que ya lo compraron.
 
 **Ejemplo de uso:**  
-El administrador despublica un curso si contiene información incorrecta o no cumple con las reglas de la plataforma.
+El administrador despublica un curso porque ya no se venderá. El curso deja de aparecer en el catálogo, pero los alumnos que ya lo compraron pueden seguir accediendo desde “Mis cursos”.
 
 ---
-
-## RF-71. Consulta de pagos
+## RF-72. Consulta de pagos
 
 El administrador debe poder consultar órdenes, pagos y estados de transacción.
 
 **Ejemplo de uso:**  
-El administrador revisa si una orden está pendiente, aprobada, rechazada o cancelada.
+El administrador revisa una orden con estado `completada` y su pago asociado con estado `aprobado`.
 
 ---
 
-## RF-72. Consulta de inscripciones
+## RF-73. Consulta de inscripciones
 
 El administrador debe poder consultar las inscripciones de los alumnos.
 
@@ -688,7 +699,7 @@ El administrador verifica si un alumno aparece inscrito después de que su pago 
 
 ---
 
-## RF-73. Configuración de pasarela de pago
+## RF-74. Configuración de pasarela de pago
 
 El administrador debe poder configurar o validar la pasarela de pago en ambiente Sandbox.
 
@@ -697,12 +708,50 @@ El administrador configura las credenciales de PayPal Sandbox o Stripe Sandbox p
 
 ---
 
-## RF-74. Supervisión de seguridad
+## RF-75. Supervisión de seguridad
 
 El administrador debe poder supervisar reglas de seguridad y acceso.
 
 **Ejemplo de uso:**  
 El administrador revisa que los alumnos no puedan acceder a cursos, lecciones o exámenes si no tienen permiso.
+
+---
+
+# K. Cuenta y solicitudes
+
+## RF-76. Solicitud de cuenta de instructor
+
+El sistema debe permitir que un alumno autenticado envíe una solicitud para ser evaluado como posible instructor.
+
+**Ejemplo de uso:**  
+Un alumno entra a su cuenta, selecciona “Solicitar cuenta de instructor”, llena un formulario con su experiencia, área de conocimiento y portafolio, y el sistema guarda la solicitud con estado `pendiente`.
+
+---
+
+## RF-77. Estados de solicitud de instructor
+
+El sistema debe manejar estados para las solicitudes de instructor, como pendiente, aceptada y rechazada.
+
+**Ejemplo de uso:**  
+Cuando el alumno envía su solicitud, queda como `pendiente`. Si el administrador la aprueba, la solicitud cambia a `aceptada`. Si no la aprueba, cambia a `rechazada`.
+
+---
+
+## RF-78. Gestión de solicitudes de instructor
+
+El sistema debe permitir que el administrador revise, acepte o rechace solicitudes de cuenta de instructor.
+
+**Ejemplo de uso:**  
+El administrador revisa la solicitud de un alumno interesado en impartir cursos. Si la aprueba, el sistema cambia la solicitud a `aceptada` y permite actualizar el rol del usuario a Instructor.
+
+---
+
+## RF-79. Revocación excepcional de acceso
+
+El sistema debe permitir cancelar una inscripción solo en casos excepcionales, como reembolso, pago fraudulento, error administrativo o validación incorrecta del pago.
+
+**Ejemplo de uso:**  
+Si se detecta que un pago fue fraudulento, el administrador puede cancelar la inscripción relacionada con esa compra.
 
 ---
 
@@ -732,10 +781,10 @@ El sistema no debe aceptar una contraseña como `12345678`, pero sí puede acept
 
 ## RNF-03. Validación de formularios
 
-El sistema debe validar formularios de registro, inicio de sesión, compra, cursos, lecciones y examen.
+El sistema debe validar formularios de registro, inicio de sesión, compra, solicitud de instructor, cursos, lecciones y examen.
 
 **Ejemplo de aplicación:**  
-Si el alumno deja vacío el correo en el registro o escribe un teléfono con letras, el sistema debe mostrar un mensaje de error.
+Si el alumno deja vacío el correo en el registro, escribe un teléfono con letras o envía una solicitud de instructor sin correo válido, el sistema debe mostrar un mensaje de error.
 
 ---
 
@@ -835,3 +884,13 @@ El sistema debe mantener consistencia entre pago, orden, inscripción, progreso,
 
 **Ejemplo de aplicación:**  
 Un alumno no debe aparecer como inscrito si su pago no fue aprobado, y no debe recibir certificado si no aprobó el examen final.
+
+---
+
+## RNF-15. Registro de webhooks
+
+El sistema debe guardar la información relevante de los eventos recibidos por webhook desde la pasarela de pago.
+
+**Ejemplo de aplicación:**  
+Cuando PayPal envía el evento `PAYMENT.CAPTURE.COMPLETED`, el sistema guarda el tipo de evento, identificador externo, fecha de recepción y contenido recibido.
+
