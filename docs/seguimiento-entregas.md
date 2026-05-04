@@ -24,11 +24,11 @@ Las actividades de este seguimiento corresponden al primer sprint del proyecto E
 | Mejia Osornio Valeria | Actores del sistema | Lista de actores y descripción | Validado |
 | Huerta Ruiz Diego Rafael | Acciones de los actores | Tabla de actores y acciones | Validado |
 | Villanueva Garcia Emanuel | Requerimientos funcionales y no funcionales | Lista de RF y RNF | Validado |
-| Romero Palacios Randy | Mapa de navegación | Diagrama o esquema de navegación | Aceptado con correciones |
+| Romero Palacios Randy | Mapa de navegación | Diagrama o esquema de navegación | Validado |
 | Martinez Mejia Edgar | Pantallas del sistema | Lista de pantallas con explicación | Valido |
 | Contreras Gonzalez Andre Yahir | Wireframes o bocetos | Bocetos de pantallas principales | Pendiente |
-| Villanueva Garcia Emanuel | Modelo de base de datos | Entidades, atributos y relaciones | Pendiente |
-| Mejia Osornio Valeria | Diagrama entidad-relación | Diagrama ER | Pendiente |
+| Villanueva Garcia Emanuel | Modelo de base de datos | Entidades, atributos y relaciones | Validado |
+| Mejia Osornio Valeria | Diagrama entidad-relación | Diagrama ER | Aceptado con correciones |
 | Romero Palacios Randy | Tecnologías | Lista de tecnologías y uso | Pendiente |
 | Martinez Mejia Edgar | Estructura de carpetas | Organización inicial del proyecto | Pendiente |
 | Contreras Gonzalez Andre Yahir | Frontend visual | Primer avance visual | Pendiente |
