@@ -8,103 +8,64 @@ EduTech
 ├── Inicio
       
       │   ├── Presentación de EduTech
-    
       │   ├── Cursos destacados
-      
       │   │   └── Ver detalle → Detalle del c  urso
-      
       │   ├── Ver cursos → Catálogo de cursos
-      
       │   ├── Crear cuenta → Registro
-      
       │   ├── Iniciar sesión → Inicio de sesión 
-      
       │   └── ¿Quieres ser instructor? → Información para solicitar cuenta de instructor
-      
-    ├── Catálogo de cursos
-    
-    │   ├── Lista de cursos publicados
-
-│   └── Ver detalle → Detalle del curso
+          ├── Catálogo de cursos
+        │   ├── Lista de cursos publicados
+            │   └── Ver detalle → Detalle del curso
 
 ├── Detalle del curso
     
     │   ├── Información general del curso
-    
-    │   ├── Instructor
-    
-    │   ├── Nivel
-    
-    │   ├── Módulos y lecciones incluidas
-    
-    │   ├── Precio en MXN
-    
-    │   └── Comprar curso
-    
-        │       ├── Si no ha iniciado sesión → Inicio de sesión / Registro
-      
-        │       └── Si inició sesión como Alumno → Compra del curso  
-  ├── Registro
+        │   ├── Instructor
+        │   ├── Nivel
+        │   ├── Módulos y lecciones incluidas
+        │   ├── Precio en MXN
+        │   └── Comprar curso
+            │       ├── Si no ha iniciado sesión → Inicio de sesión / Registro
+            │       └── Si inició sesión como Alumno → Compra del curso  
+        ├── Registro
     │   ├── Formulario de registro
-    
-    │   ├── Registrarse
-  
-    │   │   ├── Si los datos son correctos → Crear cuenta con rol Alumno
-  
-    │   │   │   └── Iniciar sesión automáticamente → Escritorio del alumno
-  
-    │   │   └── Si los datos son incorrectos → Permanecer en Registro y mostrar errores
-  
-    │   └── Ya tengo cuenta → Inicio de sesión
+        │   ├── Registrarse
+      │   │   ├── Si los datos son correctos → Crear cuenta con rol Alumno
+      │   │   │   └── Iniciar sesión automáticamente → Escritorio del alumno
+      │   │   └── Si los datos son incorrectos → Permanecer en Registro y mostrar errores
+      │   └── Ya tengo cuenta → Inicio de sesión
 ├── Inicio de sesión
   
      │   ├── Formulario de acceso
-    
-    │   ├── Iniciar sesión
-    
-    │   │   ├── Si el rol es Alumno → Escritorio del alumno
-    
-    │   │   ├── Si el rol es Instructor → Escritorio del instructor
-    
-    │   │   ├── Si el rol es Administrador → Escritorio del administrador
-    
-    │   │   ├── Si el usuario está desactivado → Permanecer en Inicio de sesión y mostrar aviso
-    
-    │   │   └── Si los datos son incorrectos → Permanecer en Inicio de sesión y mostrar error
-    
-    │   └── Crear cuenta → Registro
+      │   ├── Iniciar sesión
+      │   │   ├── Si el rol es Alumno → Escritorio del alumno
+      │   │   ├── Si el rol es Instructor → Escritorio del instructor
+      │   │   ├── Si el rol es Administrador → Escritorio del administrador
+      │   │   ├── Si el usuario está desactivado → Permanecer en Inicio de sesión y mostrar aviso
+      │   │   └── Si los datos son incorrectos → Permanecer en Inicio de sesión y mostrar error
+      │   └── Crear cuenta → Registro
 ├── ¿Quiénes somos?
 
-    │   ├── Qué es EduTech
-    
-    │   ├── Misión
-    
-    │   ├── Visión
-    
-    │   └── Objetivo
+      │   ├── Qué es EduTech
+      │   ├── Misión
+      │   ├── Visión
+          │   └── Objetivo
 ├── Contacto
 
-    │   ├── Formulario de contacto
-    
-    │   ├── Enviar mensaje
-    
-    │   └── Solicitar cuenta de instructor
-    
-    │       ├── Si no ha iniciado sesión → Inicio de sesión / Registro
-    
-    │       └── Si inició sesión como Alumno → Solicitud de instructor
+      │   ├── Formulario de contacto
+      │   ├── Enviar mensaje
+      │   └── Solicitar cuenta de instructor    
+      │       ├── Si no ha iniciado sesión → Inicio de sesión / Registro
+      │       └── Si inició sesión como Alumno → Solicitud de instructor
 
 ├── Información para solicitar cuenta de instructor
 
     │   ├── Requisitos para solicitar cuenta de instructor
-    
-    │   ├── Explicación del proceso de revisión
-    
-    │   └── Solicitar cuenta de instructor
-    
-    │       ├── Si no ha iniciado sesión → Inicio de sesión / Registro
-    
-    │       └── Si inició sesión como Alumno → Solicitud de instructor
+        │   ├── Explicación del proceso de revisión
+        │   └── Solicitar cuenta de instructor
+        │       ├── Si no ha iniciado sesión → Inicio de sesión / Registro
+        │       └── Si inició sesión como Alumno → Solicitud de instructor
     
     └── Mi cuenta
         ├── Si no ha iniciado sesión → Inicio de sesión
@@ -114,10 +75,8 @@ EduTech
 
 Detalle del curso
 
-    └── Comprar curso
-
+      └── Comprar curso
       ├── Si no ha iniciado sesión → Inicio de sesión / Registro
-      
       └── Si inició sesión como Alumno → Compra del curso
 
 Compra del curso
