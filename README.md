@@ -1,5 +1,5 @@
 
-# Equipo: GTAVI (no llevan nada)
+# Equipo: GTA VI (no llevan nada)
 
 
 # EduTech - Plataforma Web de Cursos
