@@ -33,33 +33,30 @@ Organizar y construir la base inicial del proyecto, definiendo actores, requerim
 | Jueves 7 mayo | 12:00 p. m. | Todos | Entrega interna final | Todo integrado y revisado antes de la entrega oficial |
 | Jueves 7 mayo | Antes de la hora oficial | Todos | Entrega final del Sprint 1 | Documento, diagramas, estructura del proyecto, frontend y base de datos inicial |
 
-## Regla para validar entregas
+## Estado al cierre del Sprint 1
 
-Para que una actividad cuente como entregada, debe cumplir con lo siguiente:
+Al cierre del Sprint 1, el equipo avanzó principalmente en la documentación y planeación base del sistema.
 
-1. Tener evidencia visible del trabajo.
-2. Poder ser explicada por la persona responsable.
-3. Poder ser justificada.
-4. Poder modificarse si se pide un cambio básico.
+### Entregas avanzadas
 
-## Validación de aprendizaje
+- Actores del sistema.
+- Acciones por actor.
+- Requerimientos funcionales y no funcionales.
+- Mapa de navegación.
+- Pantallas necesarias del sistema.
+- Modelo de base de datos con entidades y atributos.
+- Primer avance del diagrama entidad-relación.
+- Primer avance visual del frontend.
 
-Cada integrante deberá explicar su parte como si los demás no supieran nada.
+### Entregas pendientes o con correcciones
 
-No basta con entregar algo escrito o bonito. Cada persona debe poder responder:
+- Wireframes o bocetos.
+- Diagrama entidad-relación con ajustes pendientes.
+- Tecnologías.
+- Estructura de carpetas.
+- Frontend visual completo.
+- Base de datos inicial o script SQL.
 
-- Qué hizo.
-- Por qué lo hizo así.
-- Cómo se relaciona con el proyecto.
-- Qué cambiaría si cambia un requisito.
+### Nota de cierre
 
-Si alguien no puede explicar su entrega, esa actividad queda pendiente hasta que la corrija y la vuelva a explicar.
-
-## Estados posibles
-
-| Estado | Significado |
-|---|---|
-| Validado | La persona entregó, explicó y justificó correctamente |
-| Aceptado con correcciones | La entrega sirve, pero necesita ajustes |
-| Pendiente | No está completa |
-| No validado | La persona no pudo explicar o defender su entrega |
+El Sprint 1 no se considera terminado al cien por ciento, porque algunas actividades quedaron pendientes o requieren correcciones. Sin embargo, sí existe una base documental suficiente para continuar con el siguiente avance del proyecto.
