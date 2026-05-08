@@ -35,3 +35,11 @@ Las actividades de este seguimiento corresponden al primer sprint del proyecto E
 | Huerta Ruiz Diego Rafael | Base de datos | Script o estructura inicial de BD | Pendiente |
 
 ---
+
+## Observaciones del cierre
+
+- El diagrama entidad-relación se considera aceptado con correcciones porque todavía requiere ajustes en acomodo visual y relaciones.
+- El frontend visual cuenta con avance, pero no se considera completamente terminado.
+- La base de datos queda pendiente si todavía no existe script SQL o estructura implementada.
+- Las actividades pendientes deben retomarse antes de cerrar por completo el Sprint 1.
+
