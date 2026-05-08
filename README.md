@@ -1,3 +1,7 @@
+
+# Equipo: GTAVI (no llevan nada)
+
+
 # EduTech - Plataforma Web de Cursos
 
 ## Descripción del proyecto
