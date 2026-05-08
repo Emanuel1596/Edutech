@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Contacto - EduTech</title>
+  <meta name="description" content="Pantalla de contacto de EduTech con formulario de mensaje y acceso al formulario de solicitud de instructor.">
+
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+  <div class="site" id="page">
+
+    <header class="site-header">
+      <div class="header-container">
+        <a href="index.html" class="logo" aria-label="EduTech">
+          <span class="logo-main">Edu</span><span class="logo-accent">Tech</span>
+        </a>
+
+        <button class="menu-toggle" type="button" aria-label="Abrir menú">
+          ☰
+        </button>
+
+        <nav class="main-navigation" aria-label="Menú principal">
+          <ul class="main-menu">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="cursos.html">Cursos</a></li>
+            <li><a href="contacto.html" class="active">Contacto</a></li>
+            <li><a href="registro.html">Registro</a></li>
+            <li><a href="login.html">Iniciar sesión</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="site-content contacto-tc-page">
+
+      <section class="contacto-tc-section">
+        <div class="contacto-tc-container">
+
+          <header class="contacto-tc-heading">
+            <h1>Contacto</h1>
+            <p>
+              ¡En EduTech estamos abiertos a escucharte! Toda duda, comentario o mensaje puedes enviarlo mediante el formulario que aparece a continuación. Si tu intención es convertirte en instructor, puedes llenar la solicitud correspondiente desde el botón especial de esta misma pantalla.
+            </p>
+          </header>
+
+          <section class="plain-instructor-cta contact-instructor-cta" aria-labelledby="contactInstructorTitle">
+            <h2 id="contactInstructorTitle">¿Quieres dar clases en EduTech?</h2>
+            <p>
+              Si deseas que el administrador revise tu perfil para habilitar una cuenta de instructor,
+              completa el formulario de solicitud en la pantalla correspondiente.
+            </p>
+            <a href="solicitud-instructor.html" class="button primary plain-instructor-button">Solicitar cuenta de instructor</a>
+          </section>
+
+          <section class="contacto-tc-form-section">
+            <h2>Enviar mensaje</h2>
+
+            <form class="contacto-tc-form" id="contactForm" novalidate>
+              <div class="form-field">
+                <label for="contactNombre">Nombre y apellidos</label>
+                <input type="text" id="contactNombre" name="nombre" placeholder="Tu nombre y apellidos">
+                <small class="error-message">El nombre y los apellidos solo pueden contener letras, espacios, acentos y ñ.</small>
+              </div>
+
+              <div class="form-field">
+                <label for="contactCorreo">Correo electrónico</label>
+                <input type="email" id="contactCorreo" name="correo" placeholder="correo@ejemplo.com">
+                <small class="error-message">Escribe un correo electrónico válido.</small>
+              </div>
+
+              <div class="form-field">
+                <label for="contactAsunto">Asunto</label>
+                <input type="text" id="contactAsunto" name="asunto" placeholder="Motivo del mensaje">
+                <small class="error-message">El asunto solo puede contener letras, números, @ y signos básicos.</small>
+              </div>
+
+              <div class="form-field">
+                <label for="contactMensaje">Mensaje</label>
+                <textarea id="contactMensaje" name="mensaje" rows="6" placeholder="Escribe tu mensaje"></textarea>
+                <small class="error-message">Escribe tu mensaje.</small>
+              </div>
+
+              <button type="submit" class="contacto-tc-submit">Enviar mensaje</button>
+
+              <p class="form-success" id="contactSuccess">
+                Mensaje enviado correctamente. EduTech se pondrá en contacto contigo.
+              </p>
+            </form>
+          </section>
+
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="site-footer">
+      <p>EduTech - Plataforma Web de Cursos</p>
+    </footer>
+
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Iniciar sesión - EduTech</title>
+  <meta name="description" content="Inicio de sesión de EduTech. Accede con correo y contraseña para entrar al escritorio correspondiente según tu rol.">
+
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+  <div class="site" id="page">
+
+    <header class="site-header">
+      <div class="header-container">
+        <a href="index.html" class="logo" aria-label="EduTech">
+          <span class="logo-main">Edu</span><span class="logo-accent">Tech</span>
+        </a>
+
+        <button class="menu-toggle" type="button" aria-label="Abrir menú">
+          ☰
+        </button>
+
+        <nav class="main-navigation" aria-label="Menú principal">
+          <ul class="main-menu">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="cursos.html">Cursos</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="registro.html">Registro</a></li>
+            <li><a href="login.html" class="active">Iniciar sesión</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="site-content">
+
+      <section class="login-hero">
+        <div class="login-container">
+
+          <div class="login-copy">
+            <h1>Inicia sesión</h1>
+            <p>
+              Accede con tu correo y contraseña. Después de iniciar sesión, EduTech
+              te enviará al escritorio correspondiente según tu rol dentro del sistema.
+            </p>
+          </div>
+
+          <section class="login-card" aria-labelledby="titulo-login">
+            <h2 id="titulo-login">Entrar a EduTech</h2>
+            <p class="form-intro">
+              Ingresa tus datos de acceso.
+            </p>
+
+            <form class="login-form" id="loginForm" novalidate>
+              <div class="form-field">
+                <label for="loginCorreo">Correo electrónico</label>
+                <input type="email" id="loginCorreo" name="correo" autocomplete="email" placeholder="correo@ejemplo.com">
+                <small class="error-message">Escribe un correo electrónico válido.</small>
+              </div>
+
+              <div class="form-field">
+                <label for="loginPassword">Contraseña</label>
+                <div class="password-field">
+                  <input type="password" id="loginPassword" name="password" autocomplete="current-password" placeholder="Tu contraseña">
+                  <button class="password-toggle" type="button" data-target="loginPassword" aria-label="Mostrar contraseña" aria-pressed="false">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M12 5c5.2 0 8.7 4.1 9.8 5.5.3.4.3 1 0 1.4C20.7 13.3 17.2 17 12 17s-8.7-3.7-9.8-5.1a1.1 1.1 0 0 1 0-1.4C3.3 9.1 6.8 5 12 5Zm0 2c-3.9 0-6.6 2.6-7.8 4.2C5.4 12.7 8.1 15 12 15s6.6-2.3 7.8-3.8C18.6 9.6 15.9 7 12 7Zm0 2.1a2.1 2.1 0 1 1 0 4.2 2.1 2.1 0 0 1 0-4.2Z"></path>
+                    </svg>
+                  </button>
+                </div>
+                <small class="error-message">Escribe tu contraseña.</small>
+              </div>
+
+              <div class="login-options">
+                <label class="remember-option" for="loginRemember">
+                  <input type="checkbox" id="loginRemember" name="remember">
+                  <span>Recuérdame</span>
+                </label>
+                <a href="recuperar-password.html">¿Olvidaste tu contraseña?</a>
+              </div>
+
+              <button type="submit" class="login-submit">Iniciar sesión</button>
+
+              <p class="register-link">
+                ¿No tienes cuenta?
+                <a href="registro.html">Crear cuenta</a>
+              </p>
+
+              <p class="form-success" id="loginSuccess">
+                Datos correctos. Serías enviado al escritorio correspondiente según tu rol.
+              </p>
+
+              <p class="form-warning" id="loginWarning">
+                Correo o contraseña incorrectos. Revisa tus datos e inténtalo nuevamente.
+              </p>
+
+              <p class="form-blocked" id="loginBlocked">
+                Se alcanzó el límite de 5 intentos fallidos. Por seguridad, el acceso quedó bloqueado temporalmente.
+              </p>
+            </form>
+          </section>
+
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="site-footer">
+      <p>EduTech - Plataforma Web de Cursos</p>
+    </footer>
+
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
