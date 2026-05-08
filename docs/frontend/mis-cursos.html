@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Mis cursos - EduTech</title>
+  <meta name="description" content="Cursos comprados del alumno en EduTech.">
+
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+  <div class="site student-site" id="page">
+
+    <header class="site-header">
+      <div class="header-container">
+        <a href="index.html" class="logo" aria-label="EduTech">
+          <span class="logo-main">Edu</span><span class="logo-accent">Tech</span>
+        </a>
+
+        <button class="menu-toggle" type="button" aria-label="Abrir menú">
+          ☰
+        </button>
+
+        <nav class="main-navigation" aria-label="Menú principal">
+          <ul class="main-menu">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="cursos.html">Cursos</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="mi-cuenta.html">Mi Cuenta</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="student-dashboard student-dashboard-with-header">
+      <aside class="student-sidebar" aria-label="Menú del alumno">
+        <h1>Escritorio</h1>
+
+        <nav class="student-menu">
+          <a href="mis-cursos.html">Escritorio</a>
+          <a href="mis-cursos.html" class="active">Mis cursos</a>
+          <a href="#">Mis calificaciones</a>
+          <a href="#">Mis certificados</a>
+          <a href="#">Solicitar cuenta de instructor</a>
+          <a href="mi-cuenta.html">Mi cuenta</a>
+          <a href="#">Historial de pedidos</a>
+          <a href="index.html">Cerrar sesión</a>
+        </nav>
+      </aside>
+
+      <section class="student-content student-courses-page">
+        <h2>Mis cursos</h2>
+
+        <div class="my-courses-grid" aria-label="Cursos comprados">
+          <article class="my-course-card">
+            <a href="detalle-curso.html" class="my-course-image" aria-label="Entrar al curso Hackeo">
+              <img src="assets/img/curso-hackeo.jpg" alt="Imagen del curso Hackeo">
+            </a>
+
+            <div class="my-course-body">
+              <h3><a href="detalle-curso.html">Hackeo</a></h3>
+              <p class="my-course-instructor">Instructor: Lester Crest</p>
+              <p><strong>Dificultad:</strong> Intermedio</p>
+              <p><strong>Número de lecciones:</strong> 14</p>
+              <p><strong>Estado:</strong> Matriculado</p>
+              <p><strong>Matriculado:</strong> 7 de mayo de 2026</p>
+            </div>
+          </article>
+
+          <article class="my-course-card">
+            <a href="detalle-curso.html" class="my-course-image" aria-label="Entrar al curso Aprende IA">
+              <img src="assets/img/curso-ia.jpg" alt="Imagen del curso Aprende IA">
+            </a>
+
+            <div class="my-course-body">
+              <h3><a href="detalle-curso.html">Aprende IA</a></h3>
+              <p class="my-course-instructor">Instructor: A. Ramírez</p>
+              <p><strong>Dificultad:</strong> Principiante</p>
+              <p><strong>Número de lecciones:</strong> 10</p>
+              <p><strong>Estado:</strong> Matriculado</p>
+              <p><strong>Matriculado:</strong> 7 de mayo de 2026</p>
+            </div>
+          </article>
+
+          <article class="my-course-card">
+            <a href="detalle-curso.html" class="my-course-image" aria-label="Entrar al curso Trabajo colaborativo">
+              <img src="assets/img/curso-trabajo-colaborativo.jpg" alt="Imagen del curso Trabajo colaborativo">
+            </a>
+
+            <div class="my-course-body">
+              <h3><a href="detalle-curso.html">Trabajo colaborativo</a></h3>
+              <p class="my-course-instructor">Instructor: R. Palacios</p>
+              <p><strong>Dificultad:</strong> Principiante</p>
+              <p><strong>Número de lecciones:</strong> 9</p>
+              <p><strong>Estado:</strong> Matriculado</p>
+              <p><strong>Matriculado:</strong> 7 de mayo de 2026</p>
+            </div>
+          </article>
+
+          <article class="my-course-card">
+            <a href="detalle-curso.html" class="my-course-image" aria-label="Entrar al curso Criminología">
+              <img src="assets/img/curso-criminologia.jpg" alt="Imagen del curso Criminología">
+            </a>
+
+            <div class="my-course-body">
+              <h3><a href="detalle-curso.html">Criminología</a></h3>
+              <p class="my-course-instructor">Instructor: C. Medina</p>
+              <p><strong>Dificultad:</strong> Principiante</p>
+              <p><strong>Número de lecciones:</strong> 8</p>
+              <p><strong>Estado:</strong> Matriculado</p>
+              <p><strong>Matriculado:</strong> 7 de mayo de 2026</p>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
