@@ -73,33 +73,30 @@ La documentación del proyecto se encuentra dentro de la carpeta `docs`.
 
 Actualmente el repositorio contiene el archivo principal `README.md` y la carpeta `docs`, donde se guarda la documentación del Sprint 1.
 
-```txt
-EduTech/
-│
-├── README.md
-│
-└── docs/
-    ├── sprint-1.md
-    ├── actores.md
-    ├── acciones-actores.md
-    ├── requerimientos.md
-    ├── mapa-navegacion.md
-    ├── pantallas.md
-    ├── wireframes.md
-    ├── modelo-base-datos.md
-    ├── diagrama-er.md
-    ├── tecnologias.md
-    ├── estructura-carpetas.md
-    ├── frontend-visual.md
-    └── base-datos.md
-```
+| Ruta | Descripción |
+|---|---|
+| README.md | Archivo principal del proyecto |
+| docs/sprint-1.md | Plan de trabajo del Sprint 1 |
+| docs/actores.md | Lista de actores del sistema |
+| docs/acciones-actores.md | Acciones permitidas por actor |
+| docs/requerimientos.md | Requerimientos funcionales y no funcionales |
+| docs/mapa-navegacion.md | Mapa de navegación del sistema |
+| docs/pantallas.md | Pantallas necesarias del sistema |
+| docs/wireframes.md | Bocetos o wireframes de pantallas |
+| docs/modelo-base-datos.md | Entidades y atributos de base de datos |
+| docs/diagrama-er.md | Diagrama entidad-relación |
+| docs/tecnologias.md | Tecnologías propuestas para el proyecto |
+| docs/estructura-carpetas.md | Organización inicial del repositorio |
+| docs/frontend-visual.md | Avance visual del frontend |
+| docs/base-datos.md | Base de datos inicial o pendiente de completar |
+| docs/seguimiento-entregas.md | Estado de revisión de las actividades |
 
 ---
 
 ## Estado del proyecto
 
-Actualmente el proyecto se encuentra en el Sprint 1, enfocado en la planeación, documentación inicial, diseño base y organización del sistema.
+Actualmente el proyecto se encuentra en el cierre del Sprint 1.
 
-Por el momento, el repositorio contiene principalmente documentación dentro de la carpeta `docs`.
+Durante este sprint se avanzó principalmente en la planeación y documentación inicial del sistema: actores, acciones por actor, requerimientos, mapa de navegación, pantallas, wireframes, modelo de base de datos, diagrama entidad-relación, tecnologías, estructura de carpetas y primer avance visual del frontend.
 
-Las carpetas de frontend, base de datos u otros elementos del sistema podrán agregarse conforme avance el proyecto.
+Al cierre del sprint, el proyecto todavía no cuenta con una implementación completa. El trabajo más avanzado corresponde a la documentación y al frontend visual. La base de datos inicial y algunos ajustes del diagrama entidad-relación permanecen como actividades pendientes o aceptadas con correcciones para continuar en el siguiente avanc
