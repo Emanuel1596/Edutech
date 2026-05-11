@@ -31,8 +31,8 @@ Las actividades de este seguimiento corresponden al primer sprint del proyecto E
 | Mejia Osornio Valeria | Diagrama entidad-relación | Diagrama ER | Aceptado con correciones |
 | Romero Palacios Randy | Tecnologías | Lista de tecnologías y uso | Pendiente |
 | Martinez Mejia Edgar | Estructura de carpetas | Organización inicial del proyecto | Pendiente |
-| Contreras Gonzalez Andre Yahir | Frontend visual | Primer avance visual | Pendiente |
-| Huerta Ruiz Diego Rafael | Base de datos | Script o estructura inicial de BD | Pendiente |
+| Mitad Todos | Frontend visual | Primer avance visual | Pendiente |
+| Mitad Todos | Base de datos | Script o estructura inicial de BD | Pendiente |
 
 ---
 
