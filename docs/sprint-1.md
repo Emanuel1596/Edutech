@@ -24,14 +24,11 @@ Organizar y construir la base inicial del proyecto, definiendo actores, requerim
 | Sábado 2 mayo | 5:00 p. m. | André | Hacer wireframes o bocetos | Bocetos de las pantallas principales del sistema |
 | Sábado 2 mayo | 8:00 p. m. | Emanuel | Hacer el modelo de base de datos | Lista de entidades y atributos |
 | Domingo 3 mayo | 5:00 p. m. | Valeria | Hacer el diagrama entidad-relación | Diagrama ER limpio y entendible |
-| Domingo 3 mayo | 7:00 p. m. | Randy | Elegir las tecnologías | Lista de tecnologías elegidas y explicación breve de para qué se usará cada una |
-| Lunes 4 mayo | 6:00 p. m. | Edgar | Crear la estructura de carpetas | Carpeta inicial del proyecto organizada correctamente |
-| Lunes 4 mayo | 9:00 p. m. | André | Crear primero el frontend visual | Primer avance visual de las pantallas principales |
-| Martes 5 mayo | 6:00 p. m. | Rafa | Crear la base de datos | Script, archivo SQL o estructura inicial de la base de datos |
-| Miércoles 6 mayo | 6:00 p. m. | Todos | Revisión general del sprint | Cada integrante explica su parte y recibe correcciones |
-| Miércoles 6 mayo | 8:00 p. m. | Todos | Correcciones finales | Versión corregida de cada entregable |
-| Jueves 7 mayo | 12:00 p. m. | Todos | Entrega interna final | Todo integrado y revisado antes de la entrega oficial |
-| Jueves 7 mayo | Antes de la hora oficial | Todos | Entrega final del Sprint 1 | Documento, diagramas, estructura del proyecto, frontend y base de datos inicial |
+| Lunes 11 mayo | 5:00 p. m. | Randy | Elegir las tecnologías | Lista de tecnologías elegidas y explicación breve de para qué se usará cada una |
+| Lunes 11 mayo | 5:00 p. m. | Edgar | Crear la estructura de carpetas | Carpeta inicial del proyecto organizada correctamente |
+| Martes 12 mayo | 12:00 p. m. | Mitad Todos | Crear primero el frontend visual | Primer avance visual de las pantallas principales |
+| Martes 12 mayo | 12:00 p. m. | Mitad Todos | Crear la base de datos | Script, archivo SQL o estructura inicial de la base de datos |
+| Martes 12 mayo | 12:00 p. m. | Todos | Entrega interna final | Todo integrado y revisado antes de la entrega oficial |
 
 ## Estado al cierre del Sprint 1
 
