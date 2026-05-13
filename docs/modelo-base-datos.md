@@ -2,6 +2,14 @@
 
 ## Proyecto: EduTech - Plataforma Web de Cursos
 
+## Objetivo
+
+Este documento presenta la identificación de entidades y atributos principales para la base de datos del sistema EduTech.
+
+EduTech permite que los alumnos se registren, compren cursos, accedan a módulos y lecciones, registren su progreso, presenten un examen final y obtengan certificados. También contempla usuarios con rol de instructor y administrador.
+
+---
+
 ## Criterios usados para identificar entidades
 
 Para identificar las entidades se usaron estos criterios:
@@ -16,6 +24,7 @@ Para identificar las entidades se usaron estos criterios:
 8. Las contraseñas no se guardan en texto plano; se guarda un password_hash.
 9. Los estados se guardan en la base de datos, pero normalmente los cambios de estado los realiza el backend.
 10. Los identificadores externos de pago no los genera EduTech, sino la pasarela de pago.
+11. Una orden puede incluir varios cursos; por eso los cursos comprados se guardan en Orden_Detalle.
 
 ---
 
@@ -37,180 +46,13 @@ Los tipos de dato se plantean pensando en PostgreSQL y en el tamaño esperado de
 | Código de moneda | CHAR(3) |
 | Contenido de webhook | JSONB |
 
-Se usa INTEGER para los identificadores porque es suficiente para el tamaño esperado del proyecto. Para esta etapa no es necesario usar BIGINT.
-
----
-
-## ¿Por qué TIMESTAMP y no DATE?
-
-Se usa TIMESTAMP cuando importa guardar fecha y hora.
-
-En EduTech casi todos los eventos necesitan hora exacta:
-
-- fecha de registro;
-- fecha de creación del curso;
-- fecha de compra;
-- fecha de pago;
-- fecha de inscripción;
-- fecha de inicio del examen;
-- fecha de finalización del examen;
-- fecha de emisión del certificado.
-
-Ejemplo:
-
-| Campo | Valor |
-|---|---|
-| fecha_pago | 2026-05-03 09:05:00 |
-
-No sería suficiente guardar solo la fecha 2026-05-03, porque se perdería la hora exacta del evento.
-
----
-
-## Nota sobre catálogos
-
-Un catálogo es una tabla que guarda valores controlados y definidos previamente.
-
-Por ejemplo, en lugar de escribir muchas veces el estado de un pago como texto, se crea una entidad Estado_Pago y en la tabla Pago solo se guarda el identificador correspondiente.
-
-| id_estado_pago | nombre_estado_pago |
-|---:|---|
-| 1 | pendiente |
-| 2 | aprobado |
-| 3 | rechazado |
-| 4 | cancelado |
-
-Esto evita errores de escritura y mantiene consistencia en la base de datos.
-
-Regla general:
-
-- Si solo hay dos opciones, puede usarse BOOLEAN.
-- Si hay varios estados con significado dentro del proceso, conviene usar catálogo.
-
----
-
-## Nota sobre el uso de id_usuario
-
-En el modelo se utiliza una sola entidad llamada Usuario para representar a alumnos, instructores y administradores.
-
-La diferencia entre ellos se controla mediante la entidad Rol.
-
-Por esta razón, no se crean entidades separadas llamadas Alumno, Instructor o Administrador, ya que los tres comparten datos principales como nombre, apellidos, correo, contraseña, teléfono y fecha de registro.
-
-En las tablas relacionadas se utiliza el atributo id_usuario como llave foránea hacia Usuario.id_usuario.
-
-El significado de id_usuario depende de la tabla donde aparece.
-
-| Tabla | Significado de id_usuario |
-|---|---|
-| Curso | Usuario instructor que creó el curso |
-| Orden | Usuario alumno que realizó la compra |
-| Inscripcion | Usuario alumno que tiene acceso al curso |
-
-### Ejemplo
-
-#### Rol
-
-| id_rol | nombre_rol |
-|---:|---|
-| 1 | Alumno |
-| 2 | Instructor |
-| 3 | Administrador |
-
-#### Usuario
-
-| id_usuario | id_rol | nombre |
-|---:|---:|---|
-| 1 | 1 | Emanuel |
-| 2 | 2 | Luisa |
-| 3 | 3 | Andrea |
-
-#### Curso
-
-| id_curso | id_usuario | titulo |
-|---:|---:|---|
-| 10 | 2 | Java desde cero |
-
-En este caso, Curso.id_usuario = 2 significa que el usuario 2, Luisa, es la instructora que creó el curso.
-
-#### Orden
-
-| id_orden | id_usuario | id_curso | total |
-|---:|---:|---:|---:|
-| 50 | 1 | 10 | 299.00 |
-
-En este caso, Orden.id_usuario = 1 significa que el usuario 1, Emanuel, fue el alumno que realizó la compra.
-
-#### Inscripcion
-
-| id_inscripcion | id_usuario | id_curso |
-|---:|---:|---:|
-| 80 | 1 | 10 |
-
-En este caso, Inscripcion.id_usuario = 1 significa que el usuario 1, Emanuel, tiene acceso al curso 10.
-
-### Reglas de negocio
-
-Aunque el atributo se llame id_usuario, el sistema debe validar el rol correspondiente:
-
-| Regla | Explicación |
-|---|---|
-| En Curso, id_usuario debe pertenecer a un usuario con rol Instructor | Solo un instructor debe crear cursos |
-| En Orden, id_usuario debe pertenecer a un usuario con rol Alumno | Solo un alumno debe comprar cursos |
-| En Inscripcion, id_usuario debe pertenecer a un usuario con rol Alumno | Solo un alumno debe inscribirse a cursos |
-
-Estas reglas normalmente las valida el backend antes de guardar o modificar información.
-
----
-
-## Nota sobre estados y procesos del backend
-
-La base de datos almacena los estados, pero normalmente el backend es quien decide cuándo cambiarlos.
-
-Por ejemplo, cuando un instructor crea un curso, el backend puede asignar automáticamente el estado borrador. Si después el instructor lo envía a revisión, el backend cambia el estado a pendiente_revision. Si el administrador lo aprueba, el backend cambia el estado a publicado.
-
-Lo mismo ocurre con las órdenes, pagos, inscripciones e intentos de examen. La base de datos guarda el resultado, pero las reglas del proceso se aplican desde el backend.
-
-| Acción | Cambio realizado por el backend |
-|---|---|
-| Instructor crea curso | Curso queda en estado borrador |
-| Admin aprueba curso | Curso cambia a publicado |
-| Alumno inicia compra | Orden queda pendiente |
-| PayPal confirma pago | Pago cambia a aprobado y orden a completada |
-| Pago aprobado | Se crea una inscripción activa |
-| Alumno termina el curso | Inscripción cambia a completada |
-| Alumno inicia examen | Intento queda en_progreso |
-| Alumno envía examen | Intento cambia a finalizado |
-| Sistema detecta regla inválida | Intento cambia a invalidado |
-
----
-
-## Nota sobre pagos externos y webhooks
-
-El atributo id_pago_externo no lo genera EduTech. Lo genera la pasarela de pago, como PayPal o Stripe, cuando se crea o confirma una transacción.
-
-EduTech guarda ese identificador para relacionar su pago interno con el pago registrado por la pasarela externa.
-
-El atributo contenido_evento guarda la información completa enviada por la pasarela mediante webhook. Normalmente se almacena en formato JSONB, porque la respuesta viene como datos estructurados.
-
-Ejemplo de contenido recibido:
-
-| Campo | Valor |
-|---|---|
-| event_type | PAYMENT.CAPTURE.COMPLETED |
-| status | COMPLETED |
-| payment_id | PAYPAL-ABC123 |
-| amount | 299.00 |
-| currency | MXN |
-
-Esta información sirve como evidencia técnica de lo que respondió la pasarela y ayuda al backend a procesar el pago correctamente.
-
 ---
 
 # Entidades y atributos
 
 ---
 
-## 1. Rol
+## 2. Rol
 
 Representa los roles principales del sistema.
 
@@ -234,7 +76,7 @@ Se crea porque EduTech maneja diferentes tipos de usuario: Alumno, Instructor y 
 
 ---
 
-## 2. Usuario
+## 3. Usuario
 
 Representa a las personas que utilizan el sistema.
 
@@ -268,7 +110,7 @@ Se usa esta_activo como BOOLEAN en lugar de crear una tabla Estado_Usuario, porq
 
 ---
 
-## 3. Nivel_Curso
+## 4. Nivel_Curso
 
 Representa el nivel de dificultad de un curso.
 
@@ -292,7 +134,7 @@ Se crea para normalizar los niveles de dificultad. Es mejor usar catálogo porqu
 
 ---
 
-## 4. Estado_Curso
+## 5. Estado_Curso
 
 Representa el estado de publicación de un curso.
 
@@ -326,7 +168,7 @@ Se crea como catálogo porque el curso puede tener más de dos estados. No basta
 
 ---
 
-## 5. Curso
+## 6. Curso
 
 Representa los cursos creados dentro de la plataforma.
 
@@ -361,7 +203,7 @@ Cuando se crea un curso, el backend puede asignarle automáticamente el estado b
 
 ---
 
-## 6. Modulo
+## 7. Modulo
 
 Representa las divisiones internas de un curso.
 
@@ -388,7 +230,7 @@ No se agrega descripción al módulo porque el requerimiento indica que el módu
 
 ---
 
-## 7. Tipo_Video
+## 8. Tipo_Video
 
 Representa el tipo de video que tendrá una lección.
 
@@ -432,7 +274,7 @@ Si selecciona local, el sistema debe reproducir un archivo guardado dentro del s
 
 ---
 
-## 8. Leccion
+## 9. Leccion
 
 Representa una lección perteneciente a un módulo.
 
@@ -464,7 +306,7 @@ Se usa esta_activa como BOOLEAN en lugar de crear Estado_Leccion, porque para es
 
 ---
 
-## 9. Tipo_Recurso
+## 10. Tipo_Recurso
 
 Representa los tipos de recursos adicionales que puede tener una lección.
 
@@ -507,7 +349,7 @@ Sin Tipo_Recurso, el sistema solo tendría una URL y no sabría claramente cómo
 
 ---
 
-## 10. Recurso
+## 11. Recurso
 
 Representa materiales adicionales que pueden asociarse a una o varias lecciones.
 
@@ -536,7 +378,7 @@ Se elimina id_creador porque no está explícitamente en los requerimientos y pu
 
 ---
 
-## 11. Leccion_Recurso
+## 12. Leccion_Recurso
 
 Representa la relación entre lecciones y recursos.
 
@@ -583,7 +425,7 @@ Para evitar errores, no debe repetirse el mismo numero_orden dentro de la misma 
 
 ---
 
-## 12. Moneda
+## 13. Moneda
 
 Representa las monedas permitidas en órdenes y pagos.
 
@@ -607,7 +449,7 @@ Se crea porque las pasarelas de pago manejan la moneda de forma explícita. Aunq
 
 ---
 
-## 13. Estado_Orden
+## 14. Estado_Orden
 
 Representa los estados de una orden de compra.
 
@@ -645,12 +487,14 @@ Si el alumno solo abandona la página sin cancelar, la orden puede permanecer co
 
 ---
 
-## 14. Orden
+## 15. Orden
 
-Representa el pedido generado cuando un alumno inicia la compra de un curso.
+Representa el pedido generado cuando un alumno inicia una compra.
 
-**Justificación:**  
-Se crea porque el sistema necesita registrar cada intento de compra. La orden guarda el usuario, curso, total, moneda y estado de la compra.
+Justificación:
+Se crea porque el sistema necesita registrar cada compra realizada por el alumno. Una orden puede incluir uno o varios cursos.
+
+La orden ya no guarda id_curso directamente, porque eso solo permitiría comprar un curso por orden. Para permitir varios cursos en una misma compra, los cursos se guardan en Orden_Detalle.
 
 Se conservan id_orden y numero_orden porque no cumplen la misma función:
 
@@ -683,7 +527,6 @@ En el comprobante se sigue mostrando el mismo número de orden, pero con estado 
 | id_orden | INTEGER PK |
 | numero_orden | CHAR(20) |
 | id_usuario | INTEGER FK |
-| id_curso | INTEGER FK |
 | id_moneda | INTEGER FK |
 | id_estado_orden | INTEGER FK |
 | total | NUMERIC(10,2) |
@@ -692,34 +535,65 @@ En el comprobante se sigue mostrando el mismo número de orden, pero con estado 
 
 ### Registros de ejemplo
 
-| id_orden | numero_orden | id_usuario | id_curso | id_moneda | id_estado_orden | total | fecha_creacion | fecha_actualizacion |
-|---:|---|---:|---:|---:|---:|---:|---|---|
-| 1 | ORD-2026-000001 | 1 | 1 | 1 | 2 | 299.00 | 2026-05-03 09:00:00 | 2026-05-03 09:05:00 |
-| 2 | ORD-2026-000002 | 1 | 2 | 1 | 1 | 349.00 | 2026-05-03 10:00:00 | 2026-05-03 10:00:00 |
+| id_orden | numero_orden | id_usuario | id_moneda | id_estado_orden | total | fecha_creacion | fecha_actualizacion |
+|---:|---|---:|---:|---:|---:|---|---|
+| 1 | ORD-2026-000001 | 1 | 1 | 2 | 648.00 | 2026-05-03 09:00:00 | 2026-05-03 09:05:00 |
+| 2 | ORD-2026-000002 | 1 | 1 | 1 | 399.00 | 2026-05-03 10:00:00 | 2026-05-03 10:00:00 |
 
 ---
 
-## 15. Diferencia entre precio_mxn y total
+## 16. Orden_Detalle
 
-precio_mxn y total no son lo mismo.
+Representa cada curso incluido dentro de una orden.
+
+Justificación:
+Se crea porque una orden puede incluir varios cursos. Cada registro de Orden_Detalle representa un curso específico dentro de la compra y conserva el precio usado en ese momento.
+
+Esto evita conectar Orden directamente con Curso. La relación correcta es:
+
+Orden se conecta con Orden_Detalle y Orden_Detalle se conecta con Curso.
+
+### Atributos
+
+| Atributo | Tipo de dato sugerido |
+|---|---|
+| id_orden_detalle | INTEGER PK |
+| id_orden | INTEGER FK |
+| id_curso | INTEGER FK |
+| precio_unitario | NUMERIC(10,2) |
+
+### Registros de ejemplo
+
+| id_orden_detalle | id_orden | id_curso | precio_unitario |
+|---:|---:|---:|---:|
+| 1 | 1 | 1 | 299.00 |
+| 2 | 1 | 2 | 349.00 |
+| 3 | 2 | 3 | 399.00 |
+
+---
+
+## 17. Diferencia entre precio_mxn, precio_unitario y total
+
+precio_mxn, precio_unitario y total no son lo mismo.
 
 | Campo | Significado |
 |---|---|
 | Curso.precio_mxn | Precio actual del curso. |
+| Orden_Detalle.precio_unitario | Precio del curso en el momento exacto de la compra. |
 | Orden.total | Total cobrado en una orden específica. |
 
 Ejemplo:
 
-| Momento | Curso.precio_mxn | Orden.total |
-|---|---:|---:|
-| Emanuel compra el curso | 299.00 | 299.00 |
-| Después el instructor cambia el precio | 399.00 | 299.00 |
+| Momento | Curso.precio_mxn | Orden_Detalle.precio_unitario | Orden.total |
+|---|---:|---:|---:|
+| Emanuel compra Java y Bases de datos | 299.00 y 349.00 | 299.00 y 349.00 | 648.00 |
+| Después cambia el precio de Java | 399.00 | 299.00 | 648.00 |
 
-Por eso se guardan ambos. Curso.precio_mxn puede cambiar, pero Orden.total conserva la foto del precio al momento de la compra.
+Por eso se guardan estos datos. Curso.precio_mxn puede cambiar, pero Orden_Detalle.precio_unitario conserva el precio usado en la compra y Orden.total conserva el total cobrado.
 
 ---
 
-## 16. Estado_Federativo
+## 18. Estado_Federativo
 
 Representa los estados de México usados en los datos de compra.
 
@@ -744,7 +618,7 @@ Se crea porque el sistema será usado en México y el estado federativo es un da
 
 ---
 
-## 17. Ciudad
+## 19. Ciudad
 
 Representa las ciudades disponibles para los datos de compra.
 
@@ -768,7 +642,7 @@ Se crea porque la ciudad también puede repetirse en muchos registros de compra.
 
 ---
 
-## 18. Datos_Compra
+## 20. Datos_Compra
 
 Guarda los datos de contacto y facturación capturados durante la compra.
 
@@ -804,7 +678,7 @@ El código postal se deja como atributo porque convertirlo en catálogo sería d
 
 ---
 
-## 19. Proveedor_Pago
+## 21. Proveedor_Pago
 
 Representa las pasarelas de pago permitidas.
 
@@ -827,7 +701,7 @@ Se crea para controlar qué proveedores puede usar EduTech para procesar pagos, 
 
 ---
 
-## 20. Estado_Pago
+## 22. Estado_Pago
 
 Representa los estados posibles de un pago.
 
@@ -861,7 +735,7 @@ Se crea como catálogo porque un pago puede tener varios estados de negocio. El 
 
 ---
 
-## 21. Pago
+## 23. Pago
 
 Representa el pago asociado a una orden.
 
@@ -899,7 +773,7 @@ id_pago_externo no lo genera EduTech. Lo genera la pasarela de pago y se guarda 
 
 ---
 
-## 22. Estado_Webhook
+## 24. Estado_Webhook
 
 Representa el estado de procesamiento de una notificación recibida desde una pasarela de pago.
 
@@ -931,7 +805,7 @@ Se crea para saber si un webhook fue recibido, procesado o falló. Esto ayuda a 
 
 ---
 
-## 23. Webhook_Pago
+## 25. Webhook_Pago
 
 Guarda las notificaciones recibidas desde PayPal o Stripe.
 
@@ -962,7 +836,7 @@ El atributo contenido_evento guarda la información completa enviada por la pasa
 
 ---
 
-## 24. Estado_Inscripcion
+## 26. Estado_Inscripcion
 
 Representa los estados posibles de una inscripción.
 
@@ -996,39 +870,48 @@ El estado cancelada se usaría cuando el acceso al curso fue revocado después d
 
 ---
 
-## 25. Inscripcion
+## 27. Inscripcion
 
 Representa el acceso de un alumno a un curso comprado.
 
-**Justificación:**  
-Se crea porque el sistema necesita saber qué usuario tiene acceso a qué curso. La inscripción se genera cuando el pago fue aprobado.
+Justificación:
+Se crea porque el sistema necesita saber qué cursos fueron liberados para el alumno después de una compra aprobada.
 
-La fecha de finalización se guarda aquí porque la finalización pertenece a la relación entre usuario y curso.
+La inscripción se genera a partir de Orden_Detalle, no directamente desde Orden. Esto es necesario porque una orden puede tener varios cursos.
+
+Ejemplo:
+
+| Orden | Curso en Orden_Detalle | Inscripción generada |
+|---|---|---|
+| ORD-2026-000001 | Java desde cero | Inscripción a Java |
+| ORD-2026-000001 | Bases de datos | Inscripción a Bases de datos |
+
+Si una orden contiene tres cursos, se crean tres registros en Orden_Detalle y después tres inscripciones, una por cada curso comprado.
+
+La fecha de finalización se guarda aquí porque la finalización pertenece al acceso del alumno a ese curso específico.
 
 ### Atributos
 
 | Atributo | Tipo de dato sugerido |
 |---|---|
 | id_inscripcion | INTEGER PK |
-| id_usuario | INTEGER FK |
-| id_curso | INTEGER FK |
-| id_orden | INTEGER FK |
+| id_orden_detalle | INTEGER FK |
 | id_estado_inscripcion | INTEGER FK |
 | fecha_inscripcion | TIMESTAMP |
 | fecha_finalizacion | TIMESTAMP |
 
 ### Registros de ejemplo
 
-| id_inscripcion | id_usuario | id_curso | id_orden | id_estado_inscripcion | fecha_inscripcion | fecha_finalizacion |
-|---:|---:|---:|---:|---:|---|---|
-| 1 | 1 | 1 | 1 | 1 | 2026-05-03 09:06:00 | NULL |
-| 2 | 1 | 2 | 2 | 1 | 2026-05-03 10:06:00 | NULL |
+| id_inscripcion | id_orden_detalle | id_estado_inscripcion | fecha_inscripcion | fecha_finalizacion |
+|---:|---:|---:|---|---|
+| 1 | 1 | 1 | 2026-05-03 09:06:00 | NULL |
+| 2 | 2 | 1 | 2026-05-03 09:06:00 | NULL |
 
 ---
 
-## 26. Progreso_Leccion
+## 28. Progreso_Leccion
 
-Registra las lecciones completadas por un usuario dentro de una inscripción.
+Registra las lecciones completadas por un alumno dentro de una inscripción.
 
 **Justificación:**  
 Se crea para guardar el avance real del alumno. Con esta entidad se puede calcular el porcentaje de avance sin guardarlo directamente.
@@ -1059,7 +942,7 @@ No se guarda un atributo llamado porcentaje_avance, porque podría desactualizar
 
 ---
 
-## 27. Estado_Examen
+## 29. Estado_Examen
 
 Representa los estados posibles del examen.
 
@@ -1091,7 +974,7 @@ Se crea como catálogo porque el examen puede tener varios estados.
 
 ---
 
-## 28. Examen
+## 30. Examen
 
 Representa el examen final de un curso.
 
@@ -1121,7 +1004,7 @@ Se crea porque cada curso puede tener un examen final con tiempo límite, númer
 
 ---
 
-## 29. Pregunta
+## 31. Pregunta
 
 Representa una pregunta del banco de preguntas.
 
@@ -1148,7 +1031,7 @@ Se usa esta_activa como BOOLEAN en lugar de crear Estado_Pregunta, porque para e
 
 ---
 
-## 30. Opcion_Respuesta
+## 32. Opcion_Respuesta
 
 Representa las opciones de respuesta de una pregunta.
 
@@ -1173,7 +1056,7 @@ Se crea porque cada pregunta de opción múltiple necesita varias opciones y una
 
 ---
 
-## 31. Estado_Intento
+## 33. Estado_Intento
 
 Representa el estado de un intento de examen.
 
@@ -1218,7 +1101,7 @@ Ejemplos:
 
 ---
 
-## 32. Intento_Examen
+## 34. Intento_Examen
 
 Representa cada intento realizado por un alumno al presentar un examen.
 
@@ -1248,7 +1131,7 @@ Se crea para guardar cada presentación del examen. Permite controlar intentos, 
 
 ---
 
-## 33. Pregunta_Intento
+## 35. Pregunta_Intento
 
 Guarda las preguntas asignadas a un intento de examen.
 
@@ -1272,7 +1155,7 @@ Se crea porque el examen usa preguntas aleatorias. Esta entidad conserva qué pr
 
 ---
 
-## 34. Respuesta_Alumno
+## 36. Respuesta_Alumno
 
 Guarda la respuesta seleccionada por el alumno.
 
@@ -1297,7 +1180,7 @@ Se crea para guardar qué respondió el alumno en cada pregunta del intento. Tam
 
 ---
 
-## 35. Certificado
+## 37. Certificado
 
 Representa el certificado emitido al completar un curso.
 
@@ -1342,14 +1225,22 @@ El alumno no necesita ver id_certificado. En el certificado se muestra algo como
 
 ---
 
-# Entidades opcionales
 
-## Mensaje_Contacto
+# Reglas de integridad explicadas
 
-Esta entidad solo se usaría si EduTech guardará mensajes enviados desde la pantalla de contacto.
+Estas reglas se explican fuera del diagrama para que el modelo sea más fácil de defender.
 
-Si el formulario de contacto solo envía un correo y no guarda mensajes en la base de datos, esta entidad puede omitirse.
-
-
+| Regla | Explicación |
+|---|---|
+| Examen.id_curso debe ser único | Cada curso debe tener como máximo un examen final. |
+| Orden_Detalle debe evitar repetir id_orden e id_curso | Evita que el mismo curso aparezca dos veces en la misma orden. |
+| Modulo debe evitar repetir id_curso y numero_orden | Evita dos módulos en la misma posición dentro del curso. |
+| Leccion debe evitar repetir id_modulo y numero_orden | Evita dos lecciones en la misma posición dentro del módulo. |
+| Leccion_Recurso debe evitar repetir id_leccion y numero_orden | Evita dos recursos en la misma posición dentro de una lección. |
+| Intento_Examen debe evitar repetir id_inscripcion y numero_intento | Controla el número de intentos por inscripción. |
+| Pregunta_Intento debe evitar repetir id_intento e id_pregunta | Evita que una pregunta se repita dentro del mismo intento. |
+| Pregunta_Intento debe evitar repetir id_intento y numero_orden | Evita dos preguntas en la misma posición del examen. |
+| Pago debe evitar repetir id_proveedor_pago e id_pago_externo | Evita duplicar pagos externos de PayPal o Stripe. |
+| Webhook_Pago debe evitar repetir id_evento_externo | Evita procesar dos veces el mismo webhook. |
 
 
