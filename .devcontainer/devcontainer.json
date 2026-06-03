@@ -1,0 +1,27 @@
+{
+  "name": "EduTech Codespace",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+  },
+  "forwardPorts": [3000, 3001, 5432],
+  "portsAttributes": {
+    "3000": {
+      "label": "Backend EduTech"
+    },
+    "3001": {
+      "label": "Frontend EduTech"
+    },
+    "5432": {
+      "label": "PostgreSQL EduTech"
+    }
+  },
+  "postCreateCommand": "cd backend && npm install && if [ ! -f .env ]; then cp ../.env.example .env; fi",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-azuretools.vscode-containers"
+      ]
+    }
+  }
+}
