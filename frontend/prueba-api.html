@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Prueba API EduTech</title>
+</head>
+<body>
+  <h1>Prueba de conexiÃ³n con EduTech</h1>
+
+  <button id="btnHealth">Probar backend</button>
+  <button id="btnCursos">Probar cursos</button>
+
+  <pre id="resultado"></pre>
+
+  <script src="js/api.js"></script>
+  <script>
+    const resultado = document.getElementById('resultado');
+
+    document.getElementById('btnHealth').addEventListener('click', async () => {
+      try {
+        const datos = await EduTech.apiRequest('/health');
+        resultado.textContent = JSON.stringify(datos, null, 2);
+      } catch (error) {
+        resultado.textContent = error.message || JSON.stringify(error, null, 2);
+      }
+    });
+
+    document.getElementById('btnCursos').addEventListener('click', async () => {
+      try {
+        const datos = await EduTech.apiRequest('/cursos');
+        resultado.textContent = JSON.stringify(datos, null, 2);
+      } catch (error) {
+        resultado.textContent = error.message || JSON.stringify(error, null, 2);
+      }
+    });
+  </script>
+</body>
+</html>
