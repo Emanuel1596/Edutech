@@ -11,7 +11,9 @@ services:
       - "5432:5432"
     volumes:
       - edutech_postgres_data:/var/lib/postgresql/data
-      - ../database/sql:/docker-entrypoint-initdb.d
+      - ../database/sql/01_ddl_edutech.sql:/docker-entrypoint-initdb.d/01_ddl_edutech.sql:ro
+      - ../database/sql/02_dml_edutech.sql:/docker-entrypoint-initdb.d/02_dml_edutech.sql:ro
+      - ../database/sql/03_dcl_edutech.sql:/docker-entrypoint-initdb.d/03_dcl_edutech.sql:ro
 
 volumes:
   edutech_postgres_data:

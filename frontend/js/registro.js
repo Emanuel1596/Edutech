@@ -408,7 +408,12 @@ if (!formRegistro || !registroSuccess) {
       desbloquearBotonRegistro();
       registrarIntento();
 
-      const mensajeError = error.message || error.error || 'No se pudo completar el registro.';
+      const mensajeOriginal = String(error.message || error.error || '');
+      const errorCorreoExistente = /existe|registrado|correo|duplicate|duplicado|unique/i.test(mensajeOriginal);
+      const mensajeError = errorCorreoExistente
+        ? 'No se pudo completar el registro. Revisa los datos e intenta de nuevo.'
+        : (mensajeOriginal || 'No se pudo completar el registro. Revisa los datos e intenta de nuevo.');
+
       mostrarMensajeGeneral(mensajeError, true);
     }
   });
