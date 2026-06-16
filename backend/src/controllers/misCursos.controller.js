@@ -12,7 +12,12 @@ const obtenerMisCursos = async (req, res) => {
         ei.nombre_estado_inscripcion,
         o.id_orden,
         o.numero_orden,
+        o.fecha_creacion AS fecha_orden,
+        MAX(p.fecha_pago) AS fecha_pago,
+        COALESCE(MAX(p.fecha_pago), i.fecha_inscripcion, o.fecha_creacion) AS fecha_compra,
         c.id_curso,
+        c.id_nivel_curso,
+        nc.nombre_nivel,
         c.titulo,
         c.descripcion,
         c.imagen_portada,
@@ -38,10 +43,14 @@ const obtenerMisCursos = async (req, res) => {
         ON i.id_orden_detalle = od.id_orden_detalle
        INNER JOIN edutech.orden o
         ON od.id_orden = o.id_orden
+       LEFT JOIN edutech.pago p
+        ON p.id_orden = o.id_orden
        INNER JOIN edutech.curso c
         ON od.id_curso = c.id_curso
        INNER JOIN edutech.usuario instructor
         ON c.id_usuario = instructor.id_usuario
+       INNER JOIN edutech.nivel_curso nc
+        ON c.id_nivel_curso = nc.id_nivel_curso
        LEFT JOIN edutech.modulo m
         ON c.id_curso = m.id_curso
        LEFT JOIN edutech.leccion l
@@ -57,7 +66,10 @@ const obtenerMisCursos = async (req, res) => {
         ei.nombre_estado_inscripcion,
         o.id_orden,
         o.numero_orden,
+        o.fecha_creacion,
         c.id_curso,
+        c.id_nivel_curso,
+        nc.nombre_nivel,
         c.titulo,
         c.descripcion,
         c.imagen_portada,
@@ -94,7 +106,24 @@ const obtenerCursoInscritoDetalle = async (req, res) => {
         ei.nombre_estado_inscripcion,
         o.id_orden,
         o.numero_orden,
+        o.fecha_creacion AS fecha_orden,
+        (
+          SELECT MAX(p2.fecha_pago)
+          FROM edutech.pago p2
+          WHERE p2.id_orden = o.id_orden
+        ) AS fecha_pago,
+        COALESCE(
+          (
+            SELECT MAX(p3.fecha_pago)
+            FROM edutech.pago p3
+            WHERE p3.id_orden = o.id_orden
+          ),
+          i.fecha_inscripcion,
+          o.fecha_creacion
+        ) AS fecha_compra,
         c.id_curso,
+        c.id_nivel_curso,
+        nc.nombre_nivel,
         c.titulo,
         c.descripcion,
         c.imagen_portada,
@@ -112,6 +141,8 @@ const obtenerCursoInscritoDetalle = async (req, res) => {
         ON od.id_curso = c.id_curso
        INNER JOIN edutech.usuario instructor
         ON c.id_usuario = instructor.id_usuario
+       INNER JOIN edutech.nivel_curso nc
+        ON c.id_nivel_curso = nc.id_nivel_curso
        WHERE i.id_inscripcion = $1
         AND o.id_usuario = $2`,
       [idInscripcion, idUsuario]
@@ -247,7 +278,10 @@ const marcarLeccionCompletada = async (req, res) => {
     const validacionResultado = await pool.query(
       `SELECT
         i.id_inscripcion,
-        l.id_leccion
+        c.id_curso,
+        l.id_leccion,
+        m.numero_orden AS numero_modulo,
+        l.numero_orden AS numero_leccion
        FROM edutech.inscripcion i
        INNER JOIN edutech.orden_detalle od
         ON i.id_orden_detalle = od.id_orden_detalle
@@ -270,6 +304,41 @@ const marcarLeccionCompletada = async (req, res) => {
       });
     }
 
+    const leccionActual = validacionResultado.rows[0];
+
+    const bloqueoResultado = await pool.query(
+      `SELECT
+        COUNT(DISTINCT l_prev.id_leccion)::int AS total_anteriores,
+        COUNT(DISTINCT CASE WHEN pl_prev.completada = TRUE THEN l_prev.id_leccion END)::int AS anteriores_completadas
+       FROM edutech.modulo m_prev
+       INNER JOIN edutech.leccion l_prev
+        ON l_prev.id_modulo = m_prev.id_modulo
+       LEFT JOIN edutech.progreso_leccion pl_prev
+        ON pl_prev.id_leccion = l_prev.id_leccion
+       AND pl_prev.id_inscripcion = $1
+       WHERE m_prev.id_curso = $2
+        AND l_prev.esta_activa = TRUE
+        AND (
+          m_prev.numero_orden < $3
+          OR (m_prev.numero_orden = $3 AND l_prev.numero_orden < $4)
+        )`,
+      [
+        idInscripcion,
+        leccionActual.id_curso,
+        leccionActual.numero_modulo,
+        leccionActual.numero_leccion
+      ]
+    );
+
+    const bloqueo = bloqueoResultado.rows[0] || { total_anteriores: 0, anteriores_completadas: 0 };
+
+    if (Number(bloqueo.anteriores_completadas) < Number(bloqueo.total_anteriores)) {
+      return res.status(409).json({
+        ok: false,
+        message: 'Debes completar las lecciones anteriores antes de avanzar.'
+      });
+    }
+
     const resultado = await pool.query(
       `INSERT INTO edutech.progreso_leccion
         (id_inscripcion, id_leccion, completada, fecha_completada)
@@ -287,10 +356,44 @@ const marcarLeccionCompletada = async (req, res) => {
       [idInscripcion, idLeccion]
     );
 
+    const resumenResultado = await pool.query(
+      `SELECT
+        COUNT(DISTINCT l.id_leccion)::int AS total_lecciones,
+        COUNT(DISTINCT CASE WHEN pl.completada = TRUE THEN l.id_leccion END)::int AS lecciones_completadas,
+        COALESCE(
+          ROUND(
+            (
+              COUNT(DISTINCT CASE WHEN pl.completada = TRUE THEN l.id_leccion END)::numeric
+              / NULLIF(COUNT(DISTINCT l.id_leccion), 0)
+            ) * 100,
+            2
+          ),
+          0
+        ) AS porcentaje_avance
+       FROM edutech.inscripcion i
+       INNER JOIN edutech.orden_detalle od
+        ON i.id_orden_detalle = od.id_orden_detalle
+       INNER JOIN edutech.modulo m
+        ON m.id_curso = od.id_curso
+       INNER JOIN edutech.leccion l
+        ON l.id_modulo = m.id_modulo
+       LEFT JOIN edutech.progreso_leccion pl
+        ON pl.id_inscripcion = i.id_inscripcion
+       AND pl.id_leccion = l.id_leccion
+       WHERE i.id_inscripcion = $1
+        AND l.esta_activa = TRUE`,
+      [idInscripcion]
+    );
+
     res.json({
       ok: true,
       message: 'Lección marcada como completada.',
-      progreso: resultado.rows[0]
+      progreso: resultado.rows[0],
+      resumen: resumenResultado.rows[0] || {
+        total_lecciones: 0,
+        lecciones_completadas: 0,
+        porcentaje_avance: 0
+      }
     });
   } catch (error) {
     res.status(500).json({
