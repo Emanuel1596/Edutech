@@ -6,11 +6,15 @@ const authRoutes = require('./routes/auth.routes');
 const cursosRoutes = require('./routes/cursos.routes');
 const ordenesRoutes = require('./routes/ordenes.routes');
 const misCursosRoutes = require('./routes/misCursos.routes');
+const examenesRoutes = require('./routes/examenes.routes');
+const certificadosRoutes = require('./routes/certificados.routes');
+const instructoresRoutes = require('./routes/instructores.routes');
+const adminRoutes = require('./routes/admin.routes');
 
 const app = express();
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '5mb' }));
 
 app.get('/', (req, res) => {
   res.json({
@@ -24,5 +28,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api', cursosRoutes);
 app.use('/api', ordenesRoutes);
 app.use('/api', misCursosRoutes);
+app.use('/api', examenesRoutes);
+app.use('/api', certificadosRoutes);
+app.use('/api', instructoresRoutes);
+app.use('/api', adminRoutes);
 
 module.exports = app;
