@@ -4,6 +4,7 @@
     'detalle-curso.html',
     'comprar-curso.html',
     'compra-aprobada.html',
+    'carrito.html',
     'mi-cuenta.html',
     'mis-cursos.html',
     'examen.html',
@@ -39,15 +40,9 @@
     estado.listo = true;
     window.clearTimeout(estado.temporizador);
 
-    const tiempoMinimo = 80;
-    const transcurrido = Date.now() - estado.inicio;
-    const espera = Math.max(0, tiempoMinimo - transcurrido);
-
-    window.setTimeout(() => {
-      body.classList.add('edutech-data-ready');
-      body.classList.remove('edutech-data-pending');
-      body.classList.remove('edutech-data-loading');
-    }, espera);
+    body.classList.add('edutech-data-ready');
+    body.classList.remove('edutech-data-pending');
+    body.classList.remove('edutech-data-loading');
   };
 
   const prepararPagina = () => {
@@ -66,11 +61,24 @@
 
     estado.temporizador = window.setTimeout(() => {
       revelarPagina();
-    }, 900);
+    }, 1600);
+  };
+
+  const ocultarPaginaHistorial = () => {
+    const body = obtenerBody();
+
+    if (body && esPaginaConCargaControlada()) {
+      estado.listo = false;
+      body.classList.add('edutech-data-pending', 'edutech-data-loading');
+      body.classList.remove('edutech-data-ready');
+    }
+
+    document.documentElement.classList.add('edutech-session-checking', 'edutech-guard-pending');
   };
 
   window.EduTechPrepararPagina = prepararPagina;
   window.EduTechMarcarPaginaLista = revelarPagina;
+  window.EduTechOcultarPaginaHistorial = ocultarPaginaHistorial;
 
   if (document.body && esPaginaConCargaControlada()) {
     prepararPagina();
@@ -83,6 +91,158 @@
       }
     });
   }
+
+  window.addEventListener('pageshow', (evento) => {
+    if (evento.persisted && esPaginaConCargaControlada()) {
+      revelarPagina();
+    }
+  });
+})();
+
+
+(() => {
+  const CLAVE_CARRITO = 'edutech_carrito';
+
+  const leerCarrito = () => {
+    try {
+      const carrito = JSON.parse(localStorage.getItem(CLAVE_CARRITO) || '[]');
+      return Array.isArray(carrito) ? carrito.filter((curso) => curso && curso.id_curso) : [];
+    } catch (error) {
+      return [];
+    }
+  };
+
+  const guardarCarrito = (carrito) => {
+    const cursosUnicos = [];
+    const ids = new Set();
+
+    (Array.isArray(carrito) ? carrito : []).forEach((curso) => {
+      const id = Number(curso && (curso.id_curso || curso.idCurso || curso.id));
+
+      if (!Number.isInteger(id) || id <= 0 || ids.has(id)) {
+        return;
+      }
+
+      ids.add(id);
+      cursosUnicos.push({
+        id_curso: id,
+        titulo: String(curso.titulo || curso.curso || 'Curso EduTech'),
+        descripcion: String(curso.descripcion || ''),
+        imagen_portada: curso.imagen_portada || curso.imagen || '',
+        precio_mxn: Number(curso.precio_mxn || curso.precio || 0),
+        nombre_nivel: curso.nombre_nivel || curso.nivel || '',
+        nivel: curso.nivel || curso.nombre_nivel || '',
+        nombre_instructor: curso.nombre_instructor || '',
+        apellido_paterno_instructor: curso.apellido_paterno_instructor || '',
+        instructor: curso.instructor || '',
+        total_lecciones: curso.total_lecciones || curso.lecciones || 0
+      });
+    });
+
+    localStorage.setItem(CLAVE_CARRITO, JSON.stringify(cursosUnicos));
+    window.dispatchEvent(new CustomEvent('edutech-carrito-actualizado', { detail: { total: cursosUnicos.length } }));
+    return cursosUnicos;
+  };
+
+  const obtenerIdsComprados = () => {
+    const claves = ['edutech_cursos_comprados_ids', 'edutech_mis_cursos'];
+    const ids = new Set();
+
+    claves.forEach((clave) => {
+      try {
+        const valor = JSON.parse(localStorage.getItem(clave) || '[]');
+
+        if (!Array.isArray(valor)) {
+          return;
+        }
+
+        valor.forEach((item) => {
+          const id = typeof item === 'object' ? (item.id_curso || item.idCurso || item.id) : item;
+          if (id) ids.add(String(id));
+        });
+      } catch (error) {
+        // No se rompe el menú si localStorage tiene datos viejos.
+      }
+    });
+
+    return ids;
+  };
+
+  const normalizarCursoCarrito = (curso) => {
+    const id = Number(curso && (curso.id_curso || curso.idCurso || curso.id));
+
+    if (!Number.isInteger(id) || id <= 0) {
+      return null;
+    }
+
+    return {
+      ...curso,
+      id_curso: id,
+      titulo: String(curso.titulo || curso.curso || 'Curso EduTech')
+    };
+  };
+
+  const actualizarIndicadorCarrito = () => {
+    const total = leerCarrito().length;
+
+    document.querySelectorAll('.cart-button').forEach((enlace) => {
+      enlace.href = 'carrito.html';
+      enlace.setAttribute('aria-label', total > 0 ? `Carrito de compras, ${total} curso${total === 1 ? '' : 's'}` : 'Carrito de compras');
+      enlace.classList.add('cart-button-with-count');
+
+      let badge = enlace.querySelector('.cart-count-badge');
+
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'cart-count-badge';
+        enlace.appendChild(badge);
+      }
+
+      badge.textContent = String(total);
+      badge.style.display = total > 0 ? 'inline-flex' : 'none';
+    });
+  };
+
+  window.EduTechCarrito = {
+    obtener: leerCarrito,
+    guardar: guardarCarrito,
+    limpiar: () => guardarCarrito([]),
+    contiene: (idCurso) => leerCarrito().some((curso) => String(curso.id_curso) === String(idCurso)),
+    agregar: (curso) => {
+      const cursoNormalizado = normalizarCursoCarrito(curso);
+
+      if (!cursoNormalizado) {
+        return { ok: false, message: 'No se pudo agregar el curso al carrito.' };
+      }
+
+      if (obtenerIdsComprados().has(String(cursoNormalizado.id_curso))) {
+        return { ok: false, message: 'Este curso ya está comprado.' };
+      }
+
+      const carrito = leerCarrito();
+
+      if (carrito.some((item) => String(item.id_curso) === String(cursoNormalizado.id_curso))) {
+        actualizarIndicadorCarrito();
+        return { ok: true, repetido: true, message: 'Este curso ya estaba en el carrito.' };
+      }
+
+      guardarCarrito([...carrito, cursoNormalizado]);
+      actualizarIndicadorCarrito();
+      return { ok: true, repetido: false, message: 'Curso agregado al carrito.' };
+    },
+    quitar: (idCurso) => {
+      const carrito = leerCarrito().filter((curso) => String(curso.id_curso) !== String(idCurso));
+      guardarCarrito(carrito);
+      actualizarIndicadorCarrito();
+      return carrito;
+    },
+    contar: () => leerCarrito().length,
+    actualizarIndicador: actualizarIndicadorCarrito
+  };
+
+  document.addEventListener('DOMContentLoaded', actualizarIndicadorCarrito);
+  window.addEventListener('storage', actualizarIndicadorCarrito);
+  window.addEventListener('edutech-carrito-actualizado', actualizarIndicadorCarrito);
 })();
 
 
@@ -162,15 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return 'mi-cuenta.html#dashboard';
   };
 
-  const obtenerTextoCuenta = (usuario) => {
-    if (window.EduTech && typeof window.EduTech.usuarioTieneRol === 'function') {
-      if (window.EduTech.usuarioTieneRol(usuario, 'Administrador')) {
-        return 'Admin';
-      }
-    }
-
-    return 'Mi cuenta';
-  };
+  const obtenerTextoCuenta = (_usuario) => 'Mi cuenta';
 
   const crearItemCuenta = (usuario) => {
     const item = document.createElement('li');

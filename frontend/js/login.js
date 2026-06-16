@@ -275,16 +275,22 @@ if (!formLogin) {
         && window.EduTech
         && typeof window.EduTech.usuarioPuedeAbrirRuta === 'function'
         && window.EduTech.usuarioPuedeAbrirRuta(usuario, redireccion);
+      const destinoLogin = redireccionPermitida ? redireccion : rutaPorRol;
 
-      setTimeout(() => {
+      if (window.EduTech && typeof window.EduTech.iniciarNuevaSesionNavegacion === 'function') {
+        window.EduTech.iniciarNuevaSesionNavegacion(destinoLogin);
+      } else {
         sessionStorage.removeItem('edutech_redirect_post_login');
         sessionStorage.removeItem('edutech_redirect_after_login');
-        if (typeof window.EduTechOcultarPaginaHistorial === 'function') {
-          window.EduTechOcultarPaginaHistorial();
-        }
+        sessionStorage.removeItem('edutech_mensaje_acceso');
+        sessionStorage.removeItem('edutech_mensaje_acceso_destino');
+      }
 
-        window.location.replace(redireccionPermitida ? redireccion : rutaPorRol);
-      }, 700);
+      if (typeof window.EduTechOcultarPaginaHistorial === 'function') {
+        window.EduTechOcultarPaginaHistorial();
+      }
+
+      window.location.replace(destinoLogin);
     } catch (error) {
       desbloquearBotonLogin();
       registrarIntento();

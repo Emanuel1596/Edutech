@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="edutech-session-checking">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <style id="edutech-critical-guard">html.edutech-session-checking body{display:none!important;}</style>
   <title>Solicitud de Instructor - EduTech</title>
+  <script src="js/preauth-guard.js"></script>
+<script src="js/session-guard.js"></script>
   <meta name="description" content="Formulario para solicitar cuenta de instructor en EduTech.">
 
   <link rel="stylesheet" href="css/styles.css">
@@ -53,50 +56,51 @@
           <header class="contacto-tc-heading">
             <h1>Solicitud de cuenta de instructor</h1>
             <p>
-              Completa este formulario para que el administrador revise tu perfil. La solicitud permitirá evaluar tu experiencia, evidencia y motivo para crear cursos dentro de EduTech.
+              Inicia sesión y completa este formulario para que el administrador revise tu perfil. El correo se tomará automáticamente de tu cuenta.
             </p>
           </header>
 
           <section class="contacto-tc-form-section instructor-request-page" aria-labelledby="solicitudInstructorTitulo">
             <h2 id="solicitudInstructorTitulo">Formulario de solicitud</h2>
-            <p class="form-help">
-              Llena todos los campos correctamente. Esta solicitud será revisada antes de habilitar una cuenta de instructor.
+            <p class="form-help instructor-request-help">
+              Debes tener sesión iniciada. El administrador verá tu cuenta, tu correo y los datos que escribas aquí.
             </p>
 
-            <form class="contacto-tc-form" id="instructorRequestForm" novalidate>
+            <form class="contacto-tc-form" id="instructorRequestForm" autocomplete="off" novalidate>
               <div class="form-field">
                 <label for="instructorNombre">Nombre completo</label>
-                <input type="text" id="instructorNombre" name="nombre_completo" placeholder="Nombre y apellidos">
+                <input type="text" id="instructorNombre" name="nombre_completo" placeholder="Nombre y apellidos" readonly>
                 <small class="error-message">El nombre solo puede contener letras, espacios, acentos y ñ.</small>
               </div>
 
               <div class="form-field">
                 <label for="instructorCorreo">Correo electrónico</label>
-                <input type="email" id="instructorCorreo" name="correo" placeholder="correo@ejemplo.com">
+                <input type="email" id="instructorCorreo" name="correo" placeholder="correo@ejemplo.com" readonly>
                 <small class="error-message">Escribe un correo electrónico válido.</small>
               </div>
-<div class="form-field">
+
+              <div class="form-field">
                 <label for="instructorArea">Área de experiencia</label>
-                <input type="text" id="instructorArea" name="area_experiencia" placeholder="Ejemplo: Programación, bases de datos, redes">
-                <small class="error-message">Escribe tu área de experiencia.</small>
+                <input type="text" id="instructorArea" name="area_experiencia" maxlength="60" autocomplete="off" placeholder="Ejemplo: Programación, bases de datos, redes">
+                <small class="error-message">Escribe entre 3 y 60 caracteres.</small>
               </div>
 
               <div class="form-field">
                 <label for="instructorExperiencia">Experiencia</label>
-                <textarea id="instructorExperiencia" name="experiencia" rows="4" placeholder="Describe brevemente tu experiencia"></textarea>
-                <small class="error-message">Describe tu experiencia.</small>
+                <textarea id="instructorExperiencia" name="experiencia" rows="4" maxlength="500" autocomplete="off" placeholder="Describe brevemente tu experiencia"></textarea>
+                <small class="error-message">Describe tu experiencia con entre 10 y 500 caracteres.</small>
               </div>
 
               <div class="form-field">
                 <label for="instructorEvidencia">Portafolio, CV, LinkedIn, GitHub u otra evidencia</label>
-                <input type="url" id="instructorEvidencia" name="evidencia" placeholder="https://ejemplo.com/portafolio">
-                <small class="error-message">Agrega un enlace válido como evidencia.</small>
+                <input type="url" id="instructorEvidencia" name="evidencia" maxlength="200" autocomplete="off" placeholder="https://ejemplo.com/portafolio">
+                <small class="error-message">Agrega un enlace válido que empiece con http:// o https://. Máximo 200 caracteres.</small>
               </div>
 
               <div class="form-field">
                 <label for="instructorMotivo">Motivo de solicitud</label>
-                <textarea id="instructorMotivo" name="motivo" rows="4" placeholder="Explica por qué quieres ser instructor en EduTech"></textarea>
-                <small class="error-message">Escribe el motivo de tu solicitud.</small>
+                <textarea id="instructorMotivo" name="motivo" rows="4" maxlength="300" autocomplete="off" placeholder="Explica por qué quieres ser instructor en EduTech"></textarea>
+                <small class="error-message">Escribe entre 10 y 300 caracteres.</small>
               </div>
 
               <button type="submit" class="contacto-tc-submit">Enviar solicitud</button>
@@ -118,6 +122,7 @@
 
   </div>
 
+  <script src="js/api.js"></script>
   <script src="js/main.js"></script>
   <script src="js/solicitud-instructor.js"></script>
 </body>

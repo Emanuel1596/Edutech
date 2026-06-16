@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="edutech-session-checking">
 <head>
   <meta charset="UTF-8">
+  <style id="edutech-critical-guard">html.edutech-session-checking body{display:none!important;}</style>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Compra de curso - EduTech</title>
-  <script src="js/session-guard.js"></script>
+  <script src="js/preauth-guard.js"></script>
+<script src="js/session-guard.js"></script>
   <meta name="description" content="Pantalla de compra del curso seleccionado en EduTech.">
 
   <link rel="stylesheet" href="css/styles.css">
@@ -164,18 +166,23 @@
 
             <label class="payment-option">
               <input type="radio" name="payment" checked>
-              <span>Pago con PayPal / Sandbox</span>
+              <span>PayPal Sandbox</span>
             </label>
 
             <p class="payment-note">
-              Al continuar, se creará la orden y se simulará la aprobación del pago.
+              Completa los datos del formulario y paga desde aquí con el botón oficial de PayPal Sandbox.
             </p>
 
             <p class="form-warning checkout-summary-message" id="checkoutError" style="display: none;"></p>
             <p class="form-success checkout-summary-message" id="checkoutSuccess" style="display: none;"></p>
 
-            <button class="checkout-buy-button" type="submit" form="compraCursoForm" id="checkoutBoton">
-              Continuar con PayPal
+            <div class="paypal-inline-box" aria-label="Pago con PayPal Sandbox">
+              <div id="paypal-button-container" class="paypal-button-container"></div>
+              <p class="paypal-config-message" id="paypalConfigMessage" style="display: none;"></p>
+            </div>
+
+            <button class="checkout-buy-button checkout-paypal-fallback" type="submit" form="compraCursoForm" id="checkoutBoton" hidden>
+              Continuar con PayPal Sandbox
             </button>
           </aside>
 

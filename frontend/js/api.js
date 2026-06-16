@@ -27,10 +27,14 @@ const obtenerBaseUrlApi = () => {
 const API_BASE_URL = obtenerBaseUrlApi();
 
 const apiRequest = async (ruta, opciones = {}) => {
+  const idUsuarioSesion = localStorage.getItem('edutech_id_usuario') || '';
+  const rolUsuarioSesion = localStorage.getItem('edutech_nombre_rol') || '';
   const configuracion = {
     method: opciones.method || 'GET',
     headers: {
       'Content-Type': 'application/json',
+      ...(idUsuarioSesion ? { 'X-Edutech-User-Id': idUsuarioSesion } : {}),
+      ...(rolUsuarioSesion ? { 'X-Edutech-Role': rolUsuarioSesion } : {}),
       ...(opciones.headers || {})
     }
   };
@@ -125,6 +129,9 @@ const guardarUsuarioSesion = (usuario) => {
   localStorage.setItem('edutech_id_rol', String(usuarioNormalizado.id_rol || ''));
   localStorage.setItem('edutech_nombre_rol', String(usuarioNormalizado.nombre_rol || ''));
   localStorage.setItem('edutech_sesion_activa', 'true');
+  asegurarEpochSesion();
+  sessionStorage.removeItem('edutech_mensaje_acceso');
+  sessionStorage.removeItem('edutech_mensaje_acceso_destino');
 };
 
 const obtenerUsuarioSesion = () => {
@@ -162,13 +169,62 @@ const haySesionActiva = () => {
   return localStorage.getItem('edutech_sesion_activa') === 'true' && Boolean(obtenerUsuarioSesion());
 };
 
+const generarEpochSesion = () => `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+
+const limpiarEstadoTemporalNavegacion = () => {
+  [sessionStorage].forEach((storage) => {
+    Object.keys(storage)
+      .filter((clave) => clave.startsWith('edutech_'))
+      .forEach((clave) => storage.removeItem(clave));
+  });
+};
+
+const iniciarNuevaSesionNavegacion = (rutaDestino = '') => {
+  limpiarEstadoTemporalNavegacion();
+
+  const epoch = generarEpochSesion();
+  sessionStorage.setItem('edutech_session_epoch', epoch);
+
+  if (rutaDestino) {
+    sessionStorage.setItem('edutech_ultima_ruta_segura', rutaDestino);
+  }
+
+  try {
+    const estadoActual = history.state && typeof history.state === 'object' ? history.state : {};
+    history.replaceState({
+      ...estadoActual,
+      edutechAuthEpoch: epoch,
+      edutechLoginBoundary: true
+    }, document.title, window.location.href);
+  } catch (error) {
+    // Si el navegador no permite modificar el estado, el guard seguirá validando por rol.
+  }
+
+  return epoch;
+};
+
+const asegurarEpochSesion = () => {
+  let epoch = sessionStorage.getItem('edutech_session_epoch');
+
+  if (!epoch) {
+    epoch = generarEpochSesion();
+    sessionStorage.setItem('edutech_session_epoch', epoch);
+  }
+
+  return epoch;
+};
+
+const esClavePersistenteAlumno = (clave) => {
+  return /^edutech_perfil_alumno_\d+$/.test(clave) || clave === 'edutech_carrito';
+};
+
 const limpiarClavesEdutech = (storage) => {
   if (!storage) {
     return;
   }
 
   Object.keys(storage)
-    .filter((clave) => clave.startsWith('edutech_'))
+    .filter((clave) => clave.startsWith('edutech_') && !esClavePersistenteAlumno(clave))
     .forEach((clave) => storage.removeItem(clave));
 };
 
@@ -226,7 +282,7 @@ const usuarioPuedeAbrirRuta = (usuario, ruta) => {
     return true;
   }
 
-  if (archivo === 'instructor.html') {
+  if (archivo === 'instructor.html' || archivo === 'instructor-examen.html') {
     return usuarioTieneRol(usuario, 'Instructor');
   }
 
@@ -284,6 +340,9 @@ window.EduTech = {
   obtenerUsuarioSesion,
   obtenerIdUsuarioSesion,
   haySesionActiva,
+  iniciarNuevaSesionNavegacion,
+  limpiarEstadoTemporalNavegacion,
+  asegurarEpochSesion,
   cerrarSesion,
   requiereSesion,
   requiereRol,

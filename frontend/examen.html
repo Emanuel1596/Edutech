@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html lang="es" data-wp-dark-mode-active="true" data-wp-dark-mode-loading="true" data-wp-dark-mode-preset="1">
+<html lang="es" data-wp-dark-mode-active="true" data-wp-dark-mode-loading="true" data-wp-dark-mode-preset="1" class="edutech-session-checking">
 <head>
   <meta charset="UTF-8">
+  <style id="edutech-critical-guard">html.edutech-session-checking body{display:none!important;}</style>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, follow">
   <title>Examen Final - EduTech</title>
-  <script src="js/session-guard.js"></script>
+  <script src="js/preauth-guard.js"></script>
+<script src="js/session-guard.js"></script>
   <meta name="description" content="Lección y cuestionario final del curso.">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="css/styles.css">
@@ -69,8 +71,8 @@
                           <div class="elementor-widget-wrap elementor-element-populated">
                             <div class="elementor-widget elementor-widget-text-editor">
                               <div class="elementor-widget-container">
-                                <p id="examenTextoIntroUno">¡Estamos llegando al final del curso! Con lo que aprendimos vas a poder tener un manejo básico para realizar tus primeras aplicaciones completas con lógica de negocio simple e interfaz gráfica de usuario. No te olvides que, para seguir aprendiendo, te recomendamos repasar todas las lecciones del curso.</p>
-                                <p id="examenTextoIntroDos">Fue un largo camino, de mucho esfuerzo y práctica pero llegamos finalmente al examen final. Para rendirlo y obtener el correspondiente certificado tenés que tener en cuenta lo siguiente:</p>
+                                <p id="examenTextoIntroUno">Evaluación final del curso.</p>
+                                <p id="examenTextoIntroDos" hidden></p>
                               </div>
                             </div>
                           </div>
