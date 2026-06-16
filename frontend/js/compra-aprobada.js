@@ -39,13 +39,13 @@ const leerJsonStorage = (storage, clave) => {
 const obtenerCompraAprobada = () => {
   const compraSesion = leerJsonStorage(sessionStorage, 'edutech_compra_pendiente');
 
-  if (compraSesion && compraSesion.id_curso) {
+  if (compraSesion && (compraSesion.id_curso || (Array.isArray(compraSesion.cursos) && compraSesion.cursos.length > 0))) {
     return compraSesion;
   }
 
   const compraLocal = leerJsonStorage(localStorage, 'edutech_compra_aprobada_backend');
 
-  if (compraLocal && compraLocal.id_curso) {
+  if (compraLocal && (compraLocal.id_curso || (Array.isArray(compraLocal.cursos) && compraLocal.cursos.length > 0))) {
     return compraLocal;
   }
 
@@ -98,12 +98,59 @@ const obtenerMapaFechasCompra = () => {
 };
 
 const guardarFechaCompraCurso = (compra) => {
-  if (!compra || !compra.id_curso) {
+  if (!compra || (!compra.id_curso && (!Array.isArray(compra.cursos) || compra.cursos.length === 0))) {
     return;
   }
 
   const mapa = obtenerMapaFechasCompra();
   mapa[String(compra.id_curso)] = obtenerFechaCompra(compra);
+  localStorage.setItem('edutech_fechas_compra_cursos', JSON.stringify(mapa));
+};
+
+
+const obtenerCursosCompra = (compra) => {
+  if (!compra) {
+    return [];
+  }
+
+  if (Array.isArray(compra.cursos) && compra.cursos.length > 0) {
+    return compra.cursos.map((curso) => ({
+      id_curso: curso.id_curso || curso.idCurso || curso.id,
+      curso: curso.curso || curso.titulo || 'Curso EduTech',
+      titulo: curso.titulo || curso.curso || 'Curso EduTech',
+      instructor: curso.instructor || compra.instructor || 'Instructor EduTech',
+      nivel: curso.nivel || curso.nombre_nivel || compra.nivel || compra.nombre_nivel || 'Curso disponible',
+      nombre_nivel: curso.nombre_nivel || curso.nivel || compra.nombre_nivel || compra.nivel || '',
+      precio: curso.precio || curso.precio_mxn || compra.precio || '$0 MXN',
+      id_inscripcion: curso.id_inscripcion || curso.idInscripcion || null
+    })).filter((curso) => curso.id_curso);
+  }
+
+  if (compra.id_curso) {
+    return [{
+      id_curso: compra.id_curso,
+      curso: compra.curso || 'Curso EduTech',
+      titulo: compra.curso || 'Curso EduTech',
+      instructor: compra.instructor || 'Instructor EduTech',
+      nivel: compra.nivel || compra.nombre_nivel || 'Curso disponible',
+      nombre_nivel: compra.nombre_nivel || compra.nivel || '',
+      precio: compra.precio || compra.total || '$0 MXN',
+      id_inscripcion: compra.id_inscripcion || compra.idInscripcion || null
+    }];
+  }
+
+  return [];
+};
+
+const guardarFechasCursosCompra = (compra) => {
+  const cursos = obtenerCursosCompra(compra);
+  const mapa = obtenerMapaFechasCompra();
+  const fecha = obtenerFechaCompra(compra);
+
+  cursos.forEach((curso) => {
+    mapa[String(curso.id_curso)] = fecha;
+  });
+
   localStorage.setItem('edutech_fechas_compra_cursos', JSON.stringify(mapa));
 };
 
@@ -123,53 +170,58 @@ const obtenerListaMisCursos = () => {
 };
 
 const guardarCursoEnMisCursos = (compra) => {
-  if (!compra || !compra.id_curso) {
+  const cursosCompra = obtenerCursosCompra(compra);
+
+  if (cursosCompra.length === 0) {
     return;
   }
 
   const cursos = obtenerListaMisCursos();
-  const idCurso = String(compra.id_curso);
-  const existe = cursos.some((curso) => String(curso.id_curso) === idCurso);
-
   const fechaCompra = obtenerFechaCompra(compra);
-  const cursoActualizado = {
-    id_curso: compra.id_curso,
-    curso: compra.curso || 'Curso EduTech',
-    instructor: compra.instructor || 'Instructor EduTech',
-    nivel: compra.nivel || compra.nombre_nivel || 'Curso disponible',
-    nombre_nivel: compra.nombre_nivel || compra.nivel || '',
-    total_lecciones: compra.total_lecciones || 0,
-    precio: compra.precio || compra.total || '$0 MXN',
-    total: compra.total || compra.precio || '$0 MXN',
-    id_orden: compra.id_orden || null,
-    numero_orden: compra.numero_orden || null,
-    id_pago: compra.id_pago || null,
-    id_inscripcion: compra.id_inscripcion || compra.idInscripcion || null,
-    correo: compra.correo || '',
-    fecha_compra: fechaCompra,
-    fecha_inscripcion: compra.fecha_inscripcion || fechaCompra,
-    fecha_pago: compra.fecha_pago || fechaCompra,
-    estatus: 'Aprobada'
-  };
 
-  if (!existe) {
-    cursos.push(cursoActualizado);
-  } else {
-    const indice = cursos.findIndex((curso) => String(curso.id_curso) === idCurso);
-    cursos[indice] = {
-      ...cursos[indice],
-      ...cursoActualizado,
-      fecha_compra: cursoActualizado.fecha_compra || cursos[indice].fecha_compra,
-      fecha_inscripcion: cursoActualizado.fecha_inscripcion || cursos[indice].fecha_inscripcion
+  cursosCompra.forEach((cursoCompra) => {
+    const idCurso = String(cursoCompra.id_curso);
+    const existe = cursos.some((curso) => String(curso.id_curso) === idCurso);
+    const cursoActualizado = {
+      id_curso: cursoCompra.id_curso,
+      curso: cursoCompra.curso || cursoCompra.titulo || 'Curso EduTech',
+      instructor: cursoCompra.instructor || compra.instructor || 'Instructor EduTech',
+      nivel: cursoCompra.nivel || cursoCompra.nombre_nivel || compra.nivel || compra.nombre_nivel || 'Curso disponible',
+      nombre_nivel: cursoCompra.nombre_nivel || cursoCompra.nivel || compra.nombre_nivel || compra.nivel || '',
+      total_lecciones: cursoCompra.total_lecciones || compra.total_lecciones || 0,
+      precio: cursoCompra.precio || compra.precio || compra.total || '$0 MXN',
+      total: compra.total || cursoCompra.precio || '$0 MXN',
+      id_orden: compra.id_orden || null,
+      numero_orden: compra.numero_orden || null,
+      id_pago: compra.id_pago || null,
+      id_inscripcion: cursoCompra.id_inscripcion || compra.id_inscripcion || compra.idInscripcion || null,
+      correo: compra.correo || '',
+      fecha_compra: fechaCompra,
+      fecha_inscripcion: compra.fecha_inscripcion || fechaCompra,
+      fecha_pago: compra.fecha_pago || fechaCompra,
+      estatus: 'Aprobada'
     };
-  }
+
+    if (!existe) {
+      cursos.push(cursoActualizado);
+    } else {
+      const indice = cursos.findIndex((curso) => String(curso.id_curso) === idCurso);
+      cursos[indice] = {
+        ...cursos[indice],
+        ...cursoActualizado,
+        fecha_compra: cursoActualizado.fecha_compra || cursos[indice].fecha_compra,
+        fecha_inscripcion: cursoActualizado.fecha_inscripcion || cursos[indice].fecha_inscripcion
+      };
+    }
+  });
 
   localStorage.setItem('edutech_mis_cursos', JSON.stringify(cursos));
-  guardarFechaCompraCurso(cursoActualizado);
+  localStorage.setItem('edutech_cursos_comprados_ids', JSON.stringify(cursos.map((curso) => Number(curso.id_curso)).filter((id) => Number.isInteger(id) && id > 0)));
+  guardarFechasCursosCompra(compra);
 };
 
 const guardarCompraConfirmada = (compra) => {
-  if (!compra || !compra.id_curso) {
+  if (!compra || (!compra.id_curso && obtenerCursosCompra(compra).length === 0)) {
     return;
   }
 
@@ -185,7 +237,9 @@ const guardarCompraConfirmada = (compra) => {
 };
 
 const pintarCompra = (compra) => {
-  const curso = compra.curso || 'Curso EduTech';
+  const cursosCompra = obtenerCursosCompra(compra);
+  const esCompraMultiple = cursosCompra.length > 1;
+  const curso = esCompraMultiple ? `${cursosCompra.length} cursos comprados` : (compra.curso || (cursosCompra[0] && cursosCompra[0].curso) || 'Curso EduTech');
   const nombre = compra.nombre ? `, ${compra.nombre}` : '';
   const orden = compra.numero_orden || (compra.id_orden ? `Orden #${compra.id_orden}` : 'Por confirmar');
   const total = compra.total || compra.precio || '$0 MXN';
@@ -197,10 +251,28 @@ const pintarCompra = (compra) => {
 
   if (compraCurso) {
     compraCurso.textContent = curso;
+
+    if (esCompraMultiple) {
+      const lista = document.createElement('span');
+      lista.className = 'purchase-confirmation-course-list';
+      lista.textContent = cursosCompra.map((item) => item.curso || item.titulo || 'Curso EduTech').join(', ');
+      compraCurso.appendChild(document.createElement('br'));
+      compraCurso.appendChild(lista);
+    }
   }
 
   if (compraInstructor) {
-    compraInstructor.textContent = compra.instructor || 'Instructor EduTech';
+    const filaInstructor = compraInstructor.closest('.purchase-confirmation-row');
+    if (esCompraMultiple) {
+      if (filaInstructor) {
+        filaInstructor.style.display = 'none';
+      }
+    } else {
+      if (filaInstructor) {
+        filaInstructor.style.display = '';
+      }
+      compraInstructor.textContent = compra.instructor || (cursosCompra[0] && cursosCompra[0].instructor) || 'Instructor EduTech';
+    }
   }
 
   if (compraCorreo) {
@@ -220,11 +292,13 @@ const pintarCompra = (compra) => {
   }
 
   if (compraMensaje) {
-    compraMensaje.textContent = `Gracias por tu compra${nombre}. El pago fue aprobado y el curso "${curso}" quedó registrado correctamente.`;
+    compraMensaje.textContent = esCompraMultiple
+      ? `Gracias por tu compra${nombre}. El pago fue aprobado y los ${cursosCompra.length} cursos quedaron registrados correctamente.`
+      : `Gracias por tu compra${nombre}. El pago fue aprobado y el curso "${curso}" quedó registrado correctamente.`;
   }
 
-  if (btnMisCursos && compra.id_curso) {
-    btnMisCursos.href = `mis-cursos.html?id=${compra.id_curso}`;
+  if (btnMisCursos) {
+    btnMisCursos.href = compra.id_curso && !esCompraMultiple ? `mis-cursos.html?id=${compra.id_curso}` : 'mis-cursos.html';
   }
 
   document.title = `Compra aprobada - ${curso}`;
@@ -237,7 +311,8 @@ const compraCoincideConUrl = (compra) => {
     return true;
   }
 
-  return String(compra.id_curso) === String(idUrl);
+  const idsCompra = obtenerCursosCompra(compra).map((curso) => String(curso.id_curso));
+  return String(compra.id_curso) === String(idUrl) || idsCompra.includes(String(idUrl));
 };
 
 const marcarPaginaLista = () => {
@@ -252,14 +327,14 @@ const cargarConfirmacionCompra = () => {
 
   const compra = obtenerCompraAprobada();
 
-  if (!compra || !compra.id_curso || !compraCoincideConUrl(compra)) {
+  if (!compra || (!compra.id_curso && obtenerCursosCompra(compra).length === 0) || !compraCoincideConUrl(compra)) {
     mostrarElemento(compraSinDatos);
     marcarPaginaLista();
     return;
   }
 
   guardarCompraConfirmada(compra);
-  guardarFechaCompraCurso(compra);
+  guardarFechasCursosCompra(compra);
   guardarCursoEnMisCursos(compra);
   pintarCompra(compra);
   mostrarElemento(compraResultado);

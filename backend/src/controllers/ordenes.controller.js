@@ -120,6 +120,29 @@ const crearOrden = async (req, res) => {
       throw new Error('Solo se pueden comprar cursos publicados.');
     }
 
+    const cursosYaComprados = await client.query(
+      `SELECT
+        c.id_curso,
+        c.titulo
+       FROM edutech.inscripcion i
+       INNER JOIN edutech.orden_detalle od
+        ON od.id_orden_detalle = i.id_orden_detalle
+       INNER JOIN edutech.orden o
+        ON o.id_orden = od.id_orden
+       INNER JOIN edutech.curso c
+        ON c.id_curso = od.id_curso
+       INNER JOIN edutech.estado_inscripcion ei
+        ON ei.id_estado_inscripcion = i.id_estado_inscripcion
+       WHERE o.id_usuario = $1
+        AND od.id_curso = ANY($2::int[])
+        AND LOWER(ei.nombre_estado_inscripcion) = LOWER('activa')`,
+      [id_usuario, cursosUnicos]
+    );
+
+    if (cursosYaComprados.rows.length > 0) {
+      throw new Error(`Ya tienes comprado el curso: ${cursosYaComprados.rows[0].titulo}.`);
+    }
+
     const idMonedaMxn = await obtenerIdCatalogo(
       client,
       'moneda',
@@ -438,7 +461,305 @@ const pagarOrdenSimulada = async (req, res) => {
   }
 };
 
+
+const procesarWebhookPagoSandbox = async (req, res) => {
+  const client = await pool.connect();
+
+  try {
+    const {
+      id_orden,
+      proveedor = 'PayPal',
+      tipo_evento = 'PAYMENT.CAPTURE.COMPLETED',
+      id_evento_externo,
+      id_pago_externo,
+      monto_pagado,
+      contenido_evento
+    } = req.body || {};
+
+    const idOrden = Number(id_orden);
+
+    if (!Number.isInteger(idOrden) || idOrden <= 0) {
+      return res.status(400).json({
+        ok: false,
+        message: 'El webhook debe indicar un id_orden válido.'
+      });
+    }
+
+    const eventoExterno = id_evento_externo || `WH-PAYPAL-SANDBOX-${Date.now()}`;
+    const pagoExterno = id_pago_externo || `PAYPAL-SANDBOX-${Date.now()}`;
+
+    await client.query('BEGIN');
+
+    const webhookExistente = await client.query(
+      `SELECT wp.id_webhook, wp.id_pago
+       FROM edutech.webhook_pago wp
+       WHERE wp.id_evento_externo = $1`,
+      [eventoExterno]
+    );
+
+    if (webhookExistente.rows.length > 0) {
+      await client.query('COMMIT');
+
+      return res.json({
+        ok: true,
+        message: 'Webhook ya procesado anteriormente.',
+        webhook: webhookExistente.rows[0],
+        duplicado: true
+      });
+    }
+
+    const ordenResultado = await client.query(
+      `SELECT
+        o.id_orden,
+        o.numero_orden,
+        o.id_usuario,
+        o.total,
+        eo.nombre_estado_orden
+       FROM edutech.orden o
+       INNER JOIN edutech.estado_orden eo
+        ON eo.id_estado_orden = o.id_estado_orden
+       WHERE o.id_orden = $1
+       FOR UPDATE`,
+      [idOrden]
+    );
+
+    if (ordenResultado.rows.length === 0) {
+      await client.query('ROLLBACK');
+
+      return res.status(404).json({
+        ok: false,
+        message: 'Orden no encontrada para procesar el webhook.'
+      });
+    }
+
+    const orden = ordenResultado.rows[0];
+    const montoOrden = Number(orden.total);
+    const montoWebhook = monto_pagado === undefined || monto_pagado === null || monto_pagado === ''
+      ? montoOrden
+      : Number(monto_pagado);
+
+    if (!Number.isFinite(montoWebhook) || Number(montoWebhook.toFixed(2)) !== Number(montoOrden.toFixed(2))) {
+      await client.query('ROLLBACK');
+
+      return res.status(400).json({
+        ok: false,
+        message: 'El monto del webhook no coincide con el total de la orden.'
+      });
+    }
+
+    const pagoAprobadoExistente = await client.query(
+      `SELECT id_pago, fecha_pago
+       FROM edutech.pago
+       WHERE id_orden = $1
+        AND id_estado_pago = (
+          SELECT id_estado_pago
+          FROM edutech.estado_pago
+          WHERE LOWER(nombre_estado_pago) = LOWER('aprobado')
+          LIMIT 1
+        )
+       ORDER BY id_pago DESC
+       LIMIT 1`,
+      [idOrden]
+    );
+
+    if (pagoAprobadoExistente.rows.length > 0) {
+      await client.query('COMMIT');
+
+      return res.json({
+        ok: true,
+        message: 'La orden ya tenía un pago aprobado. No se duplicaron inscripciones.',
+        pago: pagoAprobadoExistente.rows[0],
+        inscripciones: [],
+        orden,
+        duplicado: true
+      });
+    }
+
+    const idProveedor = await obtenerIdCatalogo(
+      client,
+      'proveedor_pago',
+      'id_proveedor_pago',
+      'nombre_proveedor',
+      proveedor
+    );
+
+    const idEstadoPagoAprobado = await obtenerIdCatalogo(
+      client,
+      'estado_pago',
+      'id_estado_pago',
+      'nombre_estado_pago',
+      'aprobado'
+    );
+
+    const idEstadoOrdenCompletada = await obtenerIdCatalogo(
+      client,
+      'estado_orden',
+      'id_estado_orden',
+      'nombre_estado_orden',
+      'completada'
+    );
+
+    const idEstadoWebhookProcesado = await obtenerIdCatalogo(
+      client,
+      'estado_webhook',
+      'id_estado_webhook',
+      'nombre_estado_webhook',
+      'procesado'
+    );
+
+    const idEstadoInscripcionActiva = await obtenerIdCatalogo(
+      client,
+      'estado_inscripcion',
+      'id_estado_inscripcion',
+      'nombre_estado_inscripcion',
+      'activa'
+    );
+
+    const pagoResultado = await client.query(
+      `INSERT INTO edutech.pago
+        (id_orden, id_proveedor_pago, id_estado_pago, id_pago_externo, monto_pagado, fecha_pago)
+       VALUES
+        ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP)
+       RETURNING
+        id_pago,
+        id_orden,
+        id_proveedor_pago,
+        id_estado_pago,
+        id_pago_externo,
+        monto_pagado,
+        fecha_pago`,
+      [
+        idOrden,
+        idProveedor,
+        idEstadoPagoAprobado,
+        pagoExterno,
+        montoOrden
+      ]
+    );
+
+    const pago = pagoResultado.rows[0];
+
+    const contenidoFinal = contenido_evento && typeof contenido_evento === 'object'
+      ? contenido_evento
+      : {
+        status: 'COMPLETED',
+        provider: proveedor,
+        id_orden: idOrden,
+        sandbox: true
+      };
+
+    const webhookResultado = await client.query(
+      `INSERT INTO edutech.webhook_pago
+        (id_pago, id_estado_webhook, tipo_evento, id_evento_externo, contenido_evento)
+       VALUES
+        ($1, $2, $3, $4, $5::jsonb)
+       RETURNING
+        id_webhook,
+        id_pago,
+        id_estado_webhook,
+        tipo_evento,
+        id_evento_externo,
+        fecha_recibido`,
+      [
+        pago.id_pago,
+        idEstadoWebhookProcesado,
+        tipo_evento,
+        eventoExterno,
+        JSON.stringify(contenidoFinal)
+      ]
+    );
+
+    await client.query(
+      `UPDATE edutech.orden
+       SET id_estado_orden = $1,
+           fecha_actualizacion = CURRENT_TIMESTAMP
+       WHERE id_orden = $2`,
+      [idEstadoOrdenCompletada, idOrden]
+    );
+
+    const detallesResultado = await client.query(
+      `SELECT
+        od.id_orden_detalle,
+        od.id_curso,
+        c.titulo
+       FROM edutech.orden_detalle od
+       INNER JOIN edutech.curso c
+        ON c.id_curso = od.id_curso
+       WHERE od.id_orden = $1
+       ORDER BY od.id_orden_detalle ASC`,
+      [idOrden]
+    );
+
+    const inscripciones = [];
+
+    for (const detalle of detallesResultado.rows) {
+      const inscripcionExistente = await client.query(
+        `SELECT id_inscripcion, fecha_inscripcion
+         FROM edutech.inscripcion
+         WHERE id_orden_detalle = $1`,
+        [detalle.id_orden_detalle]
+      );
+
+      if (inscripcionExistente.rows.length > 0) {
+        inscripciones.push({
+          ...inscripcionExistente.rows[0],
+          id_orden_detalle: detalle.id_orden_detalle,
+          id_curso: detalle.id_curso,
+          titulo: detalle.titulo,
+          existente: true
+        });
+        continue;
+      }
+
+      const inscripcionResultado = await client.query(
+        `INSERT INTO edutech.inscripcion
+          (id_orden_detalle, id_estado_inscripcion)
+         VALUES
+          ($1, $2)
+         RETURNING
+          id_inscripcion,
+          id_orden_detalle,
+          id_estado_inscripcion,
+          fecha_inscripcion`,
+        [detalle.id_orden_detalle, idEstadoInscripcionActiva]
+      );
+
+      inscripciones.push({
+        ...inscripcionResultado.rows[0],
+        id_curso: detalle.id_curso,
+        titulo: detalle.titulo,
+        existente: false
+      });
+    }
+
+    await client.query('COMMIT');
+
+    res.json({
+      ok: true,
+      message: 'Webhook PayPal Sandbox procesado. Curso liberado correctamente.',
+      orden: {
+        ...orden,
+        nombre_estado_orden: 'completada'
+      },
+      pago,
+      webhook: webhookResultado.rows[0],
+      inscripciones
+    });
+  } catch (error) {
+    await client.query('ROLLBACK');
+
+    res.status(500).json({
+      ok: false,
+      message: 'Error al procesar el webhook de pago sandbox.',
+      error: error.message
+    });
+  } finally {
+    client.release();
+  }
+};
+
 module.exports = {
   crearOrden,
-  pagarOrdenSimulada
+  pagarOrdenSimulada,
+  procesarWebhookPagoSandbox
 };

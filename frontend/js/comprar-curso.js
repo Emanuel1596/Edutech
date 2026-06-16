@@ -125,7 +125,16 @@
     });
   };
 
+  const esCompraDesdeCarrito = () => {
+    const parametros = new URLSearchParams(window.location.search);
+    return parametros.get('carrito') === '1';
+  };
+
   const obtenerParametroId = () => {
+    if (esCompraDesdeCarrito()) {
+      return null;
+    }
+
     const parametros = new URLSearchParams(window.location.search);
     const idPorQuery = parametros.get('id');
 
@@ -303,7 +312,7 @@
                 <span class="error-message">Escribe un código postal válido de 5 dígitos.</span>
               </div>
 
-              <p class="form-success" id="checkoutSuccess">Datos validados. Redirigiendo a la confirmación de compra.</p>
+              <p class="form-success" id="checkoutSuccess">Datos validados. Continúa con PayPal Sandbox.</p>
             </form>
           </div>
 
@@ -346,13 +355,13 @@
 
             <label class="payment-option">
               <input type="radio" name="payment" checked>
-              <span>Pago con PayPal / Sandbox</span>
+              <span>PayPal Sandbox</span>
             </label>
 
-            <p class="payment-note">Al continuar, se creará la orden y se simulará la aprobación del pago.</p>
+            <p class="payment-note">Al continuar, se creará la orden y pagarás con PayPal Sandbox real.</p>
 
             <button class="checkout-buy-button" id="checkoutBoton" type="submit" form="compraCursoForm">
-              Continuar con PayPal
+              Continuar con PayPal Sandbox
             </button>
           </aside>
         </div>
@@ -509,8 +518,17 @@
   };
 
   const obtenerPerfilAlumno = () => {
-    const perfil = obtenerJSONLocal('edutech_perfil_alumno', {});
-    return perfil && typeof perfil === 'object' && !Array.isArray(perfil) ? perfil : {};
+    const usuario = obtenerUsuarioActual() || {};
+    const idUsuario = usuario.id_usuario || usuario.id || obtenerIdUsuarioActual() || '';
+    const perfilGeneral = obtenerJSONLocal('edutech_perfil_alumno', {});
+    const perfilPorUsuario = idUsuario ? obtenerJSONLocal(`edutech_perfil_alumno_${idUsuario}`, {}) : {};
+    const ultimoPerfil = obtenerJSONLocal('edutech_ultimo_perfil_compra', {});
+
+    return {
+      ...(ultimoPerfil && typeof ultimoPerfil === 'object' && !Array.isArray(ultimoPerfil) ? ultimoPerfil : {}),
+      ...(perfilGeneral && typeof perfilGeneral === 'object' && !Array.isArray(perfilGeneral) ? perfilGeneral : {}),
+      ...(perfilPorUsuario && typeof perfilPorUsuario === 'object' && !Array.isArray(perfilPorUsuario) ? perfilPorUsuario : {})
+    };
   };
 
   const obtenerNombreEstadoCuenta = (campoEstado) => {
@@ -558,6 +576,12 @@
     };
 
     guardarJSONLocal('edutech_perfil_alumno', perfil);
+    guardarJSONLocal('edutech_ultimo_perfil_compra', perfil);
+
+    if (usuarioActualizado.id_usuario || usuarioActualizado.id) {
+      guardarJSONLocal(`edutech_perfil_alumno_${usuarioActualizado.id_usuario || usuarioActualizado.id}`, perfil);
+    }
+
     guardarJSONLocal('edutech_usuario', usuarioActualizado);
   };
 
@@ -700,6 +724,8 @@
     const checkoutSuccess = document.getElementById('checkoutSuccess');
     let checkoutError = document.getElementById('checkoutError');
     const checkoutBoton = obtenerElemento('#checkoutBoton', '.checkout-buy-button', 'button[form="compraCursoForm"]', 'button[form="checkoutForm"]');
+    const paypalButtonContainer = document.getElementById('paypal-button-container');
+    const paypalConfigMessage = document.getElementById('paypalConfigMessage');
     const checkoutCursoLinea = document.getElementById('checkoutCursoLinea');
     const resumenCurso = document.getElementById('resumenCurso');
     const resumenInstructor = document.getElementById('resumenInstructor');
@@ -709,6 +735,15 @@
     const resumenTotal = document.getElementById('resumenTotal');
 
     let cursoSeleccionado = null;
+    let cursosSeleccionados = [];
+    let paypalRenderizado = false;
+    let paypalListo = false;
+    let compraPayPalPendiente = null;
+
+    if (checkoutBoton) {
+      checkoutBoton.hidden = true;
+      checkoutBoton.style.display = 'none';
+    }
 
     if (!checkoutError && compraForm) {
       checkoutError = document.createElement('p');
@@ -760,7 +795,7 @@
     const mostrarExitoCompra = () => {
       if (checkoutSuccess) {
         if (!limpiarTexto(checkoutSuccess.textContent)) {
-          checkoutSuccess.textContent = 'Datos validados. Redirigiendo a la confirmación de compra.';
+          checkoutSuccess.textContent = 'Datos validados. Continúa con PayPal Sandbox.';
         }
 
         checkoutSuccess.classList.add('is-visible');
@@ -770,19 +805,19 @@
       ocultarErrorCompra();
     };
 
-    const textoOriginalBotonCompra = checkoutBoton ? limpiarTexto(checkoutBoton.textContent) || 'Continuar con PayPal' : 'Continuar con PayPal';
+    const textoOriginalBotonCompra = checkoutBoton ? limpiarTexto(checkoutBoton.textContent) || 'Continuar con PayPal Sandbox' : 'Continuar con PayPal Sandbox';
 
     const bloquearBotonCompra = (bloquear) => {
       if (checkoutBoton) {
         checkoutBoton.disabled = bloquear;
-        checkoutBoton.textContent = bloquear ? 'Procesando compra...' : textoOriginalBotonCompra;
+        checkoutBoton.textContent = bloquear ? 'Creando orden...' : textoOriginalBotonCompra;
       }
     };
 
     const configurarMensajesEstaticos = () => {
       actualizarTextoError(checkoutNombre, 'Escribe un nombre válido, sin números ni signos especiales.');
       actualizarTextoError(checkoutApellidos, 'Escribe apellidos válidos, sin números ni signos especiales.');
-      actualizarTextoError(checkoutCorreo, 'Escribe un correo electrónico válido.');
+      actualizarTextoError(checkoutCorreo, 'Escribe un correo electrónico válido. Usa un dominio como .com, .net, .org o .mx.');
       actualizarTextoError(checkoutTelefono, 'Escribe un teléfono válido de 10 dígitos.');
       actualizarTextoError(checkoutDireccion, 'Escribe una dirección válida.');
       actualizarTextoError(checkoutInterior, 'Escribe un interior válido.');
@@ -878,6 +913,15 @@
 
     const patronNombre = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s]+$/;
     const patronCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const dominiosCorreoPermitidos = ['com', 'net', 'org', 'edu', 'mx', 'com.mx', 'edu.mx', 'gob.mx', 'gov'];
+    const correoCompraValido = (valor) => {
+      const correo = String(valor || '').trim().toLowerCase();
+      if (!patronCorreo.test(correo) || correo.includes('..')) {
+        return false;
+      }
+      const dominio = correo.split('@')[1] || '';
+      return dominiosCorreoPermitidos.some((terminacion) => dominio === terminacion || dominio.endsWith(`.${terminacion}`));
+    };
     const patronTelefono = /^\d{10}$/;
     const patronSoloDigitos = /^\d*$/;
     const patronDireccion = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9\s#.,\-]*$/;
@@ -899,9 +943,9 @@
         },
         {
           campo: checkoutCorreo,
-          validar: (valor) => valor !== '' && patronCorreo.test(valor),
-          errorInmediato: (valor) => valor !== '' && /\s/.test(valor),
-          mensaje: 'Escribe un correo electrónico válido.'
+          validar: (valor) => valor !== '' && correoCompraValido(valor),
+          errorInmediato: (valor) => valor !== '' && (/\s/.test(valor) || (valor.includes('@') && valor.includes('.') && !correoCompraValido(valor))),
+          mensaje: 'Escribe un correo electrónico válido. Usa un dominio como .com, .net, .org o .mx.'
         },
         {
           campo: checkoutTelefono,
@@ -998,8 +1042,8 @@
         valido = valido && campoValido;
       });
 
-      if (!cursoSeleccionado || !cursoSeleccionado.id_curso) {
-        mostrarErrorCompra('No hay curso seleccionado para comprar.');
+      if (!Array.isArray(cursosSeleccionados) || cursosSeleccionados.length === 0) {
+        mostrarErrorCompra('No hay cursos seleccionados para comprar.');
         valido = false;
       }
 
@@ -1075,17 +1119,28 @@
     };
 
     const crearCompraLocal = (datosExtra = {}) => {
-      const curso = cursoSeleccionado || obtenerCursoDesdePantalla(obtenerParametroId());
+      const cursosCompra = Array.isArray(cursosSeleccionados) && cursosSeleccionados.length > 0
+        ? cursosSeleccionados
+        : [cursoSeleccionado || obtenerCursoDesdePantalla(obtenerParametroId())].filter(Boolean);
+      const curso = cursosCompra[0] || {};
+      const totalNumerico = cursosCompra.reduce((suma, item) => suma + Number(item.precio_mxn || item.precio || 0), 0);
       const precio = formatearPrecio(curso.precio_mxn || curso.precio || 0);
+      const total = datosExtra.total || formatearPrecio(totalNumerico);
 
       return {
         id_curso: curso.id_curso,
-        curso: curso.titulo || 'Curso EduTech',
-        instructor: obtenerInstructor(curso),
-        nivel: curso.nombre_nivel || curso.nivel || 'Curso disponible',
-        total_lecciones: curso.total_lecciones || curso.lecciones || 0,
+        curso: cursosCompra.length > 1 ? `${cursosCompra.length} cursos` : (curso.titulo || 'Curso EduTech'),
+        instructor: cursosCompra.length > 1 ? 'Varios instructores' : obtenerInstructor(curso),
+        nivel: cursosCompra.length > 1 ? 'Varios niveles' : (curso.nombre_nivel || curso.nivel || 'Curso disponible'),
+        total_lecciones: cursosCompra.reduce((suma, item) => suma + Number(item.total_lecciones || item.lecciones || 0), 0),
         precio,
-        total: datosExtra.total || precio,
+        total,
+        cursos: cursosCompra.map((item) => ({
+          id_curso: item.id_curso,
+          curso: item.titulo || item.curso || 'Curso EduTech',
+          instructor: obtenerInstructor(item),
+          precio: item.precio_mxn || item.precio || 0
+        })),
         nombre: obtenerValorCampo(checkoutNombre),
         apellidos: obtenerValorCampo(checkoutApellidos),
         correo: obtenerValorCampo(checkoutCorreo),
@@ -1121,6 +1176,13 @@
         resumenCurso.textContent = titulo;
       }
 
+      [resumenInstructor, resumenNivel, resumenLecciones, resumenPrecio].forEach((elemento) => {
+        const fila = elemento ? elemento.closest('.summary-item') : null;
+        if (fila) {
+          fila.style.display = '';
+        }
+      });
+
       if (resumenInstructor) {
         resumenInstructor.textContent = instructor;
       }
@@ -1142,6 +1204,60 @@
       }
     };
 
+
+    const pintarResumenCursos = (cursos) => {
+      if (!Array.isArray(cursos) || cursos.length === 0) {
+        return;
+      }
+
+      if (cursos.length === 1) {
+        pintarResumenCurso(cursos[0]);
+        return;
+      }
+
+      const total = cursos.reduce((suma, curso) => suma + Number(curso.precio_mxn || curso.precio || 0), 0);
+
+      document.title = `Comprar ${cursos.length} cursos - EduTech`;
+
+      if (checkoutCursoLinea) {
+        checkoutCursoLinea.textContent = `Estás comprando ${cursos.length} cursos del carrito.`;
+      }
+
+      if (resumenCurso) {
+        resumenCurso.textContent = `${cursos.length} cursos seleccionados`;
+      }
+
+      [resumenInstructor, resumenNivel, resumenLecciones, resumenPrecio].forEach((elemento) => {
+        const fila = elemento ? elemento.closest('.summary-item') : null;
+        if (fila) {
+          fila.style.display = 'none';
+        }
+      });
+
+      if (resumenTotal) {
+        resumenTotal.textContent = formatearPrecio(total);
+      }
+
+      let lista = document.getElementById('resumenCursosLista');
+
+      if (!lista && resumenCurso && resumenCurso.closest('.checkout-summary')) {
+        lista = document.createElement('div');
+        lista.id = 'resumenCursosLista';
+        lista.className = 'summary-courses-list';
+        resumenCurso.closest('.summary-item').insertAdjacentElement('afterend', lista);
+      }
+
+      if (lista) {
+        lista.innerHTML = '';
+        cursos.forEach((curso) => {
+          const fila = document.createElement('div');
+          fila.className = 'summary-course-row';
+          fila.innerHTML = `<span>${curso.titulo || curso.curso || 'Curso EduTech'}</span><strong>${formatearPrecio(curso.precio_mxn || curso.precio || 0)}</strong>`;
+          lista.appendChild(fila);
+        });
+      }
+    };
+
     const apiRequestConReintento = async (ruta, opciones = {}, intentos = 3) => {
       let ultimoError = null;
 
@@ -1160,6 +1276,201 @@
       throw ultimoError;
     };
 
+
+    const leerJsonStorage = (storage, clave) => {
+      const valor = storage.getItem(clave);
+
+      if (!valor) {
+        return null;
+      }
+
+      try {
+        return JSON.parse(valor);
+      } catch (error) {
+        return null;
+      }
+    };
+
+    const mostrarMensajePayPal = (mensaje, tipo = 'warning') => {
+      if (!paypalConfigMessage) {
+        if (mensaje) {
+          mostrarErrorCompra(mensaje);
+        }
+        return;
+      }
+
+      paypalConfigMessage.textContent = mensaje || '';
+      paypalConfigMessage.style.display = mensaje ? 'block' : 'none';
+      paypalConfigMessage.classList.toggle('paypal-config-error', tipo === 'error');
+      paypalConfigMessage.classList.toggle('paypal-config-success', tipo === 'success');
+    };
+
+    const cargarScriptPayPal = (clientId, currency) => {
+      return new Promise((resolve, reject) => {
+        if (window.paypal && typeof window.paypal.Buttons === 'function') {
+          resolve();
+          return;
+        }
+
+        const scriptExistente = document.querySelector('script[data-edutech-paypal-sdk="true"]');
+
+        if (scriptExistente) {
+          scriptExistente.addEventListener('load', () => resolve(), { once: true });
+          scriptExistente.addEventListener('error', () => reject(new Error('No se pudo cargar el SDK oficial de PayPal.')), { once: true });
+          return;
+        }
+
+        const script = document.createElement('script');
+        script.dataset.edutechPaypalSdk = 'true';
+        script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=${encodeURIComponent(currency || 'MXN')}&intent=capture`;
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error('No se pudo cargar el SDK oficial de PayPal.'));
+        document.head.appendChild(script);
+      });
+    };
+
+    const guardarCompraAprobadaPayPal = (compra) => {
+      sessionStorage.setItem('edutech_compra_pendiente', JSON.stringify(compra));
+      localStorage.setItem('edutech_compra_aprobada_backend', JSON.stringify(compra));
+      sessionStorage.removeItem('edutech_orden_paypal_pendiente');
+    };
+
+    const prepararOrdenParaPayPal = async () => {
+      ocultarErrorCompra();
+      mostrarMensajePayPal('');
+
+      if (!validarFormularioCompra()) {
+        mostrarErrorCompra('Revisa únicamente los campos marcados antes de pagar con PayPal.');
+        throw new Error('Formulario de compra incompleto.');
+      }
+
+      guardarPerfilAlumnoDesdeCheckout();
+
+      if (compraPayPalPendiente && compraPayPalPendiente.id_orden) {
+        return compraPayPalPendiente;
+      }
+
+      mostrarExitoCompra();
+      const compra = await crearOrdenBackend();
+
+      if (!compra || !compra.id_orden) {
+        throw new Error('No se pudo crear la orden pendiente para PayPal.');
+      }
+
+      compraPayPalPendiente = compra;
+      guardarCompraPendiente(compra);
+      return compra;
+    };
+
+    const inicializarBotonPayPal = async () => {
+      if (!paypalButtonContainer || paypalRenderizado) {
+        return;
+      }
+
+      if (!window.EduTech || typeof window.EduTech.apiRequest !== 'function') {
+        mostrarMensajePayPal('No se cargó la conexión con la API de EduTech. Recarga la página.', 'error');
+        return;
+      }
+
+      try {
+        mostrarMensajePayPal('Cargando botón oficial de PayPal Sandbox...');
+
+        const config = await window.EduTech.apiRequest('/paypal/config');
+
+        if (!config.clientId) {
+          mostrarMensajePayPal(config.message || 'Falta configurar PAYPAL_CLIENT_ID en backend/.env para mostrar el botón oficial de PayPal.', 'error');
+          return;
+        }
+
+        await cargarScriptPayPal(config.clientId, config.currency || 'MXN');
+
+        if (!window.paypal || typeof window.paypal.Buttons !== 'function') {
+          throw new Error('El SDK oficial de PayPal no quedó disponible en la página.');
+        }
+
+        paypalButtonContainer.innerHTML = '';
+
+        window.paypal.Buttons({
+          style: {
+            layout: 'vertical',
+            color: 'gold',
+            shape: 'rect',
+            label: 'paypal'
+          },
+
+          createOrder: async () => {
+            const compra = await prepararOrdenParaPayPal();
+
+            const respuesta = await window.EduTech.apiRequest(`/paypal/ordenes/${compra.id_orden}/crear-orden`, {
+              method: 'POST'
+            });
+
+            if (!respuesta.paypalOrderId) {
+              throw new Error('PayPal no devolvió el identificador de orden.');
+            }
+
+            return respuesta.paypalOrderId;
+          },
+
+          onApprove: async (data) => {
+            mostrarMensajePayPal('Pago aprobado por PayPal. Liberando el curso...', 'success');
+
+            const compraBase = compraPayPalPendiente || leerJsonStorage(sessionStorage, 'edutech_orden_paypal_pendiente') || {};
+            const idOrden = compraBase.id_orden;
+
+            if (!idOrden) {
+              throw new Error('No se encontró la orden interna para capturar el pago.');
+            }
+
+            const respuesta = await window.EduTech.apiRequest(`/paypal/ordenes/${idOrden}/capturar-orden`, {
+              method: 'POST',
+              body: {
+                paypalOrderId: data.orderID
+              }
+            });
+
+            const compraAprobada = {
+              ...compraBase,
+              ...(respuesta.compra || {}),
+              id_curso: (respuesta.compra && respuesta.compra.id_curso) || compraBase.id_curso || obtenerParametroId(),
+              id_orden: Number(idOrden),
+              estatus: 'Aprobada'
+            };
+
+            guardarCompraAprobadaPayPal(compraAprobada);
+
+            if (esCompraDesdeCarrito() && window.EduTechCarrito) {
+              window.EduTechCarrito.limpiar();
+            }
+
+            window.location.href = esCompraDesdeCarrito()
+              ? 'compra-aprobada.html'
+              : `compra-aprobada.html?id=${compraAprobada.id_curso || obtenerParametroId() || ''}`;
+          },
+
+          onCancel: () => {
+            mostrarMensajePayPal('El pago fue cancelado en PayPal. La orden queda pendiente y el curso no se libera.', 'error');
+          },
+
+          onError: (error) => {
+            mostrarMensajePayPal(error && error.message ? error.message : 'PayPal no pudo completar el pago. Intenta de nuevo.', 'error');
+          }
+        }).render('#paypal-button-container');
+
+        paypalRenderizado = true;
+        paypalListo = true;
+        mostrarMensajePayPal('');
+      } catch (error) {
+        paypalRenderizado = false;
+        paypalListo = false;
+        if (paypalButtonContainer) {
+          paypalButtonContainer.innerHTML = '';
+        }
+        mostrarMensajePayPal(error.message || 'No se pudo preparar el botón oficial de PayPal Sandbox.', 'error');
+      }
+    };
+
     const crearOrdenBackend = async () => {
       const idUsuario = obtenerIdUsuarioActual();
 
@@ -1171,7 +1482,7 @@
         method: 'POST',
         body: {
           id_usuario: Number(idUsuario),
-          cursos: [Number(cursoSeleccionado.id_curso)],
+          cursos: cursosSeleccionados.map((curso) => Number(curso.id_curso)).filter((id) => Number.isInteger(id) && id > 0),
           datos_compra: construirDatosCompra()
         }
       }, 3);
@@ -1182,26 +1493,18 @@
         throw new Error('La API no devolvió la orden creada.');
       }
 
-      const respuestaPago = await apiRequestConReintento(`/ordenes/${orden.id_orden}/pago-simulado`, {
-        method: 'POST'
-      }, 3);
-
-      const pago = respuestaPago.pago || null;
-      const inscripciones = Array.isArray(respuestaPago.inscripciones) ? respuestaPago.inscripciones : [];
-      const inscripcion = inscripciones[0] || null;
-
       const compra = crearCompraLocal({
         id_orden: orden.id_orden,
         numero_orden: orden.numero_orden,
-        id_pago: pago ? pago.id_pago : null,
-        id_inscripcion: inscripcion ? inscripcion.id_inscripcion : null,
+        id_pago: null,
+        id_inscripcion: null,
         total: formatearPrecio(orden.total),
-        fecha_compra: (pago && pago.fecha_pago) || (inscripcion && inscripcion.fecha_inscripcion) || orden.fecha_creacion || new Date().toISOString(),
-        fecha_inscripcion: (inscripcion && inscripcion.fecha_inscripcion) || (pago && pago.fecha_pago) || orden.fecha_creacion || new Date().toISOString(),
-        estatus: 'Aprobada'
+        fecha_compra: orden.fecha_creacion || new Date().toISOString(),
+        fecha_orden: orden.fecha_creacion || new Date().toISOString(),
+        estatus: 'Pendiente'
       });
 
-      localStorage.setItem('edutech_compra_aprobada_backend', JSON.stringify(compra));
+      sessionStorage.setItem('edutech_orden_paypal_pendiente', JSON.stringify(compra));
 
       return compra;
     };
@@ -1210,49 +1513,45 @@
       evento.preventDefault();
       ocultarErrorCompra();
 
-      if (!validarFormularioCompra()) {
-        mostrarErrorCompra('Revisa únicamente los campos marcados antes de continuar.');
-        return;
-      }
-
-      guardarPerfilAlumnoDesdeCheckout();
-      bloquearBotonCompra(true);
-
       try {
-        let compra = null;
-
-        try {
-          compra = await crearOrdenBackend();
-        } catch (error) {
-          compra = crearCompraLocal({
-            id_orden: null,
-            numero_orden: `ORD-LOCAL-${Date.now()}`,
-            id_pago: null,
-            estatus: 'Aprobada',
-            fecha_compra: new Date().toISOString(),
-            respaldo_local: true
-          });
-        }
-
-        if (!compra) {
-          compra = crearCompraLocal({
-            numero_orden: `ORD-LOCAL-${Date.now()}`,
-            estatus: 'Aprobada',
-            fecha_compra: new Date().toISOString(),
-            respaldo_local: true
-          });
-        }
-
-        guardarCompraPendiente(compra);
-        mostrarExitoCompra();
-
-        window.setTimeout(() => {
-          window.location.href = `compra-aprobada.html?id=${compra.id_curso}`;
-        }, 650);
+        await prepararOrdenParaPayPal();
+        mostrarMensajePayPal(paypalListo ? 'Orden creada. Ahora termina el pago con el botón oficial de PayPal.' : 'Orden creada. Espera a que cargue el botón oficial de PayPal.', 'success');
       } catch (error) {
-        mostrarErrorCompra('No se pudo completar la compra. Revisa los campos e intenta de nuevo.');
+        mostrarErrorCompra(error.message || 'No se pudo crear la orden para PayPal. Revisa los campos e intenta de nuevo.');
+      } finally {
         bloquearBotonCompra(false);
       }
+    };
+
+    const cargarCursosActualesDelCarrito = async (carrito) => {
+      if (!Array.isArray(carrito) || carrito.length === 0 || !window.EduTech || typeof window.EduTech.apiRequest !== 'function') {
+        return carrito;
+      }
+
+      const cursos = [];
+
+      for (const item of carrito) {
+        const idCurso = Number(item.id_curso || item.idCurso || item.id);
+        if (!Number.isInteger(idCurso) || idCurso <= 0) {
+          continue;
+        }
+
+        try {
+          const respuesta = await apiRequestConReintento(`/cursos/${idCurso}`, {}, 2);
+          const curso = respuesta.curso || respuesta.data || respuesta;
+          if (curso && curso.id_curso) {
+            cursos.push(curso);
+          }
+        } catch (error) {
+          cursos.push(item);
+        }
+      }
+
+      if (window.EduTechCarrito && cursos.length > 0) {
+        window.EduTechCarrito.guardar(cursos);
+      }
+
+      return cursos;
     };
 
     const cargarCursoCompra = async () => {
@@ -1262,13 +1561,33 @@
       const idCurso = obtenerParametroId();
 
       try {
+        if (esCompraDesdeCarrito()) {
+          const carrito = window.EduTechCarrito ? window.EduTechCarrito.obtener() : [];
+
+          if (!Array.isArray(carrito) || carrito.length === 0) {
+            cursosSeleccionados = [];
+            cursoSeleccionado = null;
+            mostrarErrorCompra('Tu carrito está vacío. Agrega cursos antes de continuar.');
+            return;
+          }
+
+          const carritoActualizado = await cargarCursosActualesDelCarrito(carrito);
+          cursosSeleccionados = carritoActualizado;
+          cursoSeleccionado = carritoActualizado[0];
+          pintarResumenCursos(carritoActualizado);
+          ocultarErrorCompra();
+          return;
+        }
+
         if (!idCurso) {
           cursoSeleccionado = obtenerCursoDesdePantalla(null);
+          cursosSeleccionados = [];
           mostrarErrorCompra('No se indicó qué curso se va a comprar.');
           return;
         }
 
         cursoSeleccionado = obtenerCursoDesdePantalla(idCurso);
+        cursosSeleccionados = cursoSeleccionado && cursoSeleccionado.id_curso ? [cursoSeleccionado] : [];
 
         if (!window.EduTech || typeof window.EduTech.apiRequest !== 'function') {
           return;
@@ -1282,13 +1601,14 @@
         }
 
         cursoSeleccionado = curso;
+        cursosSeleccionados = [curso];
         sessionStorage.setItem('edutech_curso_compra_id', String(curso.id_curso));
         pintarResumenCurso(curso);
         ocultarErrorCompra();
       } catch (error) {
         mostrarResumenCompra();
       } finally {
-        if (cursoSeleccionado && cursoSeleccionado.id_curso) {
+        if (Array.isArray(cursosSeleccionados) && cursosSeleccionados.length > 0) {
           bloquearBotonCompra(false);
         }
 
@@ -1340,7 +1660,9 @@
       compraForm.addEventListener('submit', manejarEnvioCompra);
     }
 
-    cargarCursoCompra();
+    cargarCursoCompra().then(() => {
+      inicializarBotonPayPal();
+    });
   };
 
   if (document.readyState === 'loading') {

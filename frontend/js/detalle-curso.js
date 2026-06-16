@@ -258,6 +258,14 @@ const obtenerInstructor = (curso) => {
   return instructor || 'Instructor EduTech';
 };
 
+const obtenerFotoInstructor = (curso) => String(
+  curso?.foto_perfil_instructor
+  || curso?.foto_instructor
+  || curso?.foto_perfil_url_instructor
+  || curso?.instructor_foto
+  || ''
+).trim();
+
 const obtenerNivel = (curso) => {
   return normalizarTextoVisible(
     curso.nombre_nivel ||
@@ -418,6 +426,113 @@ const obtenerAvancesLocales = () => {
 
 const obtenerIdCursoValor = (curso) => curso && (curso.id_curso || curso.id || curso.idCurso);
 
+const obtenerResultadoExamenLocalDetalle = (curso) => {
+  const idCurso = obtenerIdCursoValor(curso);
+  const idInscripcion = curso && (curso.id_inscripcion || curso.idInscripcion);
+  const listas = [
+    leerJsonStorage('edutech_resultados_examenes', []),
+    leerJsonStorage('edutech_resultados_examenes_historial', [])
+  ];
+
+  for (const lista of listas) {
+    if (!Array.isArray(lista)) {
+      continue;
+    }
+
+    const coincidencias = lista
+      .filter((item) => {
+        const mismoCurso = idCurso && String(item.id_curso || item.idCurso || item.id) === String(idCurso);
+        const mismaInscripcion = idInscripcion && String(item.id_inscripcion || item.idInscripcion || '') === String(idInscripcion);
+        return mismoCurso || mismaInscripcion;
+      })
+      .sort((a, b) => new Date(b.fecha_fin || b.fecha_inicio || b.fecha || 0) - new Date(a.fecha_fin || a.fecha_inicio || a.fecha || 0));
+
+    if (coincidencias[0]) {
+      return coincidencias[0];
+    }
+  }
+
+  return null;
+};
+
+const examenRealizadoDetalle = (curso) => {
+  const examen = curso && (curso.examen || curso.examen_final || null);
+
+  return Boolean(
+    obtenerResultadoExamenLocalDetalle(curso) ||
+    (examen && (
+      examen.ultimo_resultado ||
+      examen.ultimoResultado ||
+      Number(examen.intentos_realizados || examen.intentosRealizados || 0) > 0 ||
+      (Array.isArray(examen.intentos) && examen.intentos.length > 0)
+    )) ||
+    Number(curso && (curso.intentos_examen || curso.intentos_realizados || 0)) > 0
+  );
+};
+
+const examenTieneIntentoDetalle = (examen) => {
+  if (!examen) {
+    return false;
+  }
+
+  return Boolean(
+    Number(examen.intentos_realizados || examen.intentosRealizados || 0) > 0 ||
+    (Array.isArray(examen.intentos) && examen.intentos.length > 0) ||
+    examen.ultimo_resultado ||
+    examen.ultimoResultado
+  );
+};
+
+const marcarExamenIntentadoDetalle = (idCurso) => {
+  if (!detalleContenido || !idCurso) {
+    return;
+  }
+
+  const filas = detalleContenido.querySelectorAll(`[data-edutech-examen-final="true"][data-id-curso="${String(idCurso)}"]`);
+
+  filas.forEach((fila) => {
+    fila.classList.add('lesson-row-completed');
+    fila.classList.remove('lesson-row-locked');
+    fila.removeAttribute('aria-disabled');
+
+    const icono = fila.querySelector('.lesson-status-icon');
+
+    if (icono) {
+      icono.classList.add('done');
+      icono.classList.remove('is-locked');
+      icono.removeAttribute('aria-label');
+
+      if (!icono.querySelector('.fa-check-circle')) {
+        icono.innerHTML = '';
+        const check = document.createElement('i');
+        check.className = 'fa fa-check-circle';
+        check.setAttribute('aria-hidden', 'true');
+        icono.appendChild(check);
+      }
+    }
+  });
+};
+
+const sincronizarExamenIntentadoDetalle = async (curso) => {
+  const idCurso = obtenerIdCursoValor(curso);
+  const idUsuario = obtenerIdUsuarioActual();
+
+  if (!idCurso || !idUsuario || !cursoEstaComprado(idCurso) || !window.EduTech || typeof window.EduTech.apiRequest !== 'function') {
+    return;
+  }
+
+  try {
+    const respuesta = await window.EduTech.apiRequest(`/usuarios/${idUsuario}/cursos/${idCurso}/examen`);
+    const examen = respuesta && respuesta.examen ? respuesta.examen : null;
+
+    if (examenTieneIntentoDetalle(examen)) {
+      marcarExamenIntentadoDetalle(idCurso);
+    }
+  } catch (error) {
+    // Si el curso no tiene examen activo o la API no responde, no rompemos el detalle del curso.
+  }
+};
+
 const obtenerIdInscripcionCurso = (curso) => {
   const idDirecto = curso && (curso.id_inscripcion || curso.idInscripcion);
 
@@ -459,16 +574,18 @@ const obtenerUrlExamenCurso = (curso) => {
   const idInscripcion = obtenerIdInscripcionCurso(curso);
   const parametros = new URLSearchParams();
 
-  if (idCurso) {
-    parametros.set('id', String(idCurso));
-  }
-
   if (idInscripcion) {
     parametros.set('idInscripcion', String(idInscripcion));
   }
 
+  if (idCurso) {
+    parametros.set('idCurso', String(idCurso));
+  }
+
+  parametros.set('idLeccion', 'examen-final');
+
   const query = parametros.toString();
-  return query ? `examen.html?${query}` : 'examen.html';
+  return query ? `aula.html?${query}` : 'aula.html?idLeccion=examen-final';
 };
 
 const contarLeccionesCurso = (curso) => {
@@ -498,14 +615,22 @@ const leccionCompletadaLocalmente = (curso, leccion) => {
 };
 
 const leccionEstaCompletada = (curso, leccion) => {
-  return Boolean(
-    leccion && (
-      leccion.completada === true ||
-      leccion.esta_completada === true ||
-      leccion.completada === 'true' ||
-      leccionCompletadaLocalmente(curso, leccion)
-    )
-  );
+  if (!leccion) {
+    return false;
+  }
+
+  // Si el backend mandó el estado de progreso, se respeta aunque sea false.
+  // Esto evita que avances viejos de localStorage marquen como completadas
+  // lecciones de cursos iniciales después de resetear progreso.
+  if (Object.prototype.hasOwnProperty.call(leccion, 'completada')) {
+    return leccion.completada === true || leccion.completada === 'true' || leccion.completada === 1 || leccion.completada === '1';
+  }
+
+  if (Object.prototype.hasOwnProperty.call(leccion, 'esta_completada')) {
+    return leccion.esta_completada === true || leccion.esta_completada === 'true' || leccion.esta_completada === 1 || leccion.esta_completada === '1';
+  }
+
+  return leccionCompletadaLocalmente(curso, leccion);
 };
 
 const obtenerLeccionesPlanas = (curso) => {
@@ -839,6 +964,69 @@ const esLeccionExamenFinal = (leccion, modulo = null) => {
   return tituloLeccion.includes('examen final') || tituloModulo.includes('examen final');
 };
 
+const cursoContenidoCompletoDetalle = (curso) => {
+  const modulos = Array.isArray(curso && curso.modulos) ? curso.modulos : [];
+  const leccionesContenido = [];
+
+  modulos.forEach((modulo) => {
+    const lecciones = Array.isArray(modulo.lecciones) ? modulo.lecciones : [];
+    lecciones.forEach((leccion) => {
+      if (!esLeccionExamenFinal(leccion, modulo)) {
+        leccionesContenido.push(leccion);
+      }
+    });
+  });
+
+  return leccionesContenido.length > 0 && leccionesContenido.every((leccion) => leccionEstaCompletada(curso, leccion));
+};
+
+const examenCompletadoVisibleDetalle = (curso) => examenRealizadoDetalle(curso) && cursoContenidoCompletoDetalle(curso);
+
+const cursoTieneModuloExamenFinal = (curso) => {
+  const modulos = Array.isArray(curso && curso.modulos) ? curso.modulos : [];
+  return modulos.some((modulo) => {
+    if (String(modulo.titulo || '').toLowerCase().includes('examen final')) {
+      return true;
+    }
+
+    return Array.isArray(modulo.lecciones) && modulo.lecciones.some((leccion) => esLeccionExamenFinal(leccion, modulo));
+  });
+};
+
+const agregarModuloExamenFinalSiAplica = (curso) => {
+  if (!curso || !cursoEstaComprado(obtenerIdCursoValor(curso)) || cursoTieneModuloExamenFinal(curso)) {
+    return curso;
+  }
+
+  const modulos = Array.isArray(curso.modulos) ? [...curso.modulos] : [];
+  const leccionesContenido = modulos.reduce((total, modulo) => total + (Array.isArray(modulo.lecciones) ? modulo.lecciones.length : 0), 0);
+
+  if (leccionesContenido <= 0) {
+    return curso;
+  }
+
+  return {
+    ...curso,
+    modulos: [
+      ...modulos,
+      {
+        id_modulo: 'modulo-examen-final',
+        titulo: 'Examen Final',
+        numero_orden: 9999,
+        lecciones: [
+          {
+            id_leccion: 'examen-final',
+            titulo: 'Examen final',
+            numero_orden: 1,
+            es_examen_final: true,
+            completada: examenCompletadoVisibleDetalle(curso)
+          }
+        ]
+      }
+    ]
+  };
+};
+
 const crearEnlaceLeccion = (curso, modulo, leccion, disponible, completada) => {
   const titulo = leccion.titulo || leccion.nombre_leccion || leccion.nombre || 'Lección';
   const enlace = crearElemento('a', 'lesson-title-text lesson-title-link', titulo);
@@ -886,15 +1074,26 @@ const crearEnlaceLeccion = (curso, modulo, leccion, disponible, completada) => {
   return enlace;
 };
 
-const crearIconoEstadoLeccion = (completada) => {
-  const icono = crearElemento(
-    'span',
-    completada ? 'llms-lesson-complete done lesson-status-icon' : 'llms-lesson-complete lesson-status-icon'
-  );
-  const check = crearElemento('i', 'fa fa-check-circle');
+const crearIconoEstadoLeccion = (completada, bloqueada = false) => {
+  const clases = ['llms-lesson-complete', 'lesson-status-icon'];
 
-  check.setAttribute('aria-hidden', 'true');
-  icono.appendChild(check);
+  if (completada) {
+    clases.push('done');
+  }
+
+  if (bloqueada) {
+    clases.push('is-locked');
+  }
+
+  const icono = crearElemento('span', clases.join(' '));
+  const iconoEstado = crearElemento('i', 'fa fa-check-circle');
+
+  iconoEstado.setAttribute('aria-hidden', 'true');
+  icono.appendChild(iconoEstado);
+
+  if (bloqueada) {
+    icono.setAttribute('aria-label', 'Bloqueado');
+  }
 
   return icono;
 };
@@ -913,6 +1112,8 @@ const pintarContenidoCurso = (curso) => {
   }
 
   detalleContenido.innerHTML = '';
+
+  curso = agregarModuloExamenFinalSiAplica(curso);
 
   const modulos = Array.isArray(curso.modulos) ? curso.modulos : [];
   const sesionActiva = haySesionActivaDetalle();
@@ -937,9 +1138,13 @@ const pintarContenidoCurso = (curso) => {
 
   modulos.forEach((modulo) => {
     const bloque = crearElemento('section', 'module-box');
-    const titulo = crearElemento('h3', null, modulo.titulo || 'Módulo');
+    const titulo = crearElemento('h3', 'module-title-with-caret');
+    const tituloTexto = crearElemento('span', null, modulo.titulo || 'Módulo');
+    const tituloFlecha = crearElemento('span', 'module-caret', '▾');
     const lecciones = Array.isArray(modulo.lecciones) ? modulo.lecciones : [];
 
+    titulo.appendChild(tituloTexto);
+    titulo.appendChild(tituloFlecha);
     bloque.appendChild(titulo);
 
     if (lecciones.length === 0) {
@@ -955,12 +1160,20 @@ const pintarContenidoCurso = (curso) => {
     }
 
     lecciones.forEach((leccion, index) => {
-      const completada = leccionEstaCompletada(curso, leccion);
-      const disponible = completada || puedeAvanzar;
+      const esExamen = esLeccionExamenFinal(leccion, modulo);
+      const completada = leccionEstaCompletada(curso, leccion) || (esExamen && examenCompletadoVisibleDetalle(curso));
+      const disponible = esExamen ? cursoContenidoCompletoDetalle(curso) : (completada || puedeAvanzar);
       const fila = crearElemento('div', 'lesson-row course-lesson-row');
+
+      if (esExamen) {
+        fila.dataset.edutechExamenFinal = 'true';
+        fila.dataset.idCurso = String(obtenerIdCursoValor(curso) || '');
+      }
+
       const contenido = crearElemento('span', 'lesson-content-left');
       const texto = crearElemento('span', 'lesson-title-wrap');
-      const icono = crearIconoEstadoLeccion(completada);
+      const bloqueada = !sesionActiva || !cursoComprado || (!disponible && !completada);
+      const icono = crearIconoEstadoLeccion(completada, bloqueada);
       const tituloLeccion = crearEnlaceLeccion(curso, modulo, leccion, disponible, completada);
 
       texto.appendChild(tituloLeccion);
@@ -975,8 +1188,11 @@ const pintarContenidoCurso = (curso) => {
         fila.classList.add('lesson-row-login-required');
         fila.classList.add('lesson-row-locked');
         fila.setAttribute('aria-disabled', 'true');
+        fila.style.cursor = 'not-allowed';
       } else if (!disponible) {
         fila.classList.add('lesson-row-locked');
+        fila.setAttribute('aria-disabled', 'true');
+        fila.style.cursor = 'not-allowed';
       }
 
       if (sesionActiva && cursoComprado) {
@@ -1013,6 +1229,50 @@ const pintarContenidoCurso = (curso) => {
 
     detalleContenido.appendChild(bloque);
   });
+
+  sincronizarExamenIntentadoDetalle(curso);
+};
+
+
+const obtenerCursoParaCarritoDetalle = (curso) => {
+  const idCurso = curso && (curso.id_curso || curso.id || curso.idCurso);
+
+  return {
+    ...curso,
+    id_curso: Number(idCurso),
+    titulo: curso.titulo || curso.curso || 'Curso EduTech',
+    instructor: obtenerInstructor(curso),
+    nombre_nivel: curso.nombre_nivel || curso.nivel || '',
+    total_lecciones: curso.total_lecciones || curso.lecciones || contarLeccionesCurso(curso),
+    precio_mxn: Number(curso.precio_mxn || curso.precio || 0)
+  };
+};
+
+const asegurarBotonCarritoDetalle = () => {
+  let boton = document.getElementById('detalleBotonAgregarCarrito');
+
+  if (boton) {
+    return boton;
+  }
+
+  if (!detalleBotonCompra || !detalleBotonCompra.parentElement) {
+    return null;
+  }
+
+  const contenedorAcciones = document.createElement('div');
+  contenedorAcciones.className = 'purchase-actions-detail';
+
+  detalleBotonCompra.insertAdjacentElement('beforebegin', contenedorAcciones);
+  contenedorAcciones.appendChild(detalleBotonCompra);
+
+  boton = document.createElement('button');
+  boton.id = 'detalleBotonAgregarCarrito';
+  boton.type = 'button';
+  boton.className = 'button secondary purchase-cart-add-button';
+  boton.textContent = 'Agregar al carrito';
+  contenedorAcciones.appendChild(boton);
+
+  return boton;
 };
 
 const prepararVistaCompra = (comprado) => {
@@ -1043,16 +1303,31 @@ const prepararBotonCompra = (curso) => {
 
   prepararVistaCompra(comprado);
 
+  const botonCarrito = asegurarBotonCarritoDetalle();
+
   if (esInstructor && !comprado) {
     detalleBotonCompra.removeAttribute('href');
     detalleBotonCompra.setAttribute('aria-disabled', 'true');
     detalleBotonCompra.textContent = '';
+
+    if (botonCarrito) {
+      botonCarrito.style.display = 'none';
+    }
+
     return;
   }
 
+  const enCarrito = window.EduTechCarrito && window.EduTechCarrito.contiene(idCurso);
+
   detalleBotonCompra.classList.toggle('purchase-button-owned', comprado);
-  detalleBotonCompra.textContent = comprado ? 'Entrar al curso' : 'Comprar curso';
+  detalleBotonCompra.textContent = comprado ? 'Entrar al curso' : 'Comprar ahora';
   detalleBotonCompra.href = comprado ? obtenerUrlAulaCurso(curso) : `comprar-curso.html?id=${idCurso}`;
+
+  if (botonCarrito) {
+    botonCarrito.style.display = comprado ? 'none' : 'inline-flex';
+    botonCarrito.textContent = enCarrito ? 'Agregado al carrito' : 'Agregar al carrito';
+    botonCarrito.classList.toggle('is-in-cart', Boolean(enCarrito));
+  }
 
   detalleBotonCompra.addEventListener('click', (evento) => {
     evento.preventDefault();
@@ -1071,6 +1346,30 @@ const prepararBotonCompra = (curso) => {
 
     window.location.href = `comprar-curso.html?id=${idCurso}`;
   });
+
+  if (botonCarrito) {
+    botonCarrito.addEventListener('click', () => {
+      if (comprado || usuarioEsInstructorDetalle()) {
+        return;
+      }
+
+      if (!window.EduTechCarrito) {
+        mostrarMensajeDetalle('No se pudo cargar el carrito. Recarga la página e inténtalo de nuevo.', true);
+        return;
+      }
+
+      const resultado = window.EduTechCarrito.agregar(obtenerCursoParaCarritoDetalle(curso));
+
+      if (!resultado.ok) {
+        mostrarMensajeDetalle(resultado.message || 'No se pudo agregar el curso al carrito.', true);
+        return;
+      }
+
+      botonCarrito.textContent = 'Agregado al carrito';
+      botonCarrito.classList.add('is-in-cart');
+      mostrarMensajeDetalle(resultado.message || 'Curso agregado al carrito.');
+    });
+  }
 };
 
 const pintarCurso = async (curso) => {
@@ -1116,7 +1415,14 @@ const pintarCurso = async (curso) => {
   }
 
   if (detalleInstructorAvatar) {
-    detalleInstructorAvatar.textContent = instructor.charAt(0).toUpperCase();
+    const fotoInstructor = obtenerFotoInstructor(curso);
+    detalleInstructorAvatar.classList.toggle('has-image', Boolean(fotoInstructor));
+
+    if (fotoInstructor) {
+      detalleInstructorAvatar.innerHTML = `<img src="${escaparHtml(fotoInstructor)}" alt="">`;
+    } else {
+      detalleInstructorAvatar.textContent = instructor.charAt(0).toUpperCase();
+    }
   }
 
   if (detalleInstructor) {

@@ -189,6 +189,43 @@ const prepararEnlaceDetalle = (enlace, idCurso) => {
   });
 };
 
+
+
+const crearBotonCarritoCursos = (curso, idCurso) => {
+  const boton = crearElemento('button', 'course-cart-button', 'Agregar al carrito');
+  boton.type = 'button';
+
+  const actualizarTexto = () => {
+    const enCarrito = window.EduTechCarrito && window.EduTechCarrito.contiene(idCurso);
+    boton.textContent = enCarrito ? 'En carrito' : 'Agregar al carrito';
+    boton.classList.toggle('is-in-cart', Boolean(enCarrito));
+  };
+
+  actualizarTexto();
+
+  boton.addEventListener('click', (evento) => {
+    evento.preventDefault();
+    evento.stopPropagation();
+
+    if (!window.EduTechCarrito) {
+      mostrarMensajeCursos('No se pudo cargar el carrito. Recarga la página e intenta de nuevo.', true);
+      return;
+    }
+
+    const resultado = window.EduTechCarrito.agregar(curso);
+
+    if (!resultado.ok) {
+      mostrarMensajeCursos(resultado.message || 'No se pudo agregar el curso al carrito.', true);
+      return;
+    }
+
+    actualizarTexto();
+    mostrarMensajeCursos(resultado.message || 'Curso agregado al carrito.');
+  });
+
+  return boton;
+};
+
 const prepararImagenCurso = (img, cover, curso, titulo) => {
   return new Promise((resolve) => {
     const imagen = obtenerImagenCurso(curso);
@@ -280,14 +317,17 @@ const crearTarjetaCurso = (curso) => {
 
   const footer = crearElemento('div', 'course-footer-tc');
   const precioElemento = crearElemento('strong', null, precio);
+  const acciones = crearElemento('div', 'course-footer-actions');
   const linkCurso = crearElemento('a', comprado ? 'course-entry-link' : null, comprado ? 'Entrar al curso' : 'Ver curso');
   prepararEnlaceDetalle(linkCurso, idCurso);
 
   if (!comprado) {
     footer.appendChild(precioElemento);
+    acciones.appendChild(crearBotonCarritoCursos(curso, idCurso));
   }
 
-  footer.appendChild(linkCurso);
+  acciones.appendChild(linkCurso);
+  footer.appendChild(acciones);
 
   contenido.appendChild(h2);
   contenido.appendChild(descripcionElemento);
