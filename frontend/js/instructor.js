@@ -96,6 +96,25 @@
     elementos.mensaje.style.display = 'none';
   };
 
+  const consumirMensajeAcceso = () => {
+    const mensaje = sessionStorage.getItem('edutech_mensaje_acceso');
+    const destino = sessionStorage.getItem('edutech_mensaje_acceso_destino') || 'instructor.html';
+    const pagina = window.location.pathname.split('/').pop() || 'instructor.html';
+
+    if (!mensaje) {
+      return;
+    }
+
+    sessionStorage.removeItem('edutech_mensaje_acceso');
+    sessionStorage.removeItem('edutech_mensaje_acceso_destino');
+
+    if (destino !== pagina || /inicia sesi[oó]n/i.test(mensaje)) {
+      return;
+    }
+
+    mostrarMensaje(mensaje, true);
+  };
+
   const mostrarEstadoFormulario = (texto) => {
     if (!elementos.formEstado) {
       return;
@@ -416,7 +435,7 @@
     actualizarPreviewFotoInstructor(foto);
   };
 
-  const guardarCuentaInstructor = (evento) => {
+  const guardarCuentaInstructor = async (evento) => {
     evento.preventDefault();
 
     const campos = [
@@ -460,15 +479,36 @@
       foto_perfil_url: foto
     };
 
-    estado.usuario = usuarioActualizado;
-    guardarJSONInstructor('edutech_usuario', usuarioActualizado);
-    guardarJSONInstructor('edutech_perfil_instructor', perfil);
+    try {
+      const idInstructor = obtenerIdInstructor();
 
-    actualizarPreviewFotoInstructor(foto);
-    pintarPerfil();
+      if (idInstructor && window.EduTech && typeof window.EduTech.apiRequest === 'function') {
+        const respuestaPerfil = await window.EduTech.apiRequest(`/instructores/${encodeURIComponent(idInstructor)}/perfil`, {
+          method: 'PUT',
+          body: {
+            foto_perfil_url: foto
+          }
+        });
 
-    if (elementos.cuentaGuardada) {
-      elementos.cuentaGuardada.style.display = 'block';
+        if (respuestaPerfil && respuestaPerfil.instructor) {
+          usuarioActualizado.foto_perfil_url = respuestaPerfil.instructor.foto_perfil_url || foto;
+          usuarioActualizado.foto_perfil = respuestaPerfil.instructor.foto_perfil_url || foto;
+        }
+      }
+
+      estado.usuario = usuarioActualizado;
+      guardarJSONInstructor('edutech_usuario', usuarioActualizado);
+      guardarJSONInstructor('edutech_perfil_instructor', perfil);
+
+      actualizarPreviewFotoInstructor(foto);
+      pintarPerfil();
+
+      if (elementos.cuentaGuardada) {
+        elementos.cuentaGuardada.textContent = 'Perfil actualizado correctamente.';
+        elementos.cuentaGuardada.style.display = 'block';
+      }
+    } catch (error) {
+      mostrarMensaje(error.message || 'No se pudo guardar la imagen del perfil.', true);
     }
   };
 
@@ -623,6 +663,14 @@
       if (!/^\d+(\.\d{0,2})?$/.test(precioTexto)) {
         return 'El precio debe ser un número válido.';
       }
+
+      if (Number(precioTexto) <= 0) {
+        return 'El precio debe ser mayor a 0.';
+      }
+
+      if (Number(precioTexto) > 9999) {
+        return 'El precio no puede ser mayor a $9,999 MXN.';
+      }
     }
 
     if (campo === elementos.nivel) {
@@ -725,8 +773,12 @@
     }
 
     if (campo.classList.contains('instructorLeccionDuracion')) {
-      if (valor && (!/^\d+$/.test(valor) || Number(valor) < 0 || Number(valor) > 600)) {
-        return 'La duración debe ser un número de minutos entre 0 y 600.';
+      if (valor.length === 0) {
+        return 'Agrega la duración aproximada de la lección.';
+      }
+
+      if (!/^\d+$/.test(valor) || Number(valor) < 1 || Number(valor) > 600) {
+        return 'La duración debe ser un número de minutos entre 1 y 600.';
       }
     }
 
@@ -1211,7 +1263,7 @@
     }
 
     if (elementos.descripcion) {
-      elementos.descripcion.textContent = `Hola, ${nombre}. Administra tus cursos, módulos, lecciones, exámenes y resultados de alumnos.`;
+      elementos.descripcion.textContent = `Hola, ${nombre}. Administra tus cursos, módulos, lecciones y exámenes.`;
     }
   };
 
@@ -1300,6 +1352,12 @@
     const totalAprobados = Number(curso.total_aprobados || 0);
     const promedio = Number(curso.promedio_examen || 0);
     const examen = curso.examen || null;
+    const filtroCurso = obtenerFiltroCurso(curso);
+    const tipoEliminacion = filtroCurso === 'rechazado' ? 'rechazado' : 'borrador';
+    const puedeEliminarCurso = ['borrador', 'rechazado'].includes(filtroCurso);
+    const textoBotonEliminar = tipoEliminacion === 'rechazado'
+      ? 'Eliminar curso rechazado'
+      : 'Eliminar borrador';
     const fechaBorrador = curso.fecha_actualizacion || curso.fecha_creacion;
     const fechaRevision = curso.ultima_revision?.fecha_revision || '';
     const textoFechaPrincipal = normalizarEstadoTexto(estadoCurso).includes('borrador')
@@ -1311,7 +1369,7 @@
 
     const articulo = document.createElement('article');
     articulo.className = 'instructor-course-card';
-    articulo.dataset.estadoCurso = obtenerFiltroCurso(curso);
+    articulo.dataset.estadoCurso = filtroCurso;
 
     articulo.innerHTML = `
       <div class="instructor-course-main">
@@ -1343,8 +1401,8 @@
 
       <div class="instructor-course-actions">
         <a href="#crear" data-panel-target="crear" data-action="editar-curso" data-id-curso="${encodeURIComponent(curso.id_curso)}">Editar curso</a>
-        <a href="#examenes" data-panel-target="examenes" data-id-curso="${encodeURIComponent(curso.id_curso)}">Examen</a>
-        <a href="#resultados" data-panel-target="resultados" data-id-curso="${encodeURIComponent(curso.id_curso)}">Resultados</a>
+        <a href="instructor-examen.html?idCurso=${encodeURIComponent(curso.id_curso)}">Examen</a>
+        ${puedeEliminarCurso ? `<button type="button" data-action="eliminar-borrador" data-id-curso="${encodeURIComponent(curso.id_curso)}" data-delete-kind="${tipoEliminacion}">${textoBotonEliminar}</button>` : ''}
       </div>
     `;
 
@@ -1394,8 +1452,8 @@
   };
 
   const obtenerPanelDesdeHash = () => {
-    const hash = window.location.hash.replace(/^#/, '').trim();
-    return hash || 'dashboard';
+    const hashLimpio = window.location.hash.replace('#', '').split('?')[0].trim();
+    return hashLimpio || 'dashboard';
   };
 
   const actualizarHashPanelInstructor = (panel, modo = 'replace') => {
@@ -2587,6 +2645,38 @@
       });
     });
 
+    document.querySelectorAll('.instructorLeccionesCantidad').forEach((campoCantidad) => {
+      const tarjetaModulo = campoCantidad.closest('.instructor-lesson-module-card');
+      const moduloNumeroOrden = Number(campoCantidad.dataset.moduloOrden || tarjetaModulo?.dataset.moduloOrden || 0);
+      const cantidadTexto = campoCantidad.value.trim();
+      const tarjetasModulo = Array.from(document.querySelectorAll(`.instructor-lesson-card[data-modulo-orden="${moduloNumeroOrden}"]`));
+
+      if (tarjetasModulo.length === 0 && !cantidadTexto) {
+        return;
+      }
+
+      if (!/^\d+$/.test(cantidadTexto)) {
+        mostrarErrorCampo(campoCantidad, 'Escribe la cantidad de lecciones antes de continuar.');
+        errores.push(`Módulo ${moduloNumeroOrden}: escribe la cantidad de lecciones antes de continuar.`);
+        return;
+      }
+
+      const cantidad = Number(cantidadTexto);
+
+      if (!Number.isInteger(cantidad) || cantidad < 1 || cantidad > 30) {
+        mostrarErrorCampo(campoCantidad, 'Escribe una cantidad válida de lecciones entre 1 y 30.');
+        errores.push(`Módulo ${moduloNumeroOrden}: la cantidad de lecciones debe estar entre 1 y 30.`);
+        return;
+      }
+
+      quitarErrorCampo(campoCantidad);
+
+      if (tarjetasModulo.length > 0 && tarjetasModulo.length !== cantidad) {
+        mostrarErrorCampo(campoCantidad, 'La cantidad debe coincidir con los espacios de lección creados.');
+        errores.push(`Módulo ${moduloNumeroOrden}: la cantidad debe coincidir con los espacios de lección creados.`);
+      }
+    });
+
     return { errores, lecciones };
   };
 
@@ -2626,6 +2716,35 @@
     );
     estado.leccionesActuales = estado.modulosActuales.flatMap((modulo) => obtenerLeccionesDeModulo(modulo));
     pintarCamposModulos(estado.modulosActuales.length, estado.modulosActuales);
+    return true;
+  };
+
+  const validarLeccionesRequeridasSinGuardar = (accion) => {
+    const requiereLecciones = accion === 'enviar_revision' || accion === 'continuar_examen';
+
+    if (!requiereLecciones) {
+      return true;
+    }
+
+    const tarjetas = Array.from(document.querySelectorAll('.instructor-lesson-card'));
+
+    if (tarjetas.length === 0) {
+      return true;
+    }
+
+    const { errores, lecciones } = obtenerLeccionesFormulario();
+
+    if (lecciones.length === 0) {
+      errores.push('Completa los datos de las lecciones que ya creaste antes de continuar.');
+    }
+
+    if (errores.length > 0) {
+      ocultarMensaje();
+      mostrarEstadoFormulario('Revisa las lecciones marcadas en rojo antes de continuar. No se borraron tus espacios de lección.');
+      enfocarPrimerCampoConError();
+      return false;
+    }
+
     return true;
   };
 
@@ -2728,10 +2847,18 @@
 
       mostrarMensaje('Curso cargado para edición. Completa módulos, lecciones y examen antes de enviarlo a revisión.');
     } catch (error) {
-      if (error && Number(error.status || error.statusCode) === 403) {
+      const estadoHttp = Number(error?.status || error?.statusCode || 0);
+      const mensajeError = String(error?.message || '').toLowerCase();
+      const esCursoAjeno = estadoHttp === 403
+        || estadoHttp === 404
+        || mensajeError.includes('no pertenece')
+        || mensajeError.includes('curso no encontrado para este instructor')
+        || mensajeError.includes('no tienes permisos');
+
+      if (esCursoAjeno) {
         limpiarFormularioCurso();
         activarPanel('cursos');
-        mostrarMensaje('No puedes editar ese curso porque no pertenece a tu cuenta de instructor.', true);
+        mostrarMensaje('No puedes acceder a ese curso porque no pertenece a tu cuenta de instructor.', true);
         return;
       }
 
@@ -2766,6 +2893,10 @@
         ocultarMensaje();
         mostrarEstadoFormulario('Revisa los campos marcados en rojo antes de continuar.');
         enfocarPrimerCampoConError();
+        return;
+      }
+
+      if (!validarLeccionesRequeridasSinGuardar(accion)) {
         return;
       }
 
@@ -2814,13 +2945,19 @@
       }
 
       try {
-        leccionesGuardadas = await guardarLeccionesDesdeFormulario(idCursoGuardado, accion === 'enviar_revision');
+        leccionesGuardadas = await guardarLeccionesDesdeFormulario(idCursoGuardado, accion === 'enviar_revision' || accion === 'continuar_examen');
       } catch (errorLecciones) {
         if (errorLecciones && errorLecciones.message === 'lecciones_invalidas') {
           return;
         }
 
         throw errorLecciones;
+      }
+
+      if (accion === 'continuar_examen') {
+        await cargarInstructor(false);
+        window.location.href = `instructor-examen.html?idCurso=${encodeURIComponent(idCursoGuardado)}`;
+        return;
       }
 
       if (accion === 'enviar_revision') {
@@ -3034,8 +3171,48 @@
     actualizarVistaPortada();
   };
 
+  const eliminarCursoBorradorDesdeTarjeta = async (idCurso, tipoEliminacion = 'borrador') => {
+    const idInstructor = obtenerIdInstructor();
+    const tipo = tipoEliminacion === 'rechazado' ? 'rechazado' : 'borrador';
+    const nombreElemento = tipo === 'rechazado' ? 'curso rechazado' : 'borrador';
+
+    if (!idInstructor || !idCurso) {
+      mostrarMensaje('No se pudo identificar el curso a eliminar.', true);
+      return;
+    }
+
+    const confirmar = window.confirm(
+      `¿Seguro que quieres eliminar este ${nombreElemento}? Esta acción no se puede deshacer.`
+    );
+
+    if (!confirmar) {
+      return;
+    }
+
+    try {
+      await window.EduTech.apiRequest(`/instructores/${encodeURIComponent(idInstructor)}/cursos/${encodeURIComponent(idCurso)}/borrador`, {
+        method: 'DELETE'
+      });
+      mostrarMensaje(tipo === 'rechazado'
+        ? 'Curso rechazado eliminado correctamente.'
+        : 'Borrador eliminado correctamente.');
+      await cargarInstructor(false);
+      activarPanel('cursos', { actualizarHash: true, subir: false });
+    } catch (error) {
+      mostrarMensaje(error.message || `No se pudo eliminar el ${nombreElemento}.`, true);
+    }
+  };
+
   const prepararNavegacion = () => {
     document.addEventListener('click', (evento) => {
+      const botonEliminar = evento.target.closest('[data-action="eliminar-borrador"]');
+
+      if (botonEliminar) {
+        evento.preventDefault();
+        eliminarCursoBorradorDesdeTarjeta(botonEliminar.dataset.idCurso, botonEliminar.dataset.deleteKind);
+        return;
+      }
+
       const enlace = evento.target.closest('[data-panel], [data-panel-target]');
 
       if (!enlace) {
@@ -3069,6 +3246,19 @@
     window.addEventListener('hashchange', aplicarPanelDesdeHistorial);
 
     activarPanel(obtenerPanelDesdeHash(), { actualizarHash: false, subir: false });
+  };
+
+  const cargarEdicionPendienteDesdeExamen = async () => {
+    const idCursoPendiente = sessionStorage.getItem('edutech_instructor_editar_curso_id');
+
+    if (!idCursoPendiente) {
+      return false;
+    }
+
+    sessionStorage.removeItem('edutech_instructor_editar_curso_id');
+    activarPanel('crear', { actualizarHash: true, subir: false });
+    await cargarCursoParaEditar(idCursoPendiente);
+    return true;
   };
 
   const cargarInstructor = async (debeMarcarPaginaLista = true) => {
@@ -3118,6 +3308,11 @@
       pintarEstadisticas();
       pintarCursos();
       activarPanel(obtenerPanelDesdeHash(), { actualizarHash: false, subir: false });
+      const seCargoEdicionPendiente = await cargarEdicionPendienteDesdeExamen();
+
+      if (!seCargoEdicionPendiente) {
+        consumirMensajeAcceso();
+      }
     } catch (error) {
       mostrarMensaje(error && error.message ? error.message : 'No se pudo cargar el panel del instructor.', true);
     } finally {

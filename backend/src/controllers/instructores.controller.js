@@ -5,6 +5,12 @@ const pool = require('../config/db');
 
 const obtenerNombreRol = (valor) => String(valor || '').trim().toLowerCase();
 
+const normalizarTextoSimple = (valor) => String(valor || '')
+  .trim()
+  .toLowerCase()
+  .normalize('NFD')
+  .replace(/[̀-ͯ]/g, '');
+
 const validarInstructor = async (idInstructor) => {
   const resultado = await pool.query(
     `SELECT
@@ -15,6 +21,7 @@ const validarInstructor = async (idInstructor) => {
       u.apellido_paterno,
       u.apellido_materno,
       u.correo,
+      u.foto_perfil_url,
       u.esta_activo
      FROM edutech.usuario u
      INNER JOIN edutech.rol r
@@ -70,6 +77,22 @@ const obtenerIdEstadoCurso = async (nombreEstado) => {
   }
 
   return resultado.rows[0].id_estado_curso;
+};
+
+
+const obtenerIdEstadoExamen = async (nombreEstado) => {
+  const resultado = await pool.query(
+    `SELECT id_estado_examen
+     FROM edutech.estado_examen
+     WHERE LOWER(nombre_estado_examen) = LOWER($1)`,
+    [nombreEstado]
+  );
+
+  if (resultado.rows.length === 0) {
+    throw new Error(`No existe el estado de examen: ${nombreEstado}.`);
+  }
+
+  return resultado.rows[0].id_estado_examen;
 };
 
 const obtenerIdEstadoRevision = async (nombreEstado) => {
@@ -219,8 +242,10 @@ const validarDatosCurso = ({ titulo, descripcion, precio_mxn, id_nivel_curso, im
 
   const precio = Number(precioTexto);
 
-  if (!Number.isFinite(precio) || precio < 0) {
-    errores.push('El precio debe ser un número mayor o igual a 0.');
+  if (!Number.isFinite(precio) || precio <= 0) {
+    errores.push('El precio debe ser mayor a 0.');
+  } else if (precio > 9999) {
+    errores.push('El precio no puede ser mayor a $9,999 MXN.');
   }
 
   if (!id_nivel_curso || !Number.isInteger(Number(id_nivel_curso))) {
@@ -350,8 +375,10 @@ const validarLeccionesCurso = (lecciones) => {
       errores.push(`La lección ${indice + 1} tiene un tipo de video inválido.`);
     }
 
-    if (duracion !== null && (!Number.isInteger(duracion) || duracion < 0)) {
-      errores.push(`La duración de la lección ${indice + 1} debe ser un número válido.`);
+    if (duracion === null) {
+      errores.push(`La duración de la lección ${indice + 1} es obligatoria.`);
+    } else if (!Number.isInteger(duracion) || duracion < 60 || duracion > 36000) {
+      errores.push(`La duración de la lección ${indice + 1} debe ser un número válido de minutos entre 1 y 600.`);
     }
 
     if (Array.isArray(leccion.recursos)) {
@@ -418,12 +445,45 @@ const validarCursoListoParaRevision = async (idCurso) => {
           ON p.id_examen = e.id_examen
         WHERE e.id_curso = $1
           AND p.esta_activa = TRUE
-      ), 0) AS total_preguntas`,
+      ), 0) AS total_preguntas,
+
+      COALESCE((
+        SELECT COUNT(*)::int
+        FROM (
+          SELECT p.id_pregunta
+          FROM edutech.examen e
+          INNER JOIN edutech.pregunta p
+            ON p.id_examen = e.id_examen
+          INNER JOIN edutech.opcion_respuesta o
+            ON o.id_pregunta = p.id_pregunta
+          WHERE e.id_curso = $1
+            AND p.esta_activa = TRUE
+          GROUP BY p.id_pregunta
+          HAVING COUNT(o.id_opcion) >= 2
+        ) preguntas_con_opciones
+      ), 0) AS preguntas_con_minimo_opciones,
+
+      COALESCE((
+        SELECT COUNT(*)::int
+        FROM (
+          SELECT p.id_pregunta
+          FROM edutech.examen e
+          INNER JOIN edutech.pregunta p
+            ON p.id_examen = e.id_examen
+          INNER JOIN edutech.opcion_respuesta o
+            ON o.id_pregunta = p.id_pregunta
+          WHERE e.id_curso = $1
+            AND p.esta_activa = TRUE
+          GROUP BY p.id_pregunta
+          HAVING SUM(CASE WHEN o.es_correcta = TRUE THEN 1 ELSE 0 END) = 1
+        ) preguntas_con_correcta
+      ), 0) AS preguntas_con_correcta`,
     [idCurso]
   );
 
   const datos = resultado.rows[0] || {};
   const errores = [];
+  const totalPreguntas = Number(datos.total_preguntas || 0);
 
   if (Number(datos.total_modulos || 0) < 1) {
     errores.push('Agrega al menos un módulo antes de enviar el curso a revisión.');
@@ -437,8 +497,16 @@ const validarCursoListoParaRevision = async (idCurso) => {
     errores.push('Configura un examen antes de enviar el curso a revisión.');
   }
 
-  if (Number(datos.total_preguntas || 0) < 1) {
+  if (totalPreguntas < 1) {
     errores.push('Agrega preguntas al examen antes de enviar el curso a revisión.');
+  }
+
+  if (totalPreguntas > 0 && Number(datos.preguntas_con_minimo_opciones || 0) !== totalPreguntas) {
+    errores.push('Cada pregunta del examen debe tener al menos dos opciones.');
+  }
+
+  if (totalPreguntas > 0 && Number(datos.preguntas_con_correcta || 0) !== totalPreguntas) {
+    errores.push('Cada pregunta del examen debe tener una sola respuesta correcta.');
   }
 
   return errores;
@@ -836,6 +904,7 @@ const crearCursoInstructor = async (req, res) => {
     const {
       titulo,
       descripcion,
+      texto_introductorio,
       precio_mxn,
       imagen_portada,
       id_nivel_curso,
@@ -1305,6 +1374,592 @@ const guardarLeccionesCursoInstructor = async (req, res) => {
   }
 };
 
+
+const validarExamenCurso = ({ titulo, descripcion, tiempo_limite_minutos, max_intentos, calificacion_minima, cantidad_preguntas, preguntas }) => {
+  const errores = [];
+  const tituloLimpio = String(titulo || '').trim();
+  const descripcionLimpia = String(descripcion || '').trim();
+  const tiempo = Number(tiempo_limite_minutos);
+  const intentos = Number(max_intentos);
+  const calificacion = Number(calificacion_minima);
+  const preguntasAMostrar = Number(cantidad_preguntas);
+
+  if (tituloLimpio.length < 5 || !contieneLetras(tituloLimpio)) {
+    errores.push('El título del examen debe tener al menos 5 caracteres y contener texto.');
+  }
+
+  if (descripcionLimpia.length < 2 || !contieneLetras(descripcionLimpia)) {
+    errores.push('La descripción del examen debe contener texto válido.');
+  }
+
+  if (!Number.isInteger(tiempo) || tiempo < 30 || tiempo > 180) {
+    errores.push('El tiempo límite debe estar entre 30 y 180 minutos.');
+  }
+
+  if (!(Number.isInteger(intentos) && intentos === 0) && (!Number.isInteger(intentos) || intentos < 1 || intentos > 10)) {
+    errores.push('Si el examen tiene intentos limitados, deben estar entre 1 y 10. Usa 0 solo para intentos ilimitados.');
+  }
+
+  if (!Number.isFinite(calificacion) || calificacion < 60 || calificacion > 100) {
+    errores.push('La calificación mínima debe estar entre 60 y 100.');
+  }
+
+  if (!Array.isArray(preguntas) || preguntas.length < 2) {
+    errores.push('El banco de preguntas debe tener al menos 2 preguntas para que pueda ser aleatorio.');
+    return errores;
+  }
+
+  if (preguntas.length > 50) {
+    errores.push('No puedes guardar más de 50 preguntas en un examen.');
+  }
+
+  if (!Number.isInteger(preguntasAMostrar) || preguntasAMostrar < 1 || preguntasAMostrar > 50) {
+    errores.push('Indica cuántas preguntas se mostrarán al alumno.');
+  } else if (preguntasAMostrar >= preguntas.length) {
+    errores.push('Las preguntas a mostrar deben ser menores que el banco para que el examen pueda variar entre intentos.');
+  }
+
+  preguntas.forEach((pregunta, indicePregunta) => {
+    const textoPregunta = String(pregunta.texto_pregunta || '').trim();
+    const opciones = Array.isArray(pregunta.opciones) ? pregunta.opciones : [];
+
+    if (textoPregunta.length < 5 || !contieneLetras(textoPregunta)) {
+      errores.push(`La pregunta ${indicePregunta + 1} debe contener texto válido.`);
+    }
+
+    if (opciones.length < 2) {
+      errores.push(`La pregunta ${indicePregunta + 1} debe tener al menos 2 opciones.`);
+    }
+
+    if (opciones.length > 6) {
+      errores.push(`La pregunta ${indicePregunta + 1} no puede tener más de 6 opciones.`);
+    }
+
+    const correctas = opciones.filter((opcion) => opcion.es_correcta === true).length;
+
+    if (correctas !== 1) {
+      errores.push(`La pregunta ${indicePregunta + 1} debe tener una sola respuesta correcta.`);
+    }
+
+    opciones.forEach((opcion, indiceOpcion) => {
+      const textoOpcion = String(opcion.texto_opcion || '').trim();
+
+      if (textoOpcion.length < 1 || !contieneLetras(textoOpcion)) {
+        errores.push(`La opción ${indiceOpcion + 1} de la pregunta ${indicePregunta + 1} debe contener texto.`);
+      }
+    });
+  });
+
+  return errores;
+};
+
+const obtenerExamenCursoInstructor = async (req, res) => {
+  try {
+    const { idInstructor, idCurso } = req.params;
+    const validacion = await validarInstructor(idInstructor);
+
+    if (!validacion.ok) {
+      return res.status(validacion.status).json({
+        ok: false,
+        message: validacion.message
+      });
+    }
+
+    const curso = await obtenerDatosCursoInstructor(idCurso, idInstructor);
+
+    if (!curso) {
+      return res.status(404).json({
+        ok: false,
+        message: 'Curso no encontrado para este instructor.'
+      });
+    }
+
+    const examenResultado = await pool.query(
+      `SELECT
+        e.id_examen,
+        e.id_curso,
+        e.id_estado_examen,
+        ee.nombre_estado_examen,
+        e.titulo,
+        e.descripcion,
+        e.descripcion AS texto_introductorio,
+        e.tiempo_limite_minutos,
+        e.max_intentos,
+        e.calificacion_minima,
+        e.cantidad_preguntas
+       FROM edutech.examen e
+       INNER JOIN edutech.estado_examen ee
+        ON ee.id_estado_examen = e.id_estado_examen
+       WHERE e.id_curso = $1
+       LIMIT 1`,
+      [idCurso]
+    );
+
+    if (examenResultado.rows.length === 0) {
+      return res.json({
+        ok: true,
+        curso,
+        examen: null
+      });
+    }
+
+    const examen = examenResultado.rows[0];
+
+    const preguntasResultado = await pool.query(
+      `SELECT
+        p.id_pregunta,
+        p.texto_pregunta,
+        p.esta_activa,
+        COALESCE(
+          json_agg(
+            json_build_object(
+              'id_opcion', o.id_opcion,
+              'texto_opcion', o.texto_opcion,
+              'es_correcta', o.es_correcta
+            )
+            ORDER BY o.id_opcion ASC
+          ) FILTER (WHERE o.id_opcion IS NOT NULL),
+          '[]'
+        ) AS opciones
+       FROM edutech.pregunta p
+       LEFT JOIN edutech.opcion_respuesta o
+        ON o.id_pregunta = p.id_pregunta
+       WHERE p.id_examen = $1
+        AND p.esta_activa = TRUE
+       GROUP BY p.id_pregunta, p.texto_pregunta, p.esta_activa
+       ORDER BY p.id_pregunta ASC`,
+      [examen.id_examen]
+    );
+
+    res.json({
+      ok: true,
+      curso,
+      examen: {
+        ...examen,
+        preguntas: preguntasResultado.rows
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: 'Error al obtener el examen del curso.',
+      error: error.message
+    });
+  }
+};
+
+const guardarExamenCursoInstructor = async (req, res) => {
+  const cliente = await pool.connect();
+
+  try {
+    const { idInstructor, idCurso } = req.params;
+    const validacion = await validarInstructor(idInstructor);
+
+    if (!validacion.ok) {
+      return res.status(validacion.status).json({
+        ok: false,
+        message: validacion.message
+      });
+    }
+
+    const cursoActual = await obtenerDatosCursoInstructor(idCurso, idInstructor);
+
+    if (!cursoActual) {
+      return res.status(404).json({
+        ok: false,
+        message: 'Curso no encontrado para este instructor.'
+      });
+    }
+
+    const {
+      titulo,
+      descripcion,
+      texto_introductorio,
+      tiempo_limite_minutos,
+      max_intentos,
+      calificacion_minima,
+      cantidad_preguntas,
+      preguntas,
+      activar
+    } = req.body;
+
+    const errores = validarExamenCurso({
+      titulo,
+      descripcion,
+      tiempo_limite_minutos,
+      max_intentos,
+      calificacion_minima,
+      cantidad_preguntas,
+      preguntas
+    });
+
+    if (errores.length > 0) {
+      return res.status(400).json({
+        ok: false,
+        message: errores.join(' ')
+      });
+    }
+
+    const descripcionFinalExamen = String(texto_introductorio || descripcion || '').trim();
+
+    const idEstadoExamen = await obtenerIdEstadoExamen(activar ? 'activo' : 'borrador');
+
+    await cliente.query('BEGIN');
+
+    const examenResultado = await cliente.query(
+      `INSERT INTO edutech.examen
+        (id_curso, id_estado_examen, titulo, descripcion, tiempo_limite_minutos, max_intentos, calificacion_minima, cantidad_preguntas)
+       VALUES
+        ($1, $2, $3, $4, $5, $6, $7, $8)
+       ON CONFLICT (id_curso)
+       DO UPDATE SET
+        id_estado_examen = EXCLUDED.id_estado_examen,
+        titulo = EXCLUDED.titulo,
+        descripcion = EXCLUDED.descripcion,
+        tiempo_limite_minutos = EXCLUDED.tiempo_limite_minutos,
+        max_intentos = EXCLUDED.max_intentos,
+        calificacion_minima = EXCLUDED.calificacion_minima,
+        cantidad_preguntas = EXCLUDED.cantidad_preguntas
+       RETURNING id_examen`,
+      [
+        idCurso,
+        idEstadoExamen,
+        String(titulo).trim(),
+        descripcionFinalExamen,
+        Number(tiempo_limite_minutos),
+        Number(max_intentos),
+        Number(calificacion_minima),
+        Number(cantidad_preguntas)
+      ]
+    );
+
+    const idExamen = examenResultado.rows[0].id_examen;
+
+    await cliente.query(
+      `DELETE FROM edutech.pregunta
+       WHERE id_examen = $1`,
+      [idExamen]
+    );
+
+    for (const pregunta of preguntas) {
+      const preguntaResultado = await cliente.query(
+        `INSERT INTO edutech.pregunta
+          (id_examen, texto_pregunta, esta_activa)
+         VALUES
+          ($1, $2, TRUE)
+         RETURNING id_pregunta`,
+        [
+          idExamen,
+          String(pregunta.texto_pregunta).trim()
+        ]
+      );
+
+      const idPregunta = preguntaResultado.rows[0].id_pregunta;
+
+      for (const opcion of pregunta.opciones) {
+        await cliente.query(
+          `INSERT INTO edutech.opcion_respuesta
+            (id_pregunta, texto_opcion, es_correcta)
+           VALUES
+            ($1, $2, $3)`,
+          [
+            idPregunta,
+            String(opcion.texto_opcion).trim(),
+            opcion.es_correcta === true
+          ]
+        );
+      }
+    }
+
+    await cliente.query('COMMIT');
+
+    res.json({
+      ok: true,
+      message: activar
+        ? 'Examen guardado y activado correctamente.'
+        : 'Examen guardado como borrador.',
+      id_examen: idExamen
+    });
+  } catch (error) {
+    await cliente.query('ROLLBACK');
+
+    res.status(500).json({
+      ok: false,
+      message: 'Error al guardar el examen del curso.',
+      error: error.message
+    });
+  } finally {
+    cliente.release();
+  }
+};
+
+const enviarRevisionCursoInstructor = async (req, res) => {
+  const cliente = await pool.connect();
+
+  try {
+    const { idInstructor, idCurso } = req.params;
+    const validacion = await validarInstructor(idInstructor);
+
+    if (!validacion.ok) {
+      return res.status(validacion.status).json({
+        ok: false,
+        message: validacion.message
+      });
+    }
+
+    const cursoActual = await obtenerDatosCursoInstructor(idCurso, idInstructor);
+
+    if (!cursoActual) {
+      return res.status(404).json({
+        ok: false,
+        message: 'Curso no encontrado para este instructor.'
+      });
+    }
+
+    const erroresRevision = await validarCursoListoParaRevision(idCurso);
+
+    if (erroresRevision.length > 0) {
+      return res.status(400).json({
+        ok: false,
+        message: erroresRevision.join(' ')
+      });
+    }
+
+    const idEstadoCurso = await obtenerIdEstadoCurso('pendiente_revision');
+    const idEstadoExamen = await obtenerIdEstadoExamen('activo');
+
+    await cliente.query('BEGIN');
+
+    await cliente.query(
+      `UPDATE edutech.curso
+       SET
+        id_estado_curso = $1,
+        fecha_actualizacion = CURRENT_TIMESTAMP
+       WHERE id_curso = $2
+        AND id_usuario = $3`,
+      [idEstadoCurso, idCurso, idInstructor]
+    );
+
+    await cliente.query(
+      `UPDATE edutech.examen
+       SET id_estado_examen = $1
+       WHERE id_curso = $2`,
+      [idEstadoExamen, idCurso]
+    );
+
+    await registrarRevisionPendiente(cliente, idCurso);
+
+    await cliente.query('COMMIT');
+
+    res.json({
+      ok: true,
+      message: 'Curso enviado a revisión correctamente. Administración podrá revisar el curso y el examen.'
+    });
+  } catch (error) {
+    await cliente.query('ROLLBACK');
+
+    res.status(500).json({
+      ok: false,
+      message: 'Error al enviar el curso a revisión.',
+      error: error.message
+    });
+  } finally {
+    cliente.release();
+  }
+};
+
+const eliminarBorradorCursoInstructor = async (req, res) => {
+  const cliente = await pool.connect();
+
+  try {
+    const { idInstructor, idCurso } = req.params;
+    const validacion = await validarInstructor(idInstructor);
+
+    if (!validacion.ok) {
+      return res.status(validacion.status).json({
+        ok: false,
+        message: validacion.message
+      });
+    }
+
+    const cursoActual = await obtenerDatosCursoInstructor(idCurso, idInstructor);
+
+    if (!cursoActual) {
+      return res.status(404).json({
+        ok: false,
+        message: 'Curso no encontrado para este instructor.'
+      });
+    }
+
+    const estadoCurso = normalizarTextoSimple(cursoActual.nombre_estado_curso);
+    const ultimaRevisionResultado = await cliente.query(
+      `SELECT erc.nombre_estado_revision_curso
+       FROM edutech.revision_curso rc
+       INNER JOIN edutech.estado_revision_curso erc
+        ON erc.id_estado_revision_curso = rc.id_estado_revision_curso
+       WHERE rc.id_curso = $1
+       ORDER BY rc.fecha_revision DESC, rc.id_revision_curso DESC
+       LIMIT 1`,
+      [idCurso]
+    );
+    const estadoRevision = normalizarTextoSimple(
+      ultimaRevisionResultado.rows[0]?.nombre_estado_revision_curso
+    );
+    const esBorrador = estadoCurso === 'borrador';
+    const esRechazado = estadoCurso === 'rechazado' || estadoRevision.includes('rechaz');
+
+    if (!esBorrador && !esRechazado) {
+      return res.status(400).json({
+        ok: false,
+        message: 'Solo se pueden eliminar cursos en borrador o cursos rechazados por administración.'
+      });
+    }
+
+    const inscripciones = await cliente.query(
+      `SELECT COUNT(*)::int AS total
+       FROM edutech.inscripcion i
+       INNER JOIN edutech.orden_detalle od
+        ON od.id_orden_detalle = i.id_orden_detalle
+       WHERE od.id_curso = $1`,
+      [idCurso]
+    );
+
+    if (Number(inscripciones.rows[0]?.total || 0) > 0) {
+      return res.status(400).json({
+        ok: false,
+        message: 'No se puede eliminar este curso porque ya tiene alumnos inscritos.'
+      });
+    }
+
+    const ordenes = await cliente.query(
+      `SELECT COUNT(*)::int AS total
+       FROM edutech.orden_detalle
+       WHERE id_curso = $1`,
+      [idCurso]
+    );
+
+    if (Number(ordenes.rows[0]?.total || 0) > 0) {
+      return res.status(400).json({
+        ok: false,
+        message: 'No se puede eliminar este curso porque ya tiene órdenes de compra asociadas.'
+      });
+    }
+
+    await cliente.query('BEGIN');
+
+    const recursosVinculados = await cliente.query(
+      `SELECT DISTINCT lr.id_recurso
+       FROM edutech.leccion_recurso lr
+       INNER JOIN edutech.leccion l ON l.id_leccion = lr.id_leccion
+       INNER JOIN edutech.modulo m ON m.id_modulo = l.id_modulo
+       WHERE m.id_curso = $1`,
+      [idCurso]
+    );
+
+    const recursoIds = recursosVinculados.rows.map((fila) => Number(fila.id_recurso)).filter(Boolean);
+
+    const eliminado = await cliente.query(
+      `DELETE FROM edutech.curso
+       WHERE id_curso = $1
+         AND id_usuario = $2
+       RETURNING id_curso`,
+      [idCurso, idInstructor]
+    );
+
+    if (recursoIds.length > 0) {
+      await cliente.query(
+        `DELETE FROM edutech.recurso r
+         WHERE r.id_recurso = ANY($1::int[])
+           AND NOT EXISTS (
+             SELECT 1
+             FROM edutech.leccion_recurso lr
+             WHERE lr.id_recurso = r.id_recurso
+           )`,
+        [recursoIds]
+      );
+    }
+
+    await cliente.query('COMMIT');
+
+    if (eliminado.rows.length === 0) {
+      return res.status(404).json({
+        ok: false,
+        message: 'No se pudo eliminar el borrador.'
+      });
+    }
+
+    return res.json({
+      ok: true,
+      message: 'Curso eliminado correctamente.'
+    });
+  } catch (error) {
+    await cliente.query('ROLLBACK');
+    return res.status(500).json({
+      ok: false,
+      message: 'Error al eliminar el curso.',
+      error: error.message
+    });
+  } finally {
+    cliente.release();
+  }
+};
+
+
+
+const actualizarPerfilInstructor = async (req, res) => {
+  try {
+    const { idInstructor } = req.params;
+    const validacion = await validarInstructor(idInstructor);
+
+    if (!validacion.ok) {
+      return res.status(validacion.status).json({
+        ok: false,
+        message: validacion.message
+      });
+    }
+
+    const fotoPerfil = String(req.body.foto_perfil_url || req.body.fotoPerfilUrl || req.body.foto_perfil || '').trim();
+
+    if (fotoPerfil && !(/^https?:\/\/\S+$/i.test(fotoPerfil) || /^data:image\/(png|jpeg|jpg|webp);base64,/i.test(fotoPerfil) || /^assets\/img\//i.test(fotoPerfil))) {
+      return res.status(400).json({
+        ok: false,
+        message: 'La foto de perfil debe ser una URL de imagen válida o una imagen local codificada.'
+      });
+    }
+
+    const resultado = await pool.query(
+      `UPDATE edutech.usuario
+       SET
+        foto_perfil_url = $1,
+        fecha_actualizacion = CURRENT_TIMESTAMP
+       WHERE id_usuario = $2
+       RETURNING
+        id_usuario,
+        id_rol,
+        nombre,
+        apellido_paterno,
+        apellido_materno,
+        correo,
+        telefono,
+        foto_perfil_url,
+        esta_activo`,
+      [fotoPerfil || null, idInstructor]
+    );
+
+    return res.json({
+      ok: true,
+      message: 'Perfil del instructor actualizado correctamente.',
+      instructor: resultado.rows[0]
+    });
+  } catch (error) {
+    return res.status(500).json({
+      ok: false,
+      message: 'Error al actualizar el perfil del instructor.',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   obtenerResumenInstructor,
   obtenerCatalogosCurso,
@@ -1313,5 +1968,10 @@ module.exports = {
   crearCursoInstructor,
   actualizarCursoInstructor,
   guardarModulosCursoInstructor,
-  guardarLeccionesCursoInstructor
+  guardarLeccionesCursoInstructor,
+  obtenerExamenCursoInstructor,
+  guardarExamenCursoInstructor,
+  enviarRevisionCursoInstructor,
+  eliminarBorradorCursoInstructor,
+  actualizarPerfilInstructor
 };

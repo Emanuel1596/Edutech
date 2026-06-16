@@ -8780,7 +8780,7 @@ body:not(:has(.mi-cuenta-page)):not(:has(.student-dashboard)) .site-footer {
 }
 
 .tdc-exam-body .llms-quiz-attempt-header {
-  display: grid !important;
+  display: grid;
   grid-template-columns: minmax(0, 1fr) auto !important;
   align-items: center !important;
   gap: 16px !important;
@@ -8883,7 +8883,7 @@ body:not(:has(.mi-cuenta-page)):not(:has(.student-dashboard)) .site-footer {
 
 .tdc-exam-body .tdc-choice-row.llms-choice {
   position: relative !important;
-  display: grid !important;
+  display: grid;
   grid-template-columns: 34px minmax(0, 1fr) !important;
   align-items: center !important;
   min-height: 37px !important;
@@ -9223,7 +9223,7 @@ body:not(:has(.mi-cuenta-page)):not(:has(.student-dashboard)) .site-footer {
 }
 
 .tdc-exam-body .tdc-quiz-result-view .tdc-result-grid {
-  display: grid !important;
+  display: grid;
   grid-template-columns: 190px minmax(0, 1fr) !important;
   gap: 42px !important;
   align-items: start !important;
@@ -9644,7 +9644,7 @@ body:not(:has(.mi-cuenta-page)):not(:has(.student-dashboard)) .site-footer {
 
 .mi-cuenta-grade-progress.llms-progress {
   position: relative !important;
-  display: grid !important;
+  display: grid;
   grid-template-columns: minmax(100px, 1fr) 52px !important;
   align-items: center !important;
   gap: 8px !important;
@@ -9722,7 +9722,7 @@ body:not(:has(.mi-cuenta-page)):not(:has(.student-dashboard)) .site-footer {
 }
 
 .mi-cuenta-grade-widgets.llms-sd-widgets {
-  display: grid !important;
+  display: grid;
   grid-template-columns: repeat(5, minmax(140px, 1fr)) !important;
   gap: 18px !important;
   margin: 0 0 22px !important;
@@ -10018,7 +10018,7 @@ body:not(:has(.mi-cuenta-page)):not(:has(.student-dashboard)) .site-footer {
 }
 
 .mi-cuenta-grade-widgets.llms-sd-widgets {
-  display: grid !important;
+  display: grid;
   grid-template-columns: repeat(4, minmax(160px, 1fr)) !important;
   gap: 20px !important;
   margin: 0 0 22px !important;
@@ -10293,7 +10293,7 @@ body:not(:has(.mi-cuenta-page)):not(:has(.student-dashboard)) .site-footer {
 }
 
 .mi-cuenta-grade-widgets.llms-sd-widgets {
-  display: grid !important;
+  display: grid;
   grid-template-columns: repeat(4, minmax(160px, 1fr)) !important;
   gap: 20px !important;
   align-items: stretch !important;
@@ -11138,7 +11138,7 @@ body:not(:has(.mi-cuenta-page)):not(:has(.student-dashboard)) .site-footer {
 }
 
 .tdc-exam-body .tdc-quiz-result-view .tdc-result-grid {
-  display: grid !important;
+  display: grid;
   grid-template-columns: 265px minmax(0, 1fr) !important;
   gap: 46px !important;
   align-items: start !important;
@@ -11201,7 +11201,7 @@ body:not(:has(.mi-cuenta-page)):not(:has(.student-dashboard)) .site-footer {
 }
 
 .tdc-exam-body .tdc-quiz-result-view .tdc-result-toggle {
-  display: grid !important;
+  display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto !important;
   align-items: center !important;
   column-gap: 22px !important;
@@ -11894,7 +11894,7 @@ body:not(:has(.mi-cuenta-page)):not(:has(.student-dashboard)) .site-footer {
 
 .tdc-exam-body .tdc-quiz-result-view .tdc-result-toggle,
 .tdc-exam-body .tdc-quiz-result-view .tdc-results-list .toggle-answer {
-  display: grid !important;
+  display: grid;
   grid-template-columns: minmax(0, 1fr) max-content 38px !important;
   column-gap: 14px !important;
   align-items: center !important;
@@ -13538,7 +13538,7 @@ body:not(:has(.mi-cuenta-page)):not(:has(.student-dashboard)) .site-footer {
   left: 7.5% !important;
   right: 7.5% !important;
   bottom: clamp(34px, 4.7vw, 54px) !important;
-  display: grid !important;
+  display: grid;
   grid-template-columns: minmax(210px, 1fr) 130px minmax(210px, 1fr) !important;
   align-items: end !important;
   justify-content: center !important;
@@ -13834,7 +13834,7 @@ body:not(:has(.mi-cuenta-page)):not(:has(.student-dashboard)) .site-footer {
   width: 100% !important;
   margin-top: auto !important;
   padding-top: clamp(24px, 3.4vw, 40px) !important;
-  display: grid !important;
+  display: grid;
   grid-template-columns: minmax(210px, 1fr) clamp(82px, 9vw, 118px) minmax(210px, 1fr) !important;
   align-items: end !important;
   justify-content: center !important;
@@ -14486,4 +14486,890 @@ html body:not(:has(.mi-cuenta-page)):not(:has(.student-dashboard)) .site-footer 
   color: #ffffff;
   font-size: 34px;
   line-height: 1.2;
+}
+
+
+/* Paso 24.11 - Resultado de examen: enlace de certificado sin botón cuadrado */
+.tdc-exam-body .tdc-quiz-result-view .tdc-result-certificate-wrap {
+  margin: 8px 0 0 !important;
+  padding: 0 !important;
+}
+
+.tdc-exam-body .tdc-quiz-result-view .tdc-result-certificate-link {
+  display: inline !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--color-accent, #04e2ff) !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 400 !important;
+  line-height: 1.65 !important;
+  letter-spacing: 0 !important;
+  text-decoration: none !important;
+}
+
+.tdc-exam-body .tdc-quiz-result-view .tdc-result-certificate-link:hover,
+.tdc-exam-body .tdc-quiz-result-view .tdc-result-certificate-link:focus {
+  background: transparent !important;
+  color: #98f3ff !important;
+  text-decoration: none !important;
+  outline: none !important;
+}
+
+/* FIX_PASO_25_2_PAYPAL_OFICIAL_EN_CHECKOUT */
+.paypal-inline-box {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.paypal-button-container {
+  width: 100%;
+  min-height: 48px;
+}
+
+.paypal-config-message {
+  margin: 12px 0 0;
+  color: #c8dcf6;
+  line-height: 1.6;
+}
+
+.paypal-config-message.paypal-config-error {
+  color: #ffb3b3;
+}
+
+.paypal-config-message.paypal-config-success {
+  color: #04e2ff;
+}
+
+.checkout-paypal-fallback[hidden] {
+  display: none !important;
+}
+
+
+/* Paso 26.5 - examen final en detalle y bloqueo visible */
+.lesson-row-locked,
+.lesson-row-locked *,
+.lesson-title-link-disabled,
+.lesson-title-link-disabled * {
+  cursor: not-allowed !important;
+}
+
+.lesson-status-icon.is-locked {
+  width: 24px !important;
+  min-width: 24px !important;
+  height: 24px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #8f98a8 !important;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+}
+
+.lesson-status-icon.is-locked .fa,
+.lesson-status-icon.is-locked .fa-check-circle {
+  display: none !important;
+}
+
+
+/* Paso 26.6 - detalle del curso: examen tachado si ya tuvo intento y bloqueo con cursor */
+.lesson-row-locked,
+.lesson-row-locked *,
+.lesson-title-link-disabled,
+.lesson-title-link-disabled * {
+  cursor: not-allowed !important;
+}
+
+.lesson-status-icon.is-locked {
+  position: relative !important;
+  width: 20px !important;
+  min-width: 20px !important;
+  height: 20px !important;
+  border: 2px solid #8f98a8 !important;
+  border-radius: 50% !important;
+  color: transparent !important;
+  font-size: 0 !important;
+}
+
+.lesson-status-icon.is-locked::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 3px !important;
+  right: 3px !important;
+  top: 50% !important;
+  height: 2px !important;
+  border-radius: 2px !important;
+  background: #8f98a8 !important;
+  transform: translateY(-50%) rotate(-45deg) !important;
+}
+
+
+/* Paso 26.7 - detalle del curso: conserva icono original y tacha examen con intento */
+.lesson-row-locked,
+.lesson-row-locked *,
+.lesson-title-link-disabled,
+.lesson-title-link-disabled * {
+  cursor: not-allowed !important;
+}
+
+.lesson-status-icon .fa-ban {
+  width: 20px !important;
+  height: 20px !important;
+  display: inline-block !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+
+.lesson-status-icon .fa-ban::before {
+  content: "" !important;
+  width: 20px !important;
+  height: 20px !important;
+  display: block !important;
+  background-color: currentColor !important;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 48c110.5 0 200 89.5 200 200 0 39.6-11.5 76.5-31.4 107.6L148.4 87.4C179.5 67.5 216.4 56 256 56zm0 400c-110.5 0-200-89.5-200-200 0-39.6 11.5-76.5 31.4-107.6l276.2 276.2C332.5 444.5 295.6 456 256 456z'/%3E%3C/svg%3E") center / contain no-repeat !important;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 48c110.5 0 200 89.5 200 200 0 39.6-11.5 76.5-31.4 107.6L148.4 87.4C179.5 67.5 216.4 56 256 56zm0 400c-110.5 0-200-89.5-200-200 0-39.6 11.5-76.5 31.4-107.6l276.2 276.2C332.5 444.5 295.6 456 256 456z'/%3E%3C/svg%3E") center / contain no-repeat !important;
+}
+
+.lesson-status-icon.is-locked {
+  color: #8f98a8 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.lesson-status-icon.is-locked::before {
+  content: none !important;
+  display: none !important;
+}
+
+.lesson-row-completed .lesson-title-link,
+.lesson-row-completed .lesson-title-text {
+  text-decoration-line: line-through !important;
+  text-decoration-thickness: 1px !important;
+  text-decoration-color: currentColor !important;
+}
+
+
+/* Paso 26.9 - bloqueo visual del detalle: mismo icono, solo cursor bloqueado */
+.lesson-row-locked,
+.lesson-row-locked *,
+.lesson-title-link-disabled,
+.lesson-title-link-disabled * {
+  cursor: not-allowed !important;
+}
+
+/* Paso 27.7 - Solicitud de instructor con sesión obligatoria */
+.instructor-request-page input[readonly] {
+  color: #d9e7ff;
+  background: rgba(255, 255, 255, .035);
+  cursor: not-allowed;
+}
+
+
+/* Paso 27.9 - Quitar microcortes visuales en páginas con carga controlada */
+body.edutech-data-ready .site-header,
+body.edutech-data-ready .site-footer,
+body.edutech-data-ready .site-content,
+body.edutech-data-ready .student-dashboard,
+body.edutech-data-ready .mi-cuenta-page {
+  transition: none !important;
+}
+
+body.edutech-data-pending .site-header,
+body.edutech-data-pending .site-footer,
+body.edutech-data-pending .site-content,
+body.edutech-data-pending .student-dashboard,
+body.edutech-data-pending .mi-cuenta-page {
+  transition: none !important;
+}
+
+/* PASO_28_CARRITO_COMPRAS */
+.cart-button-with-count {
+  position: relative;
+}
+
+.cart-count-badge {
+  position: absolute;
+  top: -7px;
+  right: -9px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #ffdf00;
+  color: #11131f;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 18px;
+  align-items: center;
+  justify-content: center;
+}
+
+.course-footer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.course-cart-button {
+  border: 1px solid #04e2ff;
+  background: transparent;
+  color: #04e2ff;
+  min-height: 40px;
+  padding: 9px 14px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.course-cart-button:hover,
+.course-cart-button:focus,
+.course-cart-button.is-in-cart {
+  background: #04e2ff;
+  color: #11131f;
+}
+
+.purchase-cart-link {
+  margin-left: 12px;
+  margin-top: 10px;
+  min-width: 121px;
+  min-height: 46px;
+  border: 1px solid #04e2ff;
+  border-radius: 7px;
+  background: transparent !important;
+  color: #04e2ff !important;
+  padding: 13px 24px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  align-items: center;
+  justify-content: center;
+}
+
+.purchase-cart-link:hover,
+.purchase-cart-link:focus {
+  background: #04e2ff !important;
+  color: #11131f !important;
+}
+
+.cart-page {
+  background: #1f212b;
+}
+
+.cart-section {
+  padding: 0 24px 72px;
+}
+
+.cart-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.cart-header-block {
+  padding: 48px 0 28px;
+}
+
+.cart-eyebrow {
+  margin: 0 0 12px;
+  color: #04e2ff;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.cart-header-block h1 {
+  margin: 0 0 14px;
+  color: #d7e8ff;
+  font-size: 36px;
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.cart-header-block p:not(.cart-eyebrow) {
+  margin: 0;
+  color: #ffffff;
+  line-height: 1.7;
+}
+
+.cart-message {
+  margin-bottom: 22px;
+}
+
+.cart-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 28px;
+  align-items: start;
+}
+
+.cart-list-card,
+.cart-summary-card,
+.cart-empty-card {
+  border: 1px solid #34384f;
+  background: #1f212b;
+}
+
+.cart-list-card,
+.cart-summary-card {
+  padding: 24px;
+}
+
+.cart-empty-card {
+  max-width: 720px;
+  padding: 32px;
+}
+
+.cart-card-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.cart-card-heading h2,
+.cart-summary-card h2,
+.cart-empty-card h2 {
+  margin: 0;
+  color: #d7e8ff;
+  font-size: 25px;
+  font-weight: 400;
+}
+
+.cart-text-button,
+.cart-item-actions button {
+  border: 0;
+  background: transparent;
+  color: #04e2ff;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.cart-text-button:hover,
+.cart-item-actions button:hover,
+.cart-item-actions a:hover,
+.cart-secondary-link:hover {
+  color: #ffffff;
+}
+
+.cart-items {
+  display: grid;
+  gap: 16px;
+}
+
+.cart-item {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid #34384f;
+  background: #181b28;
+}
+
+.cart-item-image {
+  width: 112px;
+  height: 72px;
+  background: #11131f;
+  overflow: hidden;
+}
+
+.cart-item-image img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.cart-item-image-empty::before {
+  content: 'EduTech';
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #04e2ff;
+  font-weight: 900;
+}
+
+.cart-item-info h3 {
+  margin: 0 0 8px;
+  color: #ffffff;
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.cart-item-info p {
+  margin: 0 0 8px;
+  color: #c8dcf6;
+  font-size: 14px;
+}
+
+.cart-item-info strong {
+  color: #ffffff;
+}
+
+.cart-item-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.cart-item-actions a,
+.cart-secondary-link {
+  color: #04e2ff;
+}
+
+.cart-summary-row,
+.summary-course-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  color: #c8dcf6;
+  padding: 12px 0;
+  border-bottom: 1px solid #34384f;
+}
+
+.cart-summary-row strong,
+.summary-course-row strong {
+  color: #ffffff;
+  text-align: right;
+}
+
+.cart-summary-total {
+  font-size: 18px;
+  margin-bottom: 22px;
+}
+
+.cart-actions {
+  display: grid;
+  gap: 14px;
+}
+
+.cart-secondary-link {
+  text-align: center;
+}
+
+.summary-courses-list {
+  margin: -8px 0 18px;
+  padding: 10px 0;
+  border-top: 1px solid #34384f;
+  border-bottom: 1px solid #34384f;
+}
+
+.summary-course-row {
+  border-bottom: 0;
+  padding: 8px 0;
+  font-size: 13px;
+}
+
+.purchase-confirmation-course-list {
+  display: inline-block;
+  margin-top: 6px;
+  color: #c8dcf6;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .cart-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .cart-item {
+    grid-template-columns: 88px minmax(0, 1fr);
+  }
+
+  .cart-item-actions {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  .course-footer-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .course-footer-actions a,
+  .course-cart-button {
+    flex: 1 1 auto;
+  }
+}
+
+/* PASO_28_2_DETALLE_COMPRA_Y_CARRITO */
+.purchase-actions-detail {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.purchase-actions-detail .purchase-button,
+.purchase-actions-detail .purchase-cart-add-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 172px !important;
+  min-height: 46px !important;
+  padding: 12px 22px !important;
+  margin: 0 !important;
+  border-radius: 4px !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  line-height: 1.1 !important;
+  text-decoration: none !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+}
+
+.purchase-actions-detail .purchase-button {
+  border: 1px solid #04e2ff !important;
+  background: #04e2ff !important;
+  color: #11131f !important;
+}
+
+.purchase-actions-detail .purchase-button:hover,
+.purchase-actions-detail .purchase-button:focus {
+  background: #7cf1ff !important;
+  border-color: #7cf1ff !important;
+  color: #11131f !important;
+}
+
+.purchase-actions-detail .purchase-cart-add-button {
+  border: 1px solid #04e2ff !important;
+  background: transparent !important;
+  color: #04e2ff !important;
+  font-family: inherit !important;
+}
+
+.purchase-actions-detail .purchase-cart-add-button:hover,
+.purchase-actions-detail .purchase-cart-add-button:focus,
+.purchase-actions-detail .purchase-cart-add-button.is-in-cart {
+  background: rgba(4, 226, 255, 0.14) !important;
+  color: #7cf1ff !important;
+}
+
+@media (max-width: 640px) {
+  .purchase-actions-detail {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .purchase-actions-detail .purchase-button,
+  .purchase-actions-detail .purchase-cart-add-button {
+    width: 100% !important;
+  }
+}
+
+/* PASO_28_3_DETALLE_BOTONES_TEXTO_MENU */
+.purchase-actions-detail {
+  gap: 28px !important;
+  margin-top: 20px !important;
+}
+
+.purchase-actions-detail .purchase-button,
+.purchase-actions-detail .purchase-cart-add-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #04e2ff !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0 !important;
+  text-decoration: none !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+}
+
+.purchase-actions-detail .purchase-button:hover,
+.purchase-actions-detail .purchase-button:focus,
+.purchase-actions-detail .purchase-cart-add-button:hover,
+.purchase-actions-detail .purchase-cart-add-button:focus,
+.purchase-actions-detail .purchase-cart-add-button.is-in-cart {
+  background: transparent !important;
+  border: 0 !important;
+  color: #ffffff !important;
+  text-decoration: none !important;
+  outline: none !important;
+}
+
+.purchase-actions-detail .purchase-cart-add-button.is-in-cart {
+  color: #04e2ff !important;
+}
+
+@media (max-width: 640px) {
+  .purchase-actions-detail {
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 18px !important;
+  }
+
+  .purchase-actions-detail .purchase-button,
+  .purchase-actions-detail .purchase-cart-add-button {
+    width: auto !important;
+  }
+}
+
+
+/* Paso 28.6 - Validación visual y sin flash en páginas protegidas */
+html.edutech-session-checking body {
+  visibility: hidden !important;
+}
+
+.instructor-request-page .contacto-tc-form input,
+.instructor-request-page .contacto-tc-form textarea,
+.instructor-request-page .contacto-tc-form select {
+  background: #111422 !important;
+  color: #ffffff !important;
+  border-color: #34405f !important;
+  caret-color: #04e2ff !important;
+}
+
+.instructor-request-page .contacto-tc-form input:focus,
+.instructor-request-page .contacto-tc-form textarea:focus,
+.instructor-request-page .contacto-tc-form select:focus {
+  background: #111422 !important;
+  color: #ffffff !important;
+  border-color: #04e2ff !important;
+  box-shadow: 0 0 0 2px rgba(4, 226, 255, 0.16) !important;
+}
+
+.instructor-request-page .contacto-tc-form input:-webkit-autofill,
+.instructor-request-page .contacto-tc-form input:-webkit-autofill:hover,
+.instructor-request-page .contacto-tc-form input:-webkit-autofill:focus,
+.instructor-request-page .contacto-tc-form textarea:-webkit-autofill,
+.instructor-request-page .contacto-tc-form textarea:-webkit-autofill:hover,
+.instructor-request-page .contacto-tc-form textarea:-webkit-autofill:focus {
+  -webkit-text-fill-color: #ffffff !important;
+  box-shadow: 0 0 0 1000px #111422 inset !important;
+  transition: background-color 9999s ease-in-out 0s !important;
+}
+
+.instructor-request-page .contacto-tc-submit {
+  display: inline-flex !important;
+  width: auto !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin-top: 14px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--color-accent) !important;
+  font-size: 15px !important;
+  font-weight: 400 !important;
+  line-height: 1.4 !important;
+  text-decoration: none !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+}
+
+.instructor-request-page .contacto-tc-submit:hover,
+.instructor-request-page .contacto-tc-submit:focus {
+  background: transparent !important;
+  color: #ffffff !important;
+  transform: none !important;
+}
+
+.instructor-request-page .contacto-tc-submit:disabled {
+  color: #7d849c !important;
+  cursor: wait !important;
+}
+
+
+/* Paso 28.7 - Correcciones finales de seguridad, carrito y formularios */
+html.edutech-session-checking body {
+  display: none !important;
+}
+
+.instructor-request-page .contacto-tc-heading,
+.instructor-request-page .contacto-tc-form-section,
+.instructor-request-page .contacto-tc-form {
+  text-align: left !important;
+}
+
+.instructor-request-page .instructor-request-help,
+.instructor-request-page .form-help {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 0 28px 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+  color: #f8fafc !important;
+  line-height: 1.55 !important;
+}
+
+.instructor-request-page .contacto-tc-submit {
+  display: inline-flex !important;
+  width: auto !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--color-accent) !important;
+  font-size: 15px !important;
+  font-weight: 400 !important;
+  line-height: 1.4 !important;
+  text-decoration: none !important;
+  box-shadow: none !important;
+}
+
+.instructor-request-page .contacto-tc-form input,
+.instructor-request-page .contacto-tc-form textarea,
+.instructor-request-page .contacto-tc-form select,
+.instructor-request-page .contacto-tc-form input:focus,
+.instructor-request-page .contacto-tc-form textarea:focus,
+.instructor-request-page .contacto-tc-form select:focus {
+  background-color: #111422 !important;
+  color: #ffffff !important;
+}
+
+.instructor-request-page .contacto-tc-form input:-webkit-autofill,
+.instructor-request-page .contacto-tc-form input:-webkit-autofill:hover,
+.instructor-request-page .contacto-tc-form input:-webkit-autofill:focus,
+.instructor-request-page .contacto-tc-form textarea:-webkit-autofill,
+.instructor-request-page .contacto-tc-form textarea:-webkit-autofill:hover,
+.instructor-request-page .contacto-tc-form textarea:-webkit-autofill:focus {
+  -webkit-text-fill-color: #ffffff !important;
+  -webkit-box-shadow: 0 0 0 1000px #111422 inset !important;
+  box-shadow: 0 0 0 1000px #111422 inset !important;
+  transition: background-color 999999s ease-in-out 0s !important;
+}
+
+.module-title-with-caret,
+.module-box h3.module-title-with-caret {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+}
+
+.module-caret,
+.aula-module-arrow {
+  color: #d7e8ff !important;
+  font-size: 14px !important;
+  line-height: 1 !important;
+  font-weight: 400 !important;
+}
+
+.checkout-summary .summary-item[style*="display: none"] {
+  display: none !important;
+}
+
+.purchase-confirmation-card {
+  width: min(860px, calc(100% - 40px)) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.purchase-confirmation-card h1,
+.purchase-confirmation-card #compraMensaje,
+.purchase-confirmation-card .result-eyebrow,
+.purchase-confirmation-card .result-actions {
+  text-align: center !important;
+}
+
+.purchase-confirmation-summary {
+  width: 100% !important;
+}
+
+.purchase-confirmation-row {
+  grid-template-columns: 190px minmax(0, 1fr) !important;
+  align-items: start !important;
+}
+
+.purchase-confirmation-row strong {
+  text-align: left !important;
+  word-break: break-word !important;
+}
+
+.aula-video-original-link,
+.preview-video-original-link {
+  display: none !important;
+}
+
+/* Paso 28.9 - ajuste final: perfil instructor e iconos de lecciones */
+.course-instructor-avatar.has-image {
+  overflow: hidden !important;
+  padding: 0 !important;
+  background: #11131f !important;
+}
+
+.course-instructor-avatar.has-image img,
+.instructor-avatar-has-image img,
+.instructor-account-preview img {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+  object-fit: cover !important;
+  border-radius: inherit !important;
+}
+
+.lesson-status-icon,
+.lesson-status-icon.is-locked,
+.lesson-row-locked .lesson-status-icon,
+.lesson-row-login-required .lesson-status-icon {
+  color: #8f98a8 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.lesson-status-icon.done,
+.lesson-row-completed .lesson-status-icon,
+.lesson-row-completed .lesson-status-icon.done {
+  color: #8fcaff !important;
+}
+
+.lesson-status-icon.is-locked .fa,
+.lesson-status-icon.is-locked .fa-check-circle,
+.lesson-row-login-required .lesson-status-icon .fa,
+.lesson-row-login-required .lesson-status-icon .fa-check-circle {
+  display: inline-block !important;
+}
+
+.lesson-status-icon.is-locked::before,
+.lesson-status-icon.is-locked::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* Paso 28.9 - acomodo del texto de solicitud de instructor */
+.instructor-request-page .instructor-request-help {
+  max-width: 760px !important;
+  margin: 16px 0 26px 0 !important;
+  padding-left: 0 !important;
+  text-align: left !important;
+  line-height: 1.65 !important;
+}
+
+.instructor-request-page .contacto-tc-form-section > h2 {
+  margin-bottom: 12px !important;
 }

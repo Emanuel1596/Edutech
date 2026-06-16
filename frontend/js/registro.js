@@ -14,7 +14,19 @@ if (!formRegistro || !registroSuccess || !registroWarning) {
   const botonRegistro = formRegistro.querySelector('.register-submit');
 
   const regexNombre = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+$/;
-  const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const regexCorreoBase = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+  const dominiosPermitidos = ['com', 'net', 'org', 'edu', 'mx', 'com.mx', 'edu.mx', 'gob.mx', 'gov'];
+
+  const correoValido = (correo) => {
+    const valor = String(correo || '').trim().toLowerCase();
+
+    if (!regexCorreoBase.test(valor) || valor.includes('..')) {
+      return false;
+    }
+
+    const dominio = valor.split('@')[1] || '';
+    return dominiosPermitidos.some((terminacion) => dominio === terminacion || dominio.endsWith(`.${terminacion}`));
+  };
   const maxIntentos = 10;
   const tiempoBloqueoMs = 5000;
   const claveIntentos = 'edutech_registro_intentos';
@@ -253,8 +265,8 @@ if (!formRegistro || !registroSuccess || !registroWarning) {
       return false;
     }
 
-    if (!regexCorreo.test(correo)) {
-      mostrarErrorCampo(correoInput, 'Escribe un correo electrónico válido.');
+    if (!correoValido(correo)) {
+      mostrarErrorCampo(correoInput, 'Escribe un correo electrónico válido. Usa un dominio como .com, .net, .org o .mx.');
       return false;
     }
 

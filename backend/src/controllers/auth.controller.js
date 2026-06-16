@@ -1,6 +1,19 @@
 const bcrypt = require('bcrypt');
 const pool = require('../config/db');
 
+const dominiosCorreoPermitidos = ['com', 'net', 'org', 'edu', 'mx', 'com.mx', 'edu.mx', 'gob.mx', 'gov'];
+
+const correoValido = (correo) => {
+  const valor = String(correo || '').trim().toLowerCase();
+
+  if (!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(valor) || valor.includes('..')) {
+    return false;
+  }
+
+  const dominio = valor.split('@')[1] || '';
+  return dominiosCorreoPermitidos.some((terminacion) => dominio === terminacion || dominio.endsWith(`.${terminacion}`));
+};
+
 const registrarUsuario = async (req, res) => {
   try {
     const {
@@ -16,6 +29,13 @@ const registrarUsuario = async (req, res) => {
       return res.status(400).json({
         ok: false,
         message: 'Faltan datos obligatorios: nombre, apellido_paterno, correo y password.'
+      });
+    }
+
+    if (!correoValido(correo)) {
+      return res.status(400).json({
+        ok: false,
+        message: 'Escribe un correo electrónico válido. Usa un dominio como .com, .net, .org o .mx.'
       });
     }
 
@@ -118,6 +138,7 @@ const iniciarSesion = async (req, res) => {
         u.correo,
         u.password_hash,
         u.telefono,
+        u.foto_perfil_url,
         u.esta_activo
        FROM edutech.usuario u
        INNER JOIN edutech.rol r
