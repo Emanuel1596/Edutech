@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Certificado - EduTech</title>
+  <script src="js/session-guard.js"></script>
+  <meta name="description" content="Certificado de finalización del curso en EduTech.">
+  <link rel="preload" href="assets/img/certificados/fondo-certificado.jpg?v=16-39" as="image">
+  <link rel="preload" href="assets/img/certificados/copa-certificado.png?v=16-39" as="image">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/certificado.css?v=16-39">
+</head>
+<body class="certificado-body certificado-todocode-body certificado-loading">
+  <main class="certificado-page certificado-todocode-page">
+    <p class="form-error certificado-message certificado-todocode-message" id="certificadoMensaje" style="display: none;"></p>
+
+    <section class="llms-certificate-wrapper edutech-certificate-wrapper" id="certificadoCard" style="display: none;" aria-label="Certificado de finalización EduTech">
+      <article class="llms-certificate-container edutech-certificate-container" id="certificadoExportable">
+        <img
+          class="edutech-certificate-background"
+          id="certificadoFondo"
+          src="assets/img/certificados/fondo-certificado.jpg?v=16-39"
+          alt=""
+          aria-hidden="true"
+          decoding="async"
+          fetchpriority="high"
+        >
+
+        <div class="edutech-certificate-paper">
+          <div class="edutech-certificate-logo" aria-label="EduTech">
+            <span class="edutech-logo-edu">Edu</span><span class="edutech-logo-tech">Tech</span>
+          </div>
+
+          <h1 class="edutech-certificate-title">Certificado de Finalización</h1>
+
+          <p class="edutech-certificate-label">Concedido a:</p>
+          <h2 class="edutech-certificate-student" id="certificadoAlumno">Alumno EduTech</h2>
+
+          <p class="edutech-certificate-text">por completar con éxito el curso de:</p>
+          <h3 class="edutech-certificate-course" id="certificadoCurso">Curso EduTech</h3>
+
+          <p class="edutech-certificate-date">el día <span id="certificadoFecha">–</span></p>
+
+          <div class="edutech-certificate-seal" aria-hidden="true">
+            <img src="assets/img/certificados/copa-certificado.png?v=16-39" alt="">
+          </div>
+
+          <div class="edutech-certificate-signatures">
+            <div class="edutech-certificate-signature">
+              <span class="edutech-signature-mark">E7</span>
+              <span class="edutech-signature-line"></span>
+              <strong>EDUTECH</strong>
+              <small>Plataforma Web de Cursos</small>
+            </div>
+
+            <div class="edutech-certificate-signature">
+              <span class="edutech-signature-mark">Oz</span>
+              <span class="edutech-signature-line"></span>
+              <strong id="certificadoInstructor">Instructor EduTech</strong>
+              <small>Instructor del curso</small>
+            </div>
+          </div>
+
+          <div class="edutech-certificate-meta" aria-hidden="true">
+            <span>Código: <strong id="certificadoCodigo">–</strong></span>
+            <span>Calificación: <strong id="certificadoCalificacion">–</strong></span>
+          </div>
+        </div>
+      </article>
+
+      <div class="llms-print-certificate edutech-certificate-actions no-print" id="certificadoAcciones">
+        <a class="llms-cert-return-link" href="mi-cuenta.html#certificados">← Todos los diplomas</a>
+
+        <button class="llms-button-secondary" type="button" id="btnImprimirCertificado">
+          <span>Imprimir</span>
+          <svg class="btn-icon" viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M128 0C110.3 0 96 14.3 96 32V128H416V32c0-17.7-14.3-32-32-32H128zM64 160c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H96V304c0-17.7 14.3-32 32-32H384c17.7 0 32 14.3 32 32v48h64c17.7 0 32-14.3 32-32V224c0-35.3-28.7-64-64-64H64zm336 48a24 24 0 1 1 0 48 24 24 0 1 1 0-48zM128 320V480c0 17.7 14.3 32 32 32H352c17.7 0 32-14.3 32-32V320H128z"/>
+          </svg>
+        </button>
+
+        <button class="llms-button-secondary" type="button" id="btnDescargarCertificado">
+          <span>Descargar</span>
+          <svg class="btn-icon" viewBox="0 0 640 512" aria-hidden="true">
+            <path d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9C111.7 121 181.3 64 264 64c70.5 0 132.4 40.3 162.7 99.7C487.2 173.9 536 226.4 536 290c0 5.3-.3 10.6-1 15.7C595.9 318.3 640 372.2 640 436c0 24.3-19.7 44-44 44H384V352h76.7c14.3 0 21.4-17.2 11.3-27.3l-144-144c-6.2-6.2-16.4-6.2-22.6 0l-144 144c-10.1 10.1-2.9 27.3 11.3 27.3H249V480H144z"/>
+          </svg>
+        </button>
+
+        <button class="llms-button-secondary" type="button" id="btnToggleCompartirCertificado">
+          <span class="edutech-share-label">Habilitar compartir</span>
+          <svg class="btn-icon" viewBox="0 0 448 512" aria-hidden="true">
+            <path d="M352 320c-22.9 0-43.5 10.1-57.7 26.1L160.3 265.7c1.1-6.3 1.7-12.8 1.7-19.7s-.6-13.4-1.7-19.7l134-80.4C308.5 161.9 329.1 172 352 172c44.2 0 80-35.8 80-80S396.2 12 352 12s-80 35.8-80 80c0 6.9.6 13.4 1.7 19.7l-134 80.4C125.5 176.1 104.9 166 82 166c-44.2 0-80 35.8-80 80s35.8 80 80 80c22.9 0 43.5-10.1 57.7-26.1l134 80.4c-1.1 6.3-1.7 12.8-1.7 19.7c0 44.2 35.8 80 80 80s80-35.8 80-80s-35.8-80-80-80z"/>
+          </svg>
+        </button>
+
+        <button class="llms-button-secondary" type="button" id="btnCopiarCompartirCertificado">
+          <span>Copiar enlace para compartir</span>
+          <svg class="btn-icon" viewBox="0 0 448 512" aria-hidden="true">
+            <path d="M384 336H192c-35.3 0-64-28.7-64-64V64c0-35.3 28.7-64 64-64H307.5c17 0 33.3 6.7 45.3 18.7l76.5 76.5c12 12 18.7 28.3 18.7 45.3V272c0 35.3-28.7 64-64 64zM64 128H96v48H64c-8.8 0-16 7.2-16 16V448c0 8.8 7.2 16 16 16H256c8.8 0 16-7.2 16-16V384h48v64c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V192c0-35.3 28.7-64 64-64z"/>
+          </svg>
+          <span class="edutech-copy-check" aria-hidden="true">✓</span>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/certificado.js?v=16-39"></script>
+</body>
+</html>

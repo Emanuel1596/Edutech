@@ -1,0 +1,810 @@
+/* Certificado EduTech - diseño aislado
+   Este archivo carga DESPUÉS de styles.css para evitar reglas viejas.
+*/
+
+.certificado-todocode-body,
+.certificado-body {
+  min-height: 100vh !important;
+  margin: 0 !important;
+  background: #1f212b !important;
+  color: #f8fafc !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+
+.certificado-todocode-page,
+.certificado-page {
+  width: 100% !important;
+  min-height: 100vh !important;
+  padding: 16px 12px 0 !important;
+  background: #1f212b !important;
+}
+
+.certificado-loading .edutech-certificate-wrapper {
+  visibility: hidden !important;
+}
+
+.certificado-ready .edutech-certificate-wrapper {
+  visibility: visible !important;
+}
+
+.certificado-message,
+.certificado-todocode-message {
+  width: min(850px, calc(100vw - 40px)) !important;
+  margin: 72px auto 0 !important;
+  padding: 14px 16px !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  border-radius: 8px !important;
+  color: #fff !important;
+  background: rgba(239, 47, 52, .16) !important;
+}
+
+.edutech-certificate-wrapper {
+  position: relative !important;
+  width: min(1120px, calc(100vw - 24px)) !important;
+  aspect-ratio: 900 / 635 !important;
+  height: auto !important;
+  margin: 0 auto !important;
+  color: #111 !important;
+}
+
+.edutech-certificate-container {
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background-color: #1f212b !important;
+  background-image: url("../assets/img/certificados/fondo-certificado.jpg?v=16-39") !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: 100% 100% !important;
+}
+
+.edutech-certificate-container::before,
+.edutech-certificate-container::after,
+.edutech-certificate-paper::before,
+.edutech-certificate-paper::after {
+  display: none !important;
+  content: none !important;
+}
+
+.edutech-certificate-paper {
+  position: absolute !important;
+  left: 10.6% !important;
+  top: 9.4% !important;
+  width: 78.7% !important;
+  height: 78.7% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  color: #050505 !important;
+  text-align: center !important;
+  background: #f2eee4 !important;
+  border: 1px solid rgba(88, 73, 50, .16) !important;
+  border-radius: 0 !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, .18) !important;
+}
+
+.edutech-certificate-logo {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: 8.0% !important;
+  margin: 0 !important;
+  font-size: clamp(2.1rem, 3.65vw, 3.15rem) !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  letter-spacing: -.07em !important;
+  text-shadow: 4px 5px 0 rgba(0, 0, 0, .16) !important;
+}
+
+.edutech-logo-edu {
+  color: #ffd91f !important;
+}
+
+.edutech-logo-tech {
+  color: #04e2ff !important;
+}
+
+.edutech-certificate-title {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: 19.0% !important;
+  margin: 0 !important;
+  color: #ef2f34 !important;
+  font-size: clamp(2.05rem, 3.35vw, 2.78rem) !important;
+  font-weight: 700 !important;
+  line-height: 1.1 !important;
+  letter-spacing: 0 !important;
+}
+
+.edutech-certificate-label,
+.edutech-certificate-text,
+.edutech-certificate-date {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  margin: 0 !important;
+  color: #080808 !important;
+  font-size: clamp(.96rem, 1.45vw, 1.15rem) !important;
+  font-weight: 400 !important;
+  line-height: 1.35 !important;
+}
+
+.edutech-certificate-label {
+  top: 34.2% !important;
+}
+
+.edutech-certificate-student {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: 39.0% !important;
+  margin: 0 !important;
+  color: #000 !important;
+  font-size: clamp(2.65rem, 4.35vw, 3.65rem) !important;
+  font-weight: 700 !important;
+  line-height: 1.05 !important;
+  letter-spacing: 0 !important;
+}
+
+.edutech-certificate-text {
+  top: 53.0% !important;
+}
+
+.edutech-certificate-course {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: 59.5% !important;
+  margin: 0 !important;
+  color: #000 !important;
+  font-size: clamp(1.65rem, 2.35vw, 2rem) !important;
+  font-weight: 700 !important;
+  line-height: 1.1 !important;
+}
+
+.edutech-certificate-date {
+  top: 70.0% !important;
+}
+
+.edutech-certificate-signatures {
+  position: absolute !important;
+  left: 7.7% !important;
+  right: 7.7% !important;
+  bottom: 6.2% !important;
+  display: grid !important;
+  grid-template-columns: minmax(210px, 1fr) clamp(70px, 8vw, 96px) minmax(210px, 1fr) !important;
+  align-items: end !important;
+  justify-content: center !important;
+  gap: clamp(32px, 5vw, 72px) !important;
+}
+
+.edutech-certificate-signature {
+  position: relative !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  text-align: left !important;
+}
+
+.edutech-signature-mark {
+  position: absolute !important;
+  left: 30% !important;
+  bottom: 47px !important;
+  color: #161616 !important;
+  font-family: "Segoe Script", "Brush Script MT", cursive !important;
+  font-size: clamp(2.35rem, 3.25vw, 2.95rem) !important;
+  font-weight: 400 !important;
+  line-height: .8 !important;
+  opacity: .9 !important;
+  transform: rotate(-12deg) !important;
+}
+
+.edutech-certificate-signature:nth-child(3) .edutech-signature-mark {
+  left: 36% !important;
+  transform: rotate(15deg) !important;
+}
+
+.edutech-signature-line {
+  display: block !important;
+  width: 100% !important;
+  height: 4px !important;
+  margin-bottom: 9px !important;
+  background: #3c332e !important;
+}
+
+.edutech-certificate-signature strong {
+  display: block !important;
+  color: #ef2f34 !important;
+  font-size: clamp(.78rem, 1.08vw, .95rem) !important;
+  font-weight: 900 !important;
+  line-height: 1.1 !important;
+  text-transform: uppercase !important;
+}
+
+.edutech-certificate-signature small {
+  display: block !important;
+  margin-top: 5px !important;
+  color: #615951 !important;
+  font-size: clamp(.72rem, .96vw, .86rem) !important;
+  line-height: 1.2 !important;
+}
+
+.edutech-certificate-seal {
+  height: clamp(78px, 8.7vw, 105px) !important;
+  margin: 0 auto !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+}
+
+.edutech-certificate-seal img {
+  width: auto !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  display: block !important;
+  object-fit: contain !important;
+}
+
+.edutech-certificate-meta,
+#certificadoCodigo,
+#certificadoCalificacion {
+  display: none !important;
+}
+
+.edutech-certificate-actions {
+  width: min(1120px, calc(100vw - 24px)) !important;
+  margin: 40px auto 0 !important;
+  padding-bottom: 24px !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+}
+
+.edutech-certificate-actions .llms-cert-return-link {
+  margin-right: 14px !important;
+  color: #04e2ff !important;
+  font-size: .95rem !important;
+  text-decoration: none !important;
+}
+
+.edutech-certificate-actions .llms-cert-return-link:hover {
+  color: #98f3ff !important;
+}
+
+.llms-button-secondary {
+  min-height: 43px !important;
+  padding: 0 22px !important;
+  border: 0 !important;
+  border-radius: 6px !important;
+  background: #2e89ff !important;
+  color: #fff !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 9px !important;
+  cursor: pointer !important;
+}
+
+.llms-button-secondary:hover {
+  background: #77b2ff !important;
+}
+
+.btn-icon {
+  width: 16px !important;
+  height: 16px !important;
+  fill: currentColor !important;
+  flex: 0 0 16px !important;
+  display: block !important;
+}
+
+#btnCopiarCompartirCertificado {
+  display: none !important;
+}
+
+.edutech-certificate-actions.is-sharing-enabled #btnCopiarCompartirCertificado {
+  display: inline-flex !important;
+}
+
+.edutech-copy-check {
+  display: none !important;
+  margin-left: 2px !important;
+  font-weight: 900 !important;
+}
+
+#btnCopiarCompartirCertificado.is-copied .edutech-copy-check {
+  display: inline !important;
+}
+
+.edutech-print-output {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .edutech-certificate-actions {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  .edutech-certificate-actions .llms-cert-return-link {
+    width: 100% !important;
+    margin: 0 0 8px !important;
+    text-align: center !important;
+  }
+
+  .llms-button-secondary {
+    flex: 1 1 180px !important;
+  }
+}
+
+@media print {
+  @page {
+    size: landscape;
+    margin: 0;
+  }
+
+  body.edutech-printing-certificate > *:not(.edutech-print-output) {
+    display: none !important;
+  }
+
+  body.edutech-printing-certificate {
+    margin: 0 !important;
+    background: #fff !important;
+  }
+
+  body.edutech-printing-certificate .edutech-print-output {
+    width: 100vw !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #fff !important;
+  }
+
+  body.edutech-printing-certificate .edutech-print-output img {
+    width: 100vw !important;
+    height: auto !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    object-fit: contain !important;
+    display: block !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
+
+
+/* Ajuste 16.31: el fondo se carga como imagen real y las firmas ya no se salen */
+.edutech-certificate-background {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+  object-fit: fill !important;
+  object-position: center center !important;
+  border: 0 !important;
+  user-select: none !important;
+  pointer-events: none !important;
+}
+
+.edutech-certificate-paper {
+  z-index: 1 !important;
+  overflow: hidden !important;
+}
+
+.edutech-certificate-signatures {
+  left: 7.0% !important;
+  right: 7.0% !important;
+  bottom: 6.4% !important;
+  height: 18.5% !important;
+  display: block !important;
+  gap: 0 !important;
+}
+
+.edutech-certificate-signature {
+  position: absolute !important;
+  bottom: 0 !important;
+  width: 31.5% !important;
+  text-align: left !important;
+}
+
+.edutech-certificate-signature:nth-child(1) {
+  left: 0 !important;
+}
+
+.edutech-certificate-signature:nth-child(3) {
+  right: 0 !important;
+}
+
+.edutech-certificate-seal {
+  position: absolute !important;
+  left: 50% !important;
+  bottom: 0 !important;
+  width: clamp(64px, 7.2vw, 88px) !important;
+  height: clamp(76px, 8.1vw, 98px) !important;
+  transform: translateX(-50%) !important;
+}
+
+.edutech-signature-line {
+  width: 100% !important;
+}
+
+.edutech-signature-mark {
+  left: 25% !important;
+  bottom: 46px !important;
+  font-size: clamp(2.15rem, 3.0vw, 2.72rem) !important;
+}
+
+.edutech-certificate-signature:nth-child(3) .edutech-signature-mark {
+  left: 35% !important;
+}
+
+@media print {
+  .edutech-certificate-background {
+    display: block !important;
+  }
+}
+
+
+/* Ajuste 16.32: centrado final de firmas y copa.
+   Proporciones tomadas sobre el papel, no sobre una imagen fija.
+*/
+.edutech-certificate-signatures {
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 6.4% !important;
+  height: 18.5% !important;
+  display: block !important;
+}
+
+.edutech-certificate-signature {
+  position: absolute !important;
+  bottom: 0 !important;
+  width: 27.6% !important;
+  text-align: left !important;
+}
+
+.edutech-certificate-signature:nth-child(1) {
+  left: 7.2% !important;
+}
+
+.edutech-certificate-signature:nth-child(3) {
+  right: 13.4% !important;
+}
+
+.edutech-signature-line {
+  width: 100% !important;
+  height: 4px !important;
+}
+
+.edutech-signature-mark {
+  left: 24% !important;
+  bottom: 46px !important;
+  font-size: clamp(2.15rem, 3vw, 2.72rem) !important;
+}
+
+.edutech-certificate-signature:nth-child(3) .edutech-signature-mark {
+  left: 35% !important;
+}
+
+.edutech-certificate-seal {
+  position: absolute !important;
+  left: 50% !important;
+  bottom: 0 !important;
+  width: clamp(64px, 7.2vw, 88px) !important;
+  height: clamp(76px, 8.1vw, 98px) !important;
+  transform: translateX(-50%) !important;
+}
+
+
+/* Ajuste 16.33 FINAL: firmas simétricas y copa centrada */
+.edutech-certificate-signatures {
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 6.4% !important;
+  height: 18.5% !important;
+  display: block !important;
+}
+
+.edutech-certificate-signature {
+  position: absolute !important;
+  bottom: 0 !important;
+  width: 29.3% !important;
+  text-align: left !important;
+}
+
+.edutech-certificate-signature:nth-child(1) {
+  left: 7.6% !important;
+  right: auto !important;
+}
+
+.edutech-certificate-signature:nth-child(3) {
+  left: auto !important;
+  right: 7.6% !important;
+}
+
+.edutech-signature-line {
+  width: 100% !important;
+  height: 4px !important;
+  margin-bottom: 9px !important;
+}
+
+.edutech-signature-mark {
+  left: 24% !important;
+  bottom: 46px !important;
+  font-size: clamp(2.15rem, 3vw, 2.72rem) !important;
+}
+
+.edutech-certificate-signature:nth-child(3) .edutech-signature-mark {
+  left: 35% !important;
+}
+
+.edutech-certificate-seal {
+  position: absolute !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: 0 !important;
+  width: clamp(64px, 7.2vw, 88px) !important;
+  height: clamp(76px, 8.1vw, 98px) !important;
+  transform: translateX(-50%) !important;
+}
+
+.edutech-certificate-seal img {
+  margin: 0 auto !important;
+}
+
+
+/* Ajuste 16.34 FINAL: centrado general como la referencia */
+.edutech-certificate-logo {
+  top: 7.4% !important;
+  left: 0 !important;
+  right: 0 !important;
+  text-align: center !important;
+}
+
+.edutech-certificate-title {
+  top: 18.0% !important;
+  left: 0 !important;
+  right: 0 !important;
+  text-align: center !important;
+}
+
+.edutech-certificate-label {
+  top: 32.4% !important;
+  left: 0 !important;
+  right: 0 !important;
+  text-align: center !important;
+}
+
+.edutech-certificate-student {
+  top: 37.4% !important;
+  left: 0 !important;
+  right: 0 !important;
+  text-align: center !important;
+}
+
+.edutech-certificate-text {
+  top: 50.2% !important;
+  left: 0 !important;
+  right: 0 !important;
+  text-align: center !important;
+}
+
+.edutech-certificate-course {
+  top: 56.4% !important;
+  left: 0 !important;
+  right: 0 !important;
+  text-align: center !important;
+}
+
+.edutech-certificate-date {
+  top: 66.0% !important;
+  left: 0 !important;
+  right: 0 !important;
+  text-align: center !important;
+}
+
+.edutech-certificate-signatures {
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 8.6% !important;
+  height: 18.5% !important;
+  display: block !important;
+}
+
+.edutech-certificate-signature {
+  position: absolute !important;
+  bottom: 0 !important;
+  width: 29.3% !important;
+  text-align: left !important;
+}
+
+.edutech-certificate-signature:nth-child(1) {
+  left: 7.6% !important;
+  right: auto !important;
+}
+
+.edutech-certificate-signature:nth-child(3) {
+  left: auto !important;
+  right: 7.6% !important;
+}
+
+.edutech-signature-line {
+  width: 100% !important;
+  height: 4px !important;
+  margin-bottom: 9px !important;
+}
+
+.edutech-signature-mark {
+  left: 24% !important;
+  bottom: 46px !important;
+  font-size: clamp(2.15rem, 3vw, 2.72rem) !important;
+}
+
+.edutech-certificate-signature:nth-child(3) .edutech-signature-mark {
+  left: 35% !important;
+}
+
+.edutech-certificate-seal {
+  position: absolute !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: 0 !important;
+  width: clamp(64px, 7.2vw, 88px) !important;
+  height: clamp(76px, 8.1vw, 98px) !important;
+  transform: translateX(-50%) !important;
+}
+
+.edutech-certificate-seal img {
+  margin: 0 auto !important;
+}
+
+
+/* Ajuste 16.35: copa a media altura de las líneas como referencia final */
+.edutech-certificate-signatures {
+  bottom: 7.9% !important;
+  height: 18.8% !important;
+}
+
+.edutech-certificate-signature {
+  bottom: 0 !important;
+}
+
+.edutech-signature-line {
+  margin-bottom: 10px !important;
+}
+
+.edutech-signature-mark {
+  bottom: 45px !important;
+}
+
+.edutech-certificate-seal {
+  left: 50% !important;
+  bottom: 18px !important;
+  width: clamp(66px, 7.4vw, 90px) !important;
+  height: clamp(78px, 8.3vw, 102px) !important;
+  transform: translateX(-50%) !important;
+}
+
+.edutech-certificate-seal img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+}
+
+
+/* Ajuste 16.36: bajar un poco más las firmas y subir un poco más la copa */
+.edutech-certificate-signatures {
+  bottom: 6.9% !important;
+  height: 19.0% !important;
+}
+
+.edutech-certificate-signature {
+  bottom: 0 !important;
+}
+
+.edutech-certificate-seal {
+  bottom: 28px !important;
+  width: clamp(66px, 7.4vw, 90px) !important;
+  height: clamp(78px, 8.3vw, 102px) !important;
+}
+
+
+/* Ajuste 16.37: subir la copa para que quede más alineada como la referencia */
+.edutech-certificate-seal {
+  left: 50% !important;
+  bottom: 52px !important;
+  width: clamp(66px, 7.4vw, 90px) !important;
+  height: clamp(78px, 8.3vw, 102px) !important;
+  transform: translateX(-50%) !important;
+}
+
+.edutech-certificate-seal img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+
+
+/* Ajuste 16.39 TODO O NADA:
+   La copa ya NO depende del bloque de firmas.
+   Se posiciona directamente contra el papel marfil.
+*/
+.edutech-certificate-paper > .edutech-certificate-seal {
+  position: absolute !important;
+  left: 50% !important;
+  top: 75.8% !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: auto !important;
+  height: 16.2% !important;
+  max-width: none !important;
+  transform: translateX(-50%) !important;
+  z-index: 5 !important;
+  margin: 0 !important;
+  display: block !important;
+}
+
+.edutech-certificate-paper > .edutech-certificate-seal img {
+  width: auto !important;
+  height: 100% !important;
+  max-width: none !important;
+  object-fit: contain !important;
+  display: block !important;
+  margin: 0 auto !important;
+}
+
+.edutech-certificate-signatures {
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 7.0% !important;
+  height: 18.5% !important;
+  display: block !important;
+}
+
+.edutech-certificate-signature {
+  position: absolute !important;
+  bottom: 0 !important;
+  width: 29.3% !important;
+  text-align: left !important;
+}
+
+.edutech-certificate-signature:nth-child(1) {
+  left: 7.6% !important;
+  right: auto !important;
+}
+
+.edutech-certificate-signature:nth-child(2) {
+  left: auto !important;
+  right: 7.6% !important;
+}
+
+.edutech-certificate-signature:nth-child(3) {
+  left: auto !important;
+  right: 7.6% !important;
+}
+
+.edutech-certificate-signature:nth-child(2) .edutech-signature-mark,
+.edutech-certificate-signature:nth-child(3) .edutech-signature-mark {
+  left: 35% !important;
+  transform: rotate(15deg) !important;
+}
