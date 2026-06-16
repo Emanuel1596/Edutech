@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vista previa del curso - EduTech</title>
+  <script src="js/session-guard.js"></script>
+  <meta name="description" content="Vista previa administrativa del curso en EduTech.">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/admin-preview.css?v=23-4">
+</head>
+<body class="edutech-data-pending edutech-data-loading">
+  <div class="site admin-preview-site" id="page">
+    <header class="site-header">
+      <div class="header-container">
+        <a href="admin.html#cursos" class="logo" aria-label="EduTech">
+          <span class="logo-main">Edu</span><span class="logo-accent">Tech</span>
+        </a>
+
+        <button class="menu-toggle" type="button" aria-label="Abrir menú">☰</button>
+
+        <nav class="main-navigation" aria-label="Menú principal">
+          <ul class="main-menu">
+            <li><a href="admin.html#dashboard">Admin</a></li>
+            <li><a href="admin.html#usuarios">Usuarios</a></li>
+            <li><a href="admin.html#cursos">Cursos por revisar</a></li>
+            <li><a href="admin.html#pagos">Pagos</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="admin-preview-page">
+      <section class="admin-preview-hero">
+        <p class="admin-preview-kicker">Vista previa administrativa</p>
+        <h1 id="previewTitulo">Cargando curso...</h1>
+        <p id="previewDescripcion">Espera un momento.</p>
+
+        <div class="admin-preview-actions">
+          <a href="admin.html#cursos" class="admin-preview-link">Volver a cursos por revisar</a>
+          <button type="button" class="admin-preview-link active" id="previewModoPublica">Vista pública</button>
+          <button type="button" class="admin-preview-link" id="previewModoAula">Vista aula</button>
+          <button type="button" class="admin-preview-link" id="previewModoExamen">Vista examen</button>
+        </div>
+
+        <p class="admin-preview-message" id="previewMensaje" style="display: none;"></p>
+      </section>
+
+      <section class="admin-preview-publica active" id="previewPublica">
+        <div class="preview-public-layout">
+          <div>
+            <h2>Información del curso</h2>
+            <div class="preview-meta-list" id="previewMetaPublica"></div>
+
+            <h2>¿Qué vas a poder ver en este curso?</h2>
+            <p id="previewDescripcionLarga"></p>
+
+            <h2>Instructor</h2>
+            <div class="preview-instructor-card" id="previewInstructor"></div>
+          </div>
+
+          <aside class="preview-cover-card">
+            <img id="previewPortada" src="" alt="Portada del curso">
+            <div class="preview-buy-box">
+              <h3>Compra del curso</h3>
+              <strong id="previewPrecio">$0 MXN</strong>
+              <p>El alumno podrá acceder al contenido cuando el pago sea aprobado y su inscripción quede activa.</p>
+              <button type="button" disabled>Comprar curso</button>
+            </div>
+          </aside>
+        </div>
+
+        <section class="preview-course-content">
+          <h2>Contenido del curso</h2>
+          <div id="previewContenidoPublico"></div>
+        </section>
+      </section>
+
+      <section class="admin-preview-aula" id="previewAula" hidden>
+        <div class="preview-classroom-head">
+          <div>
+            <p class="admin-preview-kicker">Aula del curso</p>
+            <h2 id="previewAulaTitulo">Curso</h2>
+            <p id="previewAulaDescripcion"></p>
+          </div>
+
+          <div class="preview-progress-box">
+            <span>Progreso del contenido</span>
+            <strong>0%</strong>
+            <p id="previewAulaConteo">0 de 0 lecciones completadas</p>
+          </div>
+        </div>
+
+        <div class="preview-classroom-layout">
+          <article class="preview-lesson-panel">
+            <p class="preview-module-name" id="previewLeccionModulo">Módulo</p>
+            <h3 id="previewLeccionTitulo">Lección</h3>
+            <p id="previewLeccionDuracion">Tiempo estimado: 0 minutos</p>
+
+            <div class="preview-video-box" id="previewVideoBox"></div>
+
+            <div class="preview-lesson-text">
+              <h4>Contenido de la lección</h4>
+              <p id="previewLeccionTexto"></p>
+            </div>
+
+            <div class="preview-resources-box">
+              <h4>Recursos adicionales</h4>
+              <div id="previewLeccionRecursos"></div>
+            </div>
+
+            <div class="preview-lesson-nav">
+              <button type="button" class="admin-preview-link" id="previewLeccionAnterior">Lección anterior</button>
+              <button type="button" class="admin-preview-link" id="previewLeccionSiguiente">Siguiente lección</button>
+            </div>
+          </article>
+
+          <aside class="preview-sidebar">
+            <h3>Contenido</h3>
+            <a href="admin.html#cursos">Volver a revisión</a>
+            <div id="previewAulaMenu"></div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="admin-preview-examen" id="previewExamen" hidden>
+        <div class="preview-exam-head">
+          <div>
+            <p class="admin-preview-kicker">Vista previa del examen</p>
+            <h2 id="previewExamenTitulo">Examen final</h2>
+            <p id="previewExamenDescripcion">Revisión del examen sin límite de tiempo y sin guardar calificación.</p>
+          </div>
+        </div>
+
+        <div class="preview-exam-meta" id="previewExamenMeta"></div>
+
+        <form class="preview-exam-form" id="previewExamenForm"></form>
+
+        <div class="preview-exam-actions" id="previewExamenActions">
+          <button type="button" class="admin-preview-link" id="previewExamenRevisar">Revisar respuestas</button>
+          <button type="button" class="admin-preview-link" id="previewExamenLimpiar">Limpiar respuestas</button>
+        </div>
+
+        <p class="preview-exam-result" id="previewExamenResultado" style="display: none;"></p>
+      </section>
+
+    </main>
+
+    <footer class="site-footer">
+      <p>EduTech - Plataforma Web de Cursos</p>
+    </footer>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/admin-preview-curso.js"></script>
+</body>
+</html>
