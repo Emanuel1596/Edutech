@@ -181,48 +181,23 @@ if (!formLogin) {
     }
   };
 
-  const validarCorreo = (mostrarVacio = false) => {
+  const validarCorreo = () => {
     const correo = correoInput.value.trim();
 
-    if (!correo) {
-      quitarErrorCampo(correoInput);
-
-      if (mostrarVacio) {
-        mostrarErrorCampo(correoInput, 'El correo electrónico es obligatorio.');
-      }
-
-      return false;
-    }
-
-    if (!regexCorreo.test(correo)) {
-      mostrarErrorCampo(correoInput, 'Escribe un correo electrónico válido.');
-      return false;
-    }
-
     quitarErrorCampo(correoInput);
-    return true;
+
+    if (!correo) {
+      return false;
+    }
+
+    return regexCorreo.test(correo);
   };
 
-  const validarPassword = (mostrarVacio = false) => {
+  const validarPassword = () => {
     const password = passwordInput.value;
 
-    if (!password) {
-      quitarErrorCampo(passwordInput);
-
-      if (mostrarVacio) {
-        mostrarErrorCampo(passwordInput, 'La contraseña es obligatoria.');
-      }
-
-      return false;
-    }
-
-    if (password.length < 8) {
-      mostrarErrorCampo(passwordInput, 'La contraseña debe tener mínimo 8 caracteres.');
-      return false;
-    }
-
     quitarErrorCampo(passwordInput);
-    return true;
+    return Boolean(password);
   };
 
   [correoInput, passwordInput].forEach((campo) => {
@@ -232,12 +207,12 @@ if (!formLogin) {
 
   correoInput.addEventListener('input', () => {
     ocultarMensajesGenerales();
-    validarCorreo(false);
+    quitarErrorCampo(correoInput);
   });
 
   passwordInput.addEventListener('input', () => {
     ocultarMensajesGenerales();
-    validarPassword(false);
+    quitarErrorCampo(passwordInput);
   });
 
   formLogin.addEventListener('submit', async (evento) => {
@@ -252,12 +227,13 @@ if (!formLogin) {
     ocultarMensajesGenerales();
 
     const formularioValido = [
-      validarCorreo(true),
-      validarPassword(true)
+      validarCorreo(),
+      validarPassword()
     ].every(Boolean);
 
     if (!formularioValido) {
       registrarIntento();
+      mostrarElemento(loginWarning, 'Revisa el correo y la contraseña e intenta nuevamente.');
       return;
     }
 
@@ -292,22 +268,32 @@ if (!formLogin) {
       mostrarElemento(loginSuccess, 'Inicio de sesión correcto. Redirigiendo...');
 
       const redireccion = sessionStorage.getItem('edutech_redirect_post_login') || sessionStorage.getItem('edutech_redirect_after_login');
+      const rutaPorRol = window.EduTech && typeof window.EduTech.obtenerRutaInicioPorRol === 'function'
+        ? window.EduTech.obtenerRutaInicioPorRol(usuario)
+        : 'mi-cuenta.html';
+      const redireccionPermitida = redireccion
+        && window.EduTech
+        && typeof window.EduTech.usuarioPuedeAbrirRuta === 'function'
+        && window.EduTech.usuarioPuedeAbrirRuta(usuario, redireccion);
 
       setTimeout(() => {
-        if (redireccion) {
-          sessionStorage.removeItem('edutech_redirect_post_login');
-          sessionStorage.removeItem('edutech_redirect_after_login');
-          window.location.href = redireccion;
-          return;
+        sessionStorage.removeItem('edutech_redirect_post_login');
+        sessionStorage.removeItem('edutech_redirect_after_login');
+        if (typeof window.EduTechOcultarPaginaHistorial === 'function') {
+          window.EduTechOcultarPaginaHistorial();
         }
 
-        window.location.href = 'mi-cuenta.html';
+        window.location.replace(redireccionPermitida ? redireccion : rutaPorRol);
       }, 700);
     } catch (error) {
       desbloquearBotonLogin();
       registrarIntento();
 
-      const mensajeError = error.message || error.error || 'No se pudo iniciar sesión.';
+      const mensajeOriginal = String(error.message || error.error || '');
+      const mensajeError = /conectar|api|puerto|servidor/i.test(mensajeOriginal)
+        ? mensajeOriginal
+        : 'No pudimos iniciar sesión. Revisa el correo y la contraseña e intenta nuevamente.';
+
       ocultarMensajesGenerales();
       mostrarElemento(loginWarning, mensajeError);
     }
