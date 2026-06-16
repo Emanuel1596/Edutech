@@ -1,0 +1,1046 @@
+.aula-body {
+  background: #11131f;
+}
+
+.aula-page {
+  background: #11131f;
+  color: #f8fafc;
+}
+
+.aula-container {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+.aula-hero {
+  padding: 42px 0 30px;
+  background: #1b1d26;
+}
+
+.aula-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 28px;
+  align-items: end;
+}
+
+.aula-kicker {
+  margin: 0 0 8px;
+  color: #04e2ff;
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.aula-title {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(34px, 4vw, 56px);
+  line-height: 1.05;
+  font-weight: 900;
+  letter-spacing: -1.4px;
+}
+
+.aula-description {
+  max-width: 760px;
+  margin: 18px 0 0;
+  color: #d7e8ff;
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.aula-meta-row {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.aula-meta-row span {
+  padding: 8px 12px;
+  color: #dce7ff;
+  background: rgba(255, 255, 255, .045);
+  border: 1px solid rgba(208, 225, 255, .11);
+  border-radius: 0;
+  font-size: 14px;
+}
+
+.aula-progress-card {
+  padding: 22px;
+  background: #1b1d26;
+  border: 1px solid rgba(208, 225, 255, .12);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.aula-progress-label {
+  display: block;
+  margin-bottom: 6px;
+  color: #d7e8ff;
+  font-size: 14px;
+}
+
+.aula-progress-card strong {
+  display: block;
+  color: #2e85b5;
+  font-size: 38px;
+  line-height: 1;
+}
+
+.aula-progress-card p {
+  margin: 10px 0 0;
+  color: #d7e8ff;
+  font-size: 14px;
+}
+
+.aula-progress-bar {
+  width: 100%;
+  height: 8px;
+  margin-top: 16px;
+  overflow: hidden;
+  background: #161a24;
+  border-radius: 0;
+}
+
+.aula-progress-fill {
+  width: 0;
+  height: 100%;
+  background: #2e85b5;
+  border-radius: 0;
+  transition: width .25s ease;
+}
+
+.aula-main-section {
+  padding: 28px 0 52px;
+}
+
+.aula-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 26px;
+  align-items: start;
+}
+
+.aula-sidebar,
+.aula-content-card {
+  background: #1b1d26;
+  border: 1px solid rgba(208, 225, 255, .12);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.aula-sidebar {
+  padding: 0;
+  position: sticky;
+  top: 18px;
+  overflow: hidden;
+  order: 2;
+}
+
+.aula-content-card {
+  min-height: 620px;
+  padding: 30px;
+  order: 1;
+}
+
+.aula-sidebar-header {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid rgba(208, 225, 255, .1);
+}
+
+.aula-sidebar-header h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.aula-sidebar-header a {
+  color: #04e2ff;
+  font-size: 17px;
+  line-height: 1.25;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.aula-modulos-lista {
+  padding: 0;
+}
+
+.aula-module-block {
+  padding: 0;
+  border-top: 1px solid rgba(208, 225, 255, .1);
+}
+
+.aula-module-block:first-child {
+  border-top: 0;
+}
+
+.aula-module-block h3 {
+  margin: 0;
+  padding: 14px 18px;
+  background: #256f96;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.aula-lessons-list {
+  display: grid;
+  gap: 0;
+}
+
+.aula-lesson-button {
+  width: 100%;
+  min-height: 48px;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 12px 18px;
+  color: #04e2ff;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid rgba(208, 225, 255, .14);
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.aula-lesson-button:hover:not(:disabled),
+.aula-lesson-button.is-active {
+  color: #04e2ff;
+  background: rgba(37, 111, 150, .10);
+}
+
+.aula-lesson-button.is-completed .aula-lesson-name {
+  text-decoration: line-through;
+}
+
+.aula-lesson-button.is-completed,
+.aula-lesson-button.is-exam {
+  color: #04e2ff;
+  background: transparent;
+}
+
+.aula-lesson-button.is-locked,
+.aula-lesson-button:disabled {
+  color: #9ea8bc;
+  background: transparent;
+  cursor: not-allowed;
+}
+
+.aula-lesson-state {
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border: 2px solid #aab3c4;
+  border-radius: 50%;
+  color: transparent;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.aula-lesson-state.is-completed {
+  border-color: #6fb3ff;
+  color: #6fb3ff;
+}
+
+.aula-lesson-button.is-active .aula-lesson-state:not(.is-completed):not(.is-locked):not(.is-exam) {
+  border-color: #6fb3ff;
+  color: transparent;
+}
+
+.aula-lesson-state.is-exam {
+  border-color: #6fb3ff;
+  color: #6fb3ff;
+  font-size: 12px;
+}
+
+.aula-lesson-state.is-locked {
+  border-color: #8a93a8;
+  color: transparent;
+  font-size: 18px;
+}
+
+.aula-lesson-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 16px;
+  line-height: 1.45;
+  font-weight: 400;
+}
+
+.aula-message {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  color: #d8f7ff;
+  background: rgba(4, 226, 255, .08);
+  border: 1px solid rgba(4, 226, 255, .25);
+  border-radius: 0;
+}
+
+.aula-message-error {
+  color: #ffd6d6;
+  background: rgba(255, 82, 82, .08);
+  border-color: rgba(255, 82, 82, .24);
+}
+
+.aula-lesson-header {
+  margin-bottom: 22px;
+}
+
+.aula-lesson-module {
+  margin: 0 0 7px;
+  color: #ffffff;
+  font-size: 15px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+.aula-lesson-header h2 {
+  margin: 0;
+  color: #04e2ff;
+  font-size: 28px;
+  line-height: 1.25;
+  font-weight: 400;
+}
+
+.aula-exam-card h2,
+.aula-empty-state h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(28px, 3vw, 42px);
+  line-height: 1.15;
+}
+
+.aula-lesson-duration {
+  margin: 10px 0 0;
+  color: #d7e8ff;
+}
+
+.aula-video-box {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  margin-bottom: 16px;
+  background: #0d0f18;
+  border: 1px solid rgba(208, 225, 255, .12);
+  border-radius: 0;
+}
+
+.aula-video-box iframe,
+.aula-video-box video {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.aula-video-placeholder {
+  text-align: center;
+  color: #d7e8ff;
+}
+
+.aula-video-placeholder span {
+  width: 76px;
+  height: 76px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 12px;
+  color: #11131f;
+  background: #04e2ff;
+  border-radius: 0;
+  font-size: 32px;
+  line-height: 1;
+}
+
+.aula-video-placeholder p {
+  margin: 0 0 8px;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.aula-video-placeholder a {
+  color: #04e2ff;
+}
+
+.aula-lesson-text,
+.aula-resources,
+.aula-exam-card,
+.aula-empty-state {
+  padding: 22px;
+  background: rgba(255, 255, 255, .035);
+  border: 1px solid rgba(208, 225, 255, .1);
+  border-radius: 0;
+}
+
+.aula-lesson-text,
+.aula-resources {
+  margin: 0;
+}
+
+.aula-lesson-text h3,
+.aula-resources h3 {
+  margin: 0 0 10px;
+  color: #ffffff;
+  font-size: 20px;
+}
+
+.aula-lesson-text p,
+.aula-no-resources,
+.aula-empty-state p,
+.aula-exam-card p {
+  margin: 0;
+  color: #d7e8ff;
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.aula-resources {
+  margin-top: 0;
+}
+
+.aula-resources-list {
+  list-style: none;
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+}
+
+.aula-resources-list li {
+  padding: 14px;
+  background: rgba(17, 19, 31, .7);
+  border: 1px solid rgba(208, 225, 255, .09);
+  border-radius: 0;
+}
+
+.aula-resources-list a {
+  color: #04e2ff;
+  font-weight: 700;
+}
+
+.aula-resources-list p {
+  margin: 5px 0 0;
+  color: #d7e8ff;
+}
+
+.aula-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.aula-nav-button,
+.aula-primary-button,
+.aula-secondary-button {
+  min-height: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  font: inherit;
+  font-size: 18px;
+  line-height: 1.35;
+  font-weight: 400;
+  color: #04e2ff;
+  background: transparent;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+.aula-nav-button:hover,
+.aula-primary-button:hover,
+.aula-secondary-button:hover {
+  color: #7ef2ff;
+  background: transparent;
+}
+
+.aula-nav-button:disabled,
+.aula-primary-button:disabled,
+.aula-secondary-button:disabled,
+.aula-disabled-link {
+  opacity: .55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.aula-primary-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 18px;
+  text-decoration: none;
+}
+
+.aula-empty-state {
+  text-align: center;
+}
+
+.aula-sidebar-empty,
+.aula-module-empty {
+  margin: 0;
+  padding: 16px 18px;
+  color: #8f9ab3;
+  font-size: 14px;
+}
+
+@media (max-width: 980px) {
+  .aula-hero-grid,
+  .aula-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .aula-sidebar,
+  .aula-content-card {
+    order: initial;
+  }
+
+  .aula-sidebar {
+    position: static;
+  }
+}
+
+@media (max-width: 620px) {
+  .aula-container {
+    width: min(100% - 28px, 1180px);
+  }
+
+  .aula-content-card {
+    padding: 20px;
+  }
+
+  .aula-meta-row {
+    display: grid;
+  }
+
+  .aula-actions {
+    display: flex;
+  }
+}
+
+
+/* Paso 20.5 - Examen final integrado en el aula */
+.aula-exam-card {
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+
+.aula-exam-card .aula-lesson-module {
+  margin: 0 0 7px;
+  color: #ffffff;
+  font-size: 15px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+.aula-exam-card h2 {
+  margin: 0 0 18px;
+  color: #04e2ff;
+  font-size: 28px;
+  line-height: 1.25;
+  font-weight: 400;
+  letter-spacing: normal;
+}
+
+.aula-exam-copy {
+  display: grid;
+  gap: 22px;
+  margin-bottom: 22px;
+}
+
+.aula-exam-copy p {
+  margin: 0;
+  color: #ffffff;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.aula-exam-copy strong {
+  color: #ffffff;
+  font-weight: 900;
+}
+
+.aula-exam-icon-list {
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  margin: 24px 0;
+  padding: 0;
+}
+
+.aula-exam-icon-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #ffffff;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.aula-exam-icon {
+  width: 16px;
+  min-width: 16px;
+  display: inline-flex;
+  justify-content: center;
+  color: #18ff82;
+  font-size: 18px;
+}
+
+.aula-exam-icon-list strong {
+  color: #ffffff;
+  font-weight: 900;
+}
+
+.aula-exam-warning {
+  margin: 28px 0 26px;
+  padding: 18px 20px;
+  background: #4d5010;
+  color: #ffffff;
+}
+
+.aula-exam-warning p {
+  margin: 0 0 12px;
+  font-weight: 900;
+}
+
+.aula-exam-warning ul {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.aula-exam-warning li {
+  color: #ffffff;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.aula-exam-ready {
+  margin: 22px 0 18px;
+  color: #ffffff;
+  font-size: 16px;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.aula-exam-start-wrap {
+  text-align: center;
+}
+
+.aula-exam-start-button {
+  display: inline;
+  color: #04e2ff;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-size: 18px;
+  line-height: 1.45;
+  font-weight: 400;
+  text-decoration: none;
+}
+
+.aula-exam-start-button:hover {
+  color: #7ef2ff;
+}
+
+.aula-exam-status {
+  max-width: 720px;
+  margin: 14px auto 0;
+  color: #d7e8ff;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.aula-exam-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 34px;
+}
+
+.aula-lesson-button.is-exam.is-completed .aula-lesson-name {
+  text-decoration: line-through;
+}
+
+.aula-lesson-button.is-exam.is-completed .aula-lesson-state {
+  border-color: #6fb3ff;
+  color: #6fb3ff;
+}
+
+@media (max-width: 620px) {
+  .aula-exam-actions {
+    display: flex;
+  }
+}
+
+/* Paso 20.6 - Ajustes finos de examen y navegación */
+.aula-exam-card {
+  padding-bottom: 30px;
+}
+
+.aula-exam-actions {
+  margin-top: 44px;
+  padding-bottom: 8px;
+}
+
+.aula-exam-start-wrap {
+  margin-bottom: 10px;
+}
+
+.aula-content-card {
+  padding-bottom: 42px;
+}
+
+.aula-lesson-header h2 {
+  color: #04e2ff;
+  font-size: 28px;
+  line-height: 1.25;
+  font-weight: 400;
+}
+
+/* Paso 20.7 - Espaciado y botones del examen final */
+.aula-content-card {
+  min-height: 0;
+}
+
+.aula-exam-card {
+  min-height: 0;
+  padding-bottom: 24px;
+}
+
+.aula-exam-card .aula-lesson-module {
+  margin-bottom: 13px;
+}
+
+.aula-exam-card h2 {
+  margin-bottom: 26px;
+}
+
+.aula-exam-copy {
+  gap: 28px;
+  margin-bottom: 28px;
+}
+
+.aula-exam-icon-list {
+  margin: 26px 0 30px;
+}
+
+.aula-exam-warning {
+  margin-top: 30px;
+  margin-bottom: 34px;
+}
+
+.aula-exam-ready {
+  max-width: 760px;
+  margin: 34px auto 18px;
+  line-height: 1.65;
+}
+
+.aula-exam-start-wrap {
+  max-width: 760px;
+  margin: 0 auto 0;
+  text-align: center;
+}
+
+.aula-exam-start-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 22px;
+  border: 1px solid #04e2ff;
+  background: #171b2a;
+  color: #04e2ff;
+  font-size: 18px;
+  line-height: 1.35;
+  font-weight: 400;
+  text-decoration: none;
+}
+
+.aula-exam-start-button:hover {
+  background: #1d2235;
+  color: #7ef2ff;
+}
+
+.aula-exam-start-button.aula-disabled-link,
+.aula-exam-start-button[aria-disabled="true"] {
+  border-color: rgba(4, 226, 255, .35);
+  color: rgba(4, 226, 255, .65);
+  background: rgba(23, 27, 42, .75);
+}
+
+.aula-exam-status {
+  display: inline-block;
+  max-width: 760px;
+  margin: 12px auto 0;
+  padding: 10px 14px;
+  color: #ffffff;
+  background: rgba(4, 226, 255, .08);
+  border: 1px solid rgba(4, 226, 255, .22);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.aula-exam-status:empty {
+  display: none;
+}
+
+.aula-exam-actions {
+  max-width: 760px;
+  width: 100%;
+  margin: 42px auto 0;
+  padding-top: 22px;
+  border-top: 1px solid rgba(208, 225, 255, .12);
+}
+
+@media (max-width: 620px) {
+  .aula-exam-actions {
+    max-width: none;
+  }
+
+  .aula-exam-start-button {
+    width: 100%;
+  }
+
+  .aula-exam-status {
+    display: block;
+  }
+}
+
+/* Paso 20.8 - Espacio real entre aviso, botón y mensaje */
+.aula-exam-ready {
+  max-width: 760px;
+  margin: 54px auto 26px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+.aula-exam-start-wrap {
+  max-width: 760px;
+  margin: 0 auto 0;
+  display: grid;
+  justify-items: center;
+  gap: 22px;
+  text-align: center;
+}
+
+.aula-exam-start-button {
+  margin: 0;
+}
+
+.aula-exam-start-button.aula-disabled-link,
+.aula-exam-start-button[aria-disabled="true"] {
+  padding: 0;
+  min-height: auto;
+  border: 0;
+  background: transparent;
+  color: #04e2ff;
+  opacity: .8;
+  cursor: default;
+}
+
+.aula-exam-start-button.aula-disabled-link:hover,
+.aula-exam-start-button[aria-disabled="true"]:hover {
+  background: transparent;
+  color: #04e2ff;
+}
+
+.aula-exam-status {
+  display: block;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 14px 18px;
+  color: #ffffff;
+  background: rgba(4, 226, 255, .08);
+  border: 1px solid rgba(4, 226, 255, .28);
+  font-size: 15px;
+  line-height: 1.65;
+  text-align: center;
+}
+
+.aula-exam-actions {
+  max-width: 760px;
+  width: 100%;
+  margin: 54px auto 0;
+  padding-top: 24px;
+  border-top: 1px solid rgba(208, 225, 255, .12);
+}
+
+/* Paso 20.9 - Espaciado real sin estirar el recuadro */
+.aula-content-card {
+  min-height: 0 !important;
+  padding-bottom: 18px !important;
+}
+
+.aula-exam-card {
+  min-height: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.aula-exam-ready {
+  max-width: 760px !important;
+  margin: 54px auto 42px !important;
+  line-height: 1.7 !important;
+  text-align: center !important;
+}
+
+.aula-exam-start-wrap {
+  max-width: 760px !important;
+  margin: 0 auto !important;
+  display: grid !important;
+  justify-items: center !important;
+  gap: 26px !important;
+  text-align: center !important;
+}
+
+.aula-exam-start-button {
+  margin: 0 !important;
+}
+
+.aula-exam-start-button.aula-disabled-link,
+.aula-exam-start-button[aria-disabled="true"] {
+  padding: 0 !important;
+  min-height: auto !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #04e2ff !important;
+  opacity: .82 !important;
+  cursor: default !important;
+}
+
+.aula-exam-start-button.aula-disabled-link:hover,
+.aula-exam-start-button[aria-disabled="true"]:hover {
+  background: transparent !important;
+  color: #04e2ff !important;
+}
+
+.aula-exam-status {
+  display: block !important;
+  width: 100% !important;
+  max-width: 760px !important;
+  margin: 0 auto !important;
+  padding: 14px 18px !important;
+  color: #ffffff !important;
+  background: rgba(4, 226, 255, .08) !important;
+  border: 1px solid rgba(4, 226, 255, .28) !important;
+  font-size: 15px !important;
+  line-height: 1.65 !important;
+  text-align: center !important;
+}
+
+.aula-exam-actions {
+  max-width: 760px !important;
+  width: 100% !important;
+  margin: 34px auto 0 !important;
+  padding: 0 !important;
+  border-top: 0 !important;
+}
+
+.aula-exam-actions::before,
+.aula-exam-actions::after {
+  display: none !important;
+}
+
+/* Paso 20.10 - Espacio inferior moderado para botones */
+.aula-content-card {
+  min-height: 0 !important;
+  padding-bottom: 34px !important;
+}
+
+.aula-exam-card {
+  min-height: 0 !important;
+  padding-bottom: 4px !important;
+}
+
+.aula-exam-actions {
+  max-width: 760px !important;
+  width: 100% !important;
+  margin: 38px auto 0 !important;
+  padding: 0 0 10px !important;
+  border-top: 0 !important;
+}
+
+/* Paso 20.11 - Botones un poco más abajo */
+.aula-actions {
+  margin-top: 34px !important;
+}
+
+.aula-content-card {
+  min-height: 0 !important;
+  padding-bottom: 28px !important;
+}
+
+.aula-exam-actions {
+  margin-top: 46px !important;
+  padding-bottom: 12px !important;
+}
+
+/* Paso 20.12 - Botón limpio y mensaje oculto cuando está vacío */
+.aula-exam-start-button,
+.aula-exam-start-button.aula-disabled-link,
+.aula-exam-start-button[aria-disabled="true"] {
+  min-height: auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #04e2ff !important;
+  opacity: 1 !important;
+  box-shadow: none !important;
+}
+
+.aula-exam-start-button:hover,
+.aula-exam-start-button.aula-disabled-link:hover,
+.aula-exam-start-button[aria-disabled="true"]:hover {
+  background: transparent !important;
+  color: #7ef2ff !important;
+}
+
+.aula-exam-status:empty {
+  display: none !important;
+  border: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.aula-exam-status {
+  margin-top: 0 !important;
+}
+
+
+
+/* Paso 23.5 - Progreso del aula alineado con la columna de contenido */
+.aula-hero-grid {
+  grid-template-columns: minmax(0, 1fr) 360px !important;
+  align-items: stretch !important;
+}
+
+.aula-progress-card {
+  width: 100% !important;
+  min-height: 170px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+
+@media (max-width: 980px) {
+  .aula-hero-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

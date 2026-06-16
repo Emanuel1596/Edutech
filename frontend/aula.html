@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aula del curso - EduTech</title>
+  <script src="js/session-guard.js"></script>
+  <meta name="description" content="Aula del alumno para consultar módulos, lecciones, video, texto, recursos y progreso del curso.">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/aula.css?v=20-12">
+</head>
+<body class="student-site aula-body edutech-data-pending edutech-data-loading">
+  <div class="site student-site" id="page">
+        <header class="site-header">
+          <div class="header-container">
+            <a href="index.html" class="logo" aria-label="EduTech">
+              <span class="logo-main">Edu</span><span class="logo-accent">Tech</span>
+            </a>
+
+            <button class="menu-toggle" type="button" aria-label="Abrir menú">☰</button>
+
+            <nav class="main-navigation" aria-label="Menú principal">
+              <ul class="main-menu">
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="cursos.html">Cursos</a></li>
+                <li><a href="contacto.html">Contacto</a></li>
+                <li><a href="solicitud-instructor.html">Enseña en EduTech</a></li>
+                <li><a href="registro.html">Registro</a></li>
+                <li><a href="login.html">Iniciar sesión</a></li>
+                <li class="menu-icon-item">
+                  <a href="cursos.html" class="nav-icon-button cart-button" aria-label="Carrito de compras">
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+                      <path d="M3 4h2.3l2.2 10.4c.2.8.9 1.4 1.7 1.4h8.7c.8 0 1.5-.5 1.7-1.3L21 8H7.1"></path>
+                      <circle cx="8.5" cy="20" r="1.4"></circle>
+                      <circle cx="17" cy="20" r="1.4"></circle>
+                    </svg>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </header>
+
+    <main class="site-content aula-page">
+      <section class="aula-hero">
+        <div class="aula-container aula-hero-grid">
+          <div>
+            <p class="aula-kicker">Aula del curso</p>
+            <h1 class="aula-title" id="aulaTituloCurso">Cargando curso...</h1>
+            <p class="aula-description" id="aulaDescripcionCurso">Estamos preparando las lecciones del curso.</p>
+
+            <div class="aula-meta-row">
+              <span id="aulaInstructor">Instructor: EduTech</span>
+              <span id="aulaNivel">Nivel: Por definir</span>
+              <span id="aulaTotalLecciones">Lecciones: 0</span>
+            </div>
+          </div>
+
+          <div class="aula-progress-card">
+            <span class="aula-progress-label">Progreso del contenido</span>
+            <strong id="aulaProgresoNumero">0%</strong>
+            <div class="aula-progress-bar" aria-hidden="true">
+              <div class="aula-progress-fill" id="aulaProgresoBarra"></div>
+            </div>
+            <p id="aulaProgresoTexto">0 de 0 lecciones completadas</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="aula-main-section">
+        <div class="aula-container aula-layout">
+          <aside class="aula-sidebar" aria-label="Módulos y lecciones del curso">
+            <div class="aula-sidebar-header">
+              <h2>Contenido</h2>
+              <a href="mi-cuenta.html#mis-cursos">Volver a mis cursos</a>
+            </div>
+
+            <div class="aula-modulos-lista" id="aulaModulosLista"></div>
+          </aside>
+
+          <section class="aula-content-card" aria-live="polite">
+            <p class="aula-message" id="aulaMensaje" style="display: none;"></p>
+
+            <div id="aulaLeccionVista" style="display: none;">
+              <div class="aula-lesson-header">
+                <p id="aulaLeccionModulo" class="aula-lesson-module">Módulo</p>
+                <h2 id="aulaLeccionTitulo">Lección</h2>
+                <p id="aulaLeccionDuracion" class="aula-lesson-duration">Duración no disponible</p>
+              </div>
+
+              <div class="aula-video-box" id="aulaVideoBox"></div>
+
+              <div class="aula-lesson-text">
+                <h3>Contenido de la lección</h3>
+                <p id="aulaLeccionTexto">Selecciona una lección para ver el contenido.</p>
+              </div>
+
+              <div class="aula-resources" id="aulaRecursosBox">
+                <h3>Recursos adicionales</h3>
+                <div id="aulaRecursosLista"></div>
+              </div>
+
+              <div class="aula-actions">
+                <button class="aula-nav-button aula-nav-button-left" type="button" id="aulaBtnAnterior">Volver al curso</button>
+                <button class="aula-nav-button aula-nav-button-right" type="button" id="aulaBtnSiguiente">Siguiente lección</button>
+              </div>
+            </div>
+
+            <div id="aulaExamenVista" class="aula-exam-card" style="display: none;">
+              <p class="aula-lesson-module">Módulo final</p>
+              <h2>Examen final</h2>
+
+              <div class="aula-exam-copy">
+                <p id="aulaExamenTextoUno">
+                  ¡Estamos llegando al final del curso! Con lo que aprendimos vas a poder tener un manejo básico del curso para realizar tus primeras actividades completas. No te olvides que, para seguir aprendiendo, te recomendamos repasar todas las lecciones del curso.
+                </p>
+                <p id="aulaExamenTextoDos">
+                  Fue un largo camino, de mucho esfuerzo y práctica, pero llegamos finalmente al examen final. Para rendirlo y obtener el correspondiente certificado tienes que tener en cuenta lo siguiente:
+                </p>
+              </div>
+
+              <ul class="aula-exam-icon-list">
+                <li>
+                  <span class="aula-exam-icon"><i class="far fa-clock" aria-hidden="true"></i></span>
+                  <span><strong id="aulaExamenTiempo">30 minutos</strong> para resolverlo</span>
+                </li>
+                <li>
+                  <span class="aula-exam-icon"><i class="far fa-edit" aria-hidden="true"></i></span>
+                  <span><strong id="aulaExamenIntentos">2 intentos</strong></span>
+                </li>
+                <li>
+                  <span class="aula-exam-icon"><i class="far fa-file-alt" aria-hidden="true"></i></span>
+                  <span><strong id="aulaExamenMinima">70% de respuestas correctas</strong> para aprobar</span>
+                </li>
+              </ul>
+
+              <div class="aula-exam-warning">
+                <p><strong>ADVERTENCIA</strong></p>
+                <ul>
+                  <li>Verifica que tu conexión a internet esté estable antes de rendir el examen. En caso de desconexión, el intento en curso puede invalidarse.</li>
+                  <li>No utilices los botones de adelante o atrás del navegador. En caso de hacerlo, el sistema puede detectar que intentas salir del examen.</li>
+                  <li>Los intentos no se pueden reiniciar.</li>
+                  <li>Asegúrate de haber repasado y estudiado los conceptos antes de rendir el examen. No arriesgues tus intentos sin motivo.</li>
+                </ul>
+              </div>
+
+              <p class="aula-exam-ready">
+                <strong>¿Todo listo? ¡ARRANQUEMOS! Estás a dos pasos de obtener tu certificado</strong>
+              </p>
+
+              <div class="aula-exam-start-wrap">
+                <a class="aula-exam-start-button" id="aulaBtnExamen" href="examen.html">Realizar cuestionario</a>
+                <p class="aula-exam-status" id="aulaExamenEstadoIntentos"></p>
+              </div>
+
+              <div class="aula-exam-actions">
+                <button class="aula-nav-button aula-nav-button-left" type="button" id="aulaBtnExamenAnterior">Lección anterior</button>
+                <button class="aula-nav-button aula-nav-button-right" type="button" id="aulaBtnExamenVolver">Volver al curso</button>
+              </div>
+            </div>
+
+            <div id="aulaEstadoVacio" class="aula-empty-state">
+              <h2>Selecciona una lección</h2>
+              <p>El contenido aparecerá aquí.</p>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>EduTech - Plataforma Web de Cursos</p>
+    </footer>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/aula.js"></script>
+</body>
+</html>

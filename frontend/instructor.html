@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Escritorio del instructor - EduTech</title>
+<script src="js/session-guard.js"></script>
+<meta content="Escritorio del instructor para administrar cursos, módulos, lecciones, exámenes y resultados." name="description"/>
+<script>
+    document.documentElement.classList.add('edutech-guard-pending');
+  </script>
+<style>
+    html.edutech-guard-pending body {
+      visibility: hidden !important;
+    }
+  </style>
+<script src="js/seguridad-roles.js"></script>
+<link href="css/styles.css" rel="stylesheet"/>
+<link href="css/instructor.css?v=21-18" rel="stylesheet"/>
+</head>
+<body class="edutech-data-pending edutech-data-loading">
+<div class="site student-site instructor-student-style" id="page">
+<header class="site-header">
+<div class="header-container">
+<a aria-label="EduTech" class="logo" href="index.html">
+<span class="logo-main">Edu</span><span class="logo-accent">Tech</span>
+</a>
+<button aria-label="Abrir menú" class="menu-toggle" type="button">☰</button>
+<nav aria-label="Menú principal" class="main-navigation">
+<ul class="main-menu">
+<li><a href="index.html">Inicio</a></li>
+<li><a href="cursos.html">Cursos</a></li>
+<li><a href="contacto.html">Contacto</a></li>
+<li><a href="registro.html">Registro</a></li>
+<li><a href="login.html">Iniciar sesión</a></li>
+<li class="menu-icon-item">
+<a aria-label="Carrito de compras" class="nav-icon-button cart-button" href="cursos.html">
+<svg aria-hidden="true" focusable="false" viewbox="0 0 24 24">
+<path d="M3 4h2.3l2.2 10.4c.2.8.9 1.4 1.7 1.4h8.7c.8 0 1.5-.5 1.7-1.3L21 8H7.1"></path>
+<circle cx="8.5" cy="20" r="1.4"></circle>
+<circle cx="17" cy="20" r="1.4"></circle>
+</svg>
+</a>
+</li>
+</ul>
+</nav>
+</div>
+</header>
+<main class="mi-cuenta-page instructor-page">
+<section class="mi-cuenta-section">
+<div class="mi-cuenta-container">
+<h1 class="mi-cuenta-title">Escritorio</h1>
+<div class="mi-cuenta-layout">
+<aside aria-label="Menú del instructor">
+<nav class="mi-cuenta-nav instructor-nav">
+<a class="mi-cuenta-link instructor-nav-link active" data-panel="dashboard" href="#dashboard">Escritorio</a>
+<a class="mi-cuenta-link instructor-nav-link" data-panel="cursos" href="#cursos">Mis cursos</a>
+<a class="mi-cuenta-link instructor-nav-link" data-panel="crear" href="#crear">Crear curso</a>
+<a class="mi-cuenta-link instructor-nav-link" data-panel="examenes" href="#">Exámenes</a>
+<a class="mi-cuenta-link instructor-nav-link" data-panel="resultados" href="#">Resultados</a>
+<a class="mi-cuenta-link instructor-nav-link" data-panel="cuenta" href="#">Editar perfil</a>
+<a class="mi-cuenta-link" href="index.html" id="instructorCerrarSesion">Cerrar sesión</a>
+</nav>
+</aside>
+<div class="mi-cuenta-content instructor-content">
+<p class="instructor-message" id="instructorMensaje" style="display: none;"></p>
+<section class="mi-cuenta-panel instructor-panel active" id="panel-dashboard">
+<h2 class="mi-cuenta-panel-title">Escritorio</h2>
+<div class="mi-cuenta-box instructor-profile-box">
+<div class="instructor-profile-inline">
+<span class="instructor-avatar" id="instructorInicial">I</span>
+<div>
+<h3 class="mi-cuenta-box-title" id="instructorNombre">Instructor</h3>
+<p class="mi-cuenta-plain-text" id="instructorCorreo">Cargando datos...</p>
+<p class="mi-cuenta-plain-text" id="instructorDescripcion">Administra tus cursos, módulos, lecciones, exámenes y resultados de alumnos.</p>
+</div>
+</div>
+</div>
+<div class="mi-cuenta-box">
+<h3 class="mi-cuenta-box-title">Resumen</h3>
+<div class="instructor-stats-grid">
+<article class="instructor-stat-card">
+<span>Cursos</span>
+<strong id="statCursos">0</strong>
+</article>
+<article class="instructor-stat-card">
+<span>Módulos</span>
+<strong id="statModulos">0</strong>
+</article>
+<article class="instructor-stat-card">
+<span>Lecciones</span>
+<strong id="statLecciones">0</strong>
+</article>
+<article class="instructor-stat-card">
+<span>Alumnos</span>
+<strong id="statAlumnos">0</strong>
+</article>
+</div>
+</div>
+<div class="mi-cuenta-box">
+<div class="instructor-box-header">
+<h3 class="mi-cuenta-box-title">Cursos recientes</h3>
+<a class="mi-cuenta-action-button instructor-small-action" data-panel-target="cursos" href="#cursos">Ver todos</a>
+</div>
+<div class="instructor-courses-list" id="instructorCursosResumen"></div>
+</div>
+</section><section class="mi-cuenta-panel instructor-panel" id="panel-cursos">
+<h2 class="mi-cuenta-panel-title">Mis cursos</h2>
+<p class="mi-cuenta-panel-description">Cursos registrados a tu nombre como instructor.</p>
+<div class="mi-cuenta-box">
+<div class="instructor-box-header">
+<h3 class="mi-cuenta-box-title">Cursos del instructor</h3>
+<a class="mi-cuenta-action-button instructor-small-action" data-panel-target="crear" href="#crear">Crear curso</a>
+</div><div class="instructor-filter-row">
+<label class="mi-cuenta-field instructor-field instructor-filter-field" for="instructorFiltroCursos">
+<span>Filtrar por estado</span>
+<select id="instructorFiltroCursos">
+<option value="todos">Todos</option>
+<option value="borrador">Borrador</option>
+<option value="pendiente">Pendiente</option>
+<option value="publicado">Publicado</option>
+<option value="rechazado">Rechazado</option>
+</select>
+<small class="error-message"></small>
+</label>
+</div>
+<div class="instructor-courses-list instructor-courses-list-full" id="instructorCursosTodos"></div>
+</div>
+</section><section class="mi-cuenta-panel instructor-panel" id="panel-crear">
+<h2 class="mi-cuenta-panel-title" id="instructorCursoFormTitulo">Crear curso</h2>
+<p class="mi-cuenta-panel-description" id="instructorCursoFormDescripcion">Crea la ficha general del curso y completa sus módulos en el mismo formulario.</p>
+<div class="mi-cuenta-box instructor-form-box">
+<form class="instructor-course-form" id="instructorCursoForm" novalidate="">
+<input id="instructorCursoId" type="hidden"/>
+<div class="instructor-form-section">
+<h3 class="instructor-form-section-title">Datos generales</h3>
+<div class="instructor-form-grid">
+<label class="mi-cuenta-field instructor-field" for="instructorCursoTitulo">
+<span>Título del curso</span>
+<input autocomplete="off" id="instructorCursoTitulo" maxlength="150" type="text"/>
+<small class="error-message" data-error-for="instructorCursoTitulo"></small>
+</label>
+<label class="mi-cuenta-field instructor-field" for="instructorCursoNivel">
+<span>Dificultad</span>
+<select id="instructorCursoNivel">
+<option value="">Selecciona una dificultad</option>
+<option value="1">Principiante</option>
+<option value="2">Intermedio</option>
+<option value="3">Avanzado</option>
+</select>
+<small class="error-message" data-error-for="instructorCursoNivel"></small>
+</label>
+</div>
+<label class="mi-cuenta-field instructor-field" for="instructorCursoDescripcion">
+<span>Descripción</span>
+<textarea id="instructorCursoDescripcion" rows="6"></textarea>
+<small class="error-message" data-error-for="instructorCursoDescripcion"></small>
+</label>
+<label class="mi-cuenta-field instructor-field instructor-price-field" for="instructorCursoPrecio">
+<span>Precio MXN</span>
+<input autocomplete="off" id="instructorCursoPrecio" inputmode="decimal" placeholder="399.00" type="text"/>
+<small class="error-message" data-error-for="instructorCursoPrecio"></small>
+</label>
+</div>
+<div class="instructor-form-section">
+<div class="instructor-form-section-header">
+<div>
+<h3 class="instructor-form-section-title">Portada del curso</h3>
+<p>Usa un link de internet o carga una imagen local. Si usas archivo local, ese archivo tendrá prioridad al guardar.</p>
+</div>
+</div>
+<div class="instructor-cover-options">
+<div class="instructor-cover-card">
+<h4>Link de internet</h4>
+<p>Pega la dirección directa de una imagen.</p>
+<label class="mi-cuenta-field instructor-field" for="instructorCursoPortada">
+<span>URL de la portada</span>
+<input autocomplete="off" id="instructorCursoPortada" placeholder="https://sitio.com/imagen-del-curso.jpg" type="text"/>
+<small class="error-message" data-error-for="instructorCursoPortada"></small>
+</label>
+</div>
+<div class="instructor-cover-card">
+<h4>Archivo local</h4>
+<p>Selecciona o arrastra una imagen desde tu computadora.</p>
+<label class="instructor-dropzone" for="instructorCursoPortadaArchivo" id="instructorPortadaDropzone">
+<span>Arrastra una imagen aquí</span>
+<small>o haz clic para seleccionar JPG, PNG o WEBP. Máximo 2 MB.</small>
+</label>
+<input accept="image/png,image/jpeg,image/webp" id="instructorCursoPortadaArchivo" type="file"/>
+<p class="instructor-file-name" id="instructorPortadaArchivoNombre">Ningún archivo seleccionado.</p>
+</div>
+</div>
+<p class="instructor-cover-single-note" hidden="" id="instructorPortadaBloqueoTexto">
+                        Solo se permite una imagen. Para cambiarla, borra la imagen actual.
+                      </p>
+<div class="instructor-cover-preview-wrap" hidden="" id="instructorPortadaPreviewWrap">
+<div class="instructor-cover-preview-header">
+<h4>Vista previa de imagen</h4>
+<p id="instructorPortadaPreviewTexto">Revisa cómo se verá la portada antes de guardar.</p>
+</div>
+<img alt="Vista previa de portada" class="instructor-cover-preview" id="instructorPortadaPreview"/>
+<div class="instructor-cover-preview-footer">
+<button class="instructor-form-text-button instructor-cover-clear" id="instructorBorrarPortada" type="button">Borrar imagen</button>
+</div>
+</div>
+</div>
+<div class="instructor-modules-step" id="instructorModuloPaso">
+<div class="instructor-form-section-header">
+<div>
+<h3 class="instructor-form-section-title">Módulos del curso</h3>
+<p>Primero indica cuántos módulos tendrá el curso. Después escribe el nombre de cada módulo.</p>
+</div>
+</div>
+<div class="instructor-module-count-row">
+<label class="mi-cuenta-field instructor-field" for="instructorCantidadModulos">
+<span>¿Cuántos módulos tendrá el curso?</span>
+<input autocomplete="off" id="instructorCantidadModulos" inputmode="numeric" placeholder="Ejemplo: 3" type="text"/>
+<small class="error-message" data-error-for="instructorCantidadModulos"></small>
+</label>
+<button class="instructor-form-text-button" id="instructorPrepararModulos" type="button">Crear espacios de módulos</button>
+</div>
+<div class="instructor-modules-fields" id="instructorModulosCampos"></div><div class="instructor-lessons-step" id="instructorLeccionesPaso">
+<div class="instructor-form-section-header">
+<div>
+<h3 class="instructor-form-section-title">Lecciones del curso</h3>
+<p>Después de crear los módulos, indica cuántas lecciones tendrá cada módulo. Después escribe el nombre, descripción, video y duración de cada lección.</p>
+</div>
+</div>
+<div class="instructor-lessons-fields" id="instructorLeccionesCampos"></div>
+</div><div class="instructor-form-actions instructor-form-actions-final"><button class="instructor-form-text-button" name="accion" type="submit" value="guardar_borrador">Guardar borrador</button><button class="instructor-form-text-button" name="accion" type="submit" value="enviar_revision">Enviar a revisión</button></div>
+</div></form></div>
+<p class="instructor-form-status" hidden="" id="instructorFormularioEstado"></p>
+</section><section class="mi-cuenta-panel instructor-panel" id="panel-examenes"><div class="mi-cuenta-box instructor-empty-panel"><h2 class="mi-cuenta-box-title">Exámenes</h2><p class="mi-cuenta-plain-text">Aquí se configurará el examen final del curso: intentos, tiempo límite, preguntas y respuestas.</p><p class="mi-cuenta-plain-text">Por ahora no hay exámenes configurados.</p></div></section><section class="mi-cuenta-panel instructor-panel" id="panel-resultados"><div class="mi-cuenta-box instructor-empty-panel"><h2 class="mi-cuenta-box-title">Resultados de alumnos</h2><p class="mi-cuenta-plain-text">Aquí se consultarán los intentos, calificaciones, aprobados y certificados de los alumnos.</p><p class="mi-cuenta-plain-text">Por ahora no hay resultados registrados.</p></div></section><section class="mi-cuenta-panel instructor-panel" id="panel-cuenta">
+<div class="mi-cuenta-box instructor-account-box">
+<h2 class="mi-cuenta-box-title">Editar perfil</h2>
+<form class="mi-cuenta-form instructor-account-form" id="instructorCuentaForm" novalidate="">
+<div class="instructor-account-photo">
+<div aria-label="Vista previa de foto de perfil" class="instructor-account-preview" id="instructorAccountFotoPreview">I</div>
+<div class="instructor-account-photo-fields">
+<label class="mi-cuenta-field instructor-field" for="instructorAccountFotoUrl">
+<span>Foto de perfil por link</span>
+<input autocomplete="off" id="instructorAccountFotoUrl" placeholder="https://ejemplo.com/foto.jpg" type="url"/>
+<small class="error-message" data-error-for="instructorAccountFotoUrl"></small>
+</label>
+<div class="mi-cuenta-field instructor-field">
+<span class="mi-cuenta-field-label">Foto de perfil local</span>
+<div class="instructor-account-file-row">
+<input accept="image/*" class="instructor-account-file-input" id="instructorAccountFotoArchivo" type="file"/>
+<label class="instructor-account-file-button" for="instructorAccountFotoArchivo">Seleccionar imagen</label>
+<span class="instructor-account-file-name" id="instructorAccountFotoNombre">Sin imagen seleccionada</span>
+</div>
+<small class="error-message" data-error-for="instructorAccountFotoArchivo"></small>
+</div>
+</div>
+</div>
+<div class="mi-cuenta-form-row">
+<label class="mi-cuenta-field instructor-field" for="instructorAccountNombre">
+<span>Nombre</span>
+<input autocomplete="given-name" id="instructorAccountNombre" type="text"/>
+<small class="error-message" data-error-for="instructorAccountNombre"></small>
+</label>
+<label class="mi-cuenta-field instructor-field" for="instructorAccountApellidos">
+<span>Apellidos</span>
+<input autocomplete="family-name" id="instructorAccountApellidos" type="text"/>
+<small class="error-message" data-error-for="instructorAccountApellidos"></small>
+</label>
+</div>
+<div class="mi-cuenta-form-row">
+<label class="mi-cuenta-field instructor-field" for="instructorAccountCorreo">
+<span>Correo electrónico</span>
+<input autocomplete="email" id="instructorAccountCorreo" type="email"/>
+<small class="error-message" data-error-for="instructorAccountCorreo"></small>
+</label>
+<label class="mi-cuenta-field instructor-field" for="instructorAccountTelefono">
+<span>Teléfono</span>
+<input autocomplete="tel" id="instructorAccountTelefono" inputmode="numeric" maxlength="10" type="tel"/>
+<small class="error-message" data-error-for="instructorAccountTelefono"></small>
+</label>
+</div>
+<h3 class="mi-cuenta-section-title">Datos de facturación</h3>
+<div class="mi-cuenta-form-row">
+<label class="mi-cuenta-field instructor-field" for="instructorAccountDireccion">
+<span>Dirección</span>
+<input autocomplete="street-address" id="instructorAccountDireccion" type="text"/>
+<small class="error-message" data-error-for="instructorAccountDireccion"></small>
+</label>
+<label class="mi-cuenta-field instructor-field" for="instructorAccountInterior">
+<span>Interior</span>
+<input autocomplete="address-line2" id="instructorAccountInterior" type="text"/>
+<small class="error-message" data-error-for="instructorAccountInterior"></small>
+</label>
+</div>
+<div class="mi-cuenta-form-row">
+<label class="mi-cuenta-field instructor-field" for="instructorAccountEstado">
+<span>Estado</span>
+<select id="instructorAccountEstado">
+<option value="">Selecciona un estado</option>
+<option value="Ciudad de México">Ciudad de México</option>
+<option value="Estado de México">Estado de México</option>
+<option value="Jalisco">Jalisco</option>
+<option value="Nuevo León">Nuevo León</option>
+<option value="Puebla">Puebla</option>
+</select>
+<small class="error-message" data-error-for="instructorAccountEstado"></small>
+</label>
+<label class="mi-cuenta-field instructor-field" for="instructorAccountCiudad">
+<span>Ciudad</span>
+<select id="instructorAccountCiudad">
+<option value="">Selecciona una ciudad</option>
+</select>
+<small class="error-message" data-error-for="instructorAccountCiudad"></small>
+</label>
+</div>
+<div class="mi-cuenta-form-row">
+<label class="mi-cuenta-field instructor-field" for="instructorAccountCodigoPostal">
+<span>Código postal</span>
+<input autocomplete="postal-code" id="instructorAccountCodigoPostal" inputmode="numeric" maxlength="5" type="text"/>
+<small class="error-message" data-error-for="instructorAccountCodigoPostal"></small>
+</label>
+</div>
+<button class="mi-cuenta-save-button" type="submit">Guardar cambios</button>
+<p class="form-success instructor-account-success" id="instructorCuentaGuardada">Datos actualizados correctamente.</p>
+</form>
+</div>
+</section></div>
+</div></div></section>
+</main></div>
+<footer class="site-footer">
+<p>EduTech - Plataforma Web de Cursos</p>
+</footer>
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
+<script src="js/instructor.js"></script>
+</body>
+</html>

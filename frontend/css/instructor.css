@@ -1,0 +1,2112 @@
+/* Paso 21.2 - Instructor con el mismo diseño base que Mi cuenta del alumno */
+
+.instructor-student-style .mi-cuenta-page {
+  background: #11131f;
+}
+
+.instructor-student-style .mi-cuenta-title,
+.instructor-student-style .mi-cuenta-panel-title,
+.instructor-student-style .mi-cuenta-box-title {
+  font-weight: 400;
+}
+
+.instructor-student-style .mi-cuenta-nav .mi-cuenta-link.active,
+.instructor-student-style .mi-cuenta-nav .mi-cuenta-link:hover {
+  color: #04e2ff;
+}
+
+.instructor-message {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  color: #d8f7ff;
+  background: rgba(4, 226, 255, .08);
+  border: 1px solid rgba(4, 226, 255, .25);
+}
+
+.instructor-message-error {
+  color: #ffd6d6;
+  background: rgba(255, 82, 82, .08);
+  border-color: rgba(255, 82, 82, .24);
+}
+
+.instructor-panel {
+  display: none !important;
+}
+
+.instructor-panel.active {
+  display: block !important;
+  visibility: visible !important;
+}
+
+.instructor-profile-box {
+  margin-bottom: 20px;
+}
+
+.instructor-profile-inline {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+}
+
+.instructor-avatar {
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+  color: #04e2ff;
+  border: 4px solid #2e85b5;
+  border-radius: 50%;
+  font-size: 30px;
+  font-weight: 900;
+}
+
+.instructor-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.instructor-stat-card {
+  padding: 18px;
+  background: #1b1d26;
+  border: 1px solid rgba(208, 225, 255, .12);
+}
+
+.instructor-stat-card span {
+  display: block;
+  color: #d7e8ff;
+  font-size: 14px;
+}
+
+.instructor-stat-card strong {
+  display: block;
+  margin-top: 8px;
+  color: #2e85b5;
+  font-size: 38px;
+  line-height: 1;
+}
+
+.instructor-box-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.instructor-small-action {
+  white-space: nowrap;
+}
+
+.instructor-courses-list {
+  display: grid;
+  gap: 16px;
+}
+
+.instructor-course-card {
+  padding: 18px;
+  background: #1b1d26;
+  border: 1px solid rgba(208, 225, 255, .12);
+}
+
+.instructor-course-status {
+  margin: 0 0 8px;
+  color: #04e2ff;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.instructor-course-main h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 400;
+}
+
+.instructor-course-main p {
+  margin: 10px 0 0;
+  color: #d7e8ff;
+  line-height: 1.55;
+}
+
+.instructor-course-metrics,
+.instructor-course-exam,
+.instructor-course-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.instructor-course-metrics span,
+.instructor-course-exam span {
+  padding: 8px 10px;
+  color: #dce7ff;
+  background: rgba(255, 255, 255, .045);
+  border: 1px solid rgba(208, 225, 255, .11);
+}
+
+.instructor-course-metrics strong,
+.instructor-course-exam strong {
+  color: #ffffff;
+}
+
+.instructor-course-actions {
+  padding-top: 16px;
+  border-top: 1px solid rgba(208, 225, 255, .12);
+}
+
+.instructor-course-actions a {
+  padding: 7px 0;
+  margin-right: 12px;
+  color: #04e2ff;
+  text-decoration: none;
+}
+
+.instructor-course-actions a:hover {
+  color: #7ef2ff;
+}
+
+.instructor-empty-panel {
+  min-height: 220px;
+}
+
+.instructor-next-note {
+  margin-top: 12px;
+  color: #04e2ff;
+}
+
+.instructor-empty-text {
+  margin: 0;
+  color: #d7e8ff;
+}
+
+@media (max-width: 980px) {
+  .instructor-stats-grid {
+    grid-template-columns: repeat(2, minmax(130px, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .instructor-profile-inline {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .instructor-avatar {
+    margin: 0 auto;
+  }
+
+  .instructor-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .instructor-box-header {
+    display: grid;
+  }
+
+  .instructor-small-action {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Paso 21.5 - Alineación comprobada con logo EduTech */
+.instructor-student-style .mi-cuenta-title,
+.instructor-student-style .mi-cuenta-nav {
+  margin-left: clamp(4px, calc((100vw - 1240px) / 2 + 4px), 44px);
+}
+
+/* Paso 21.8 - Formulario del curso limpio, separado y con edición correcta */
+.instructor-form-box {
+  max-width: 980px;
+  margin-right: auto;
+}
+
+.instructor-course-form {
+  display: grid;
+  gap: 30px;
+}
+
+.instructor-form-section {
+  display: grid;
+  gap: 18px;
+}
+
+.instructor-form-section + .instructor-form-section {
+  padding-top: 8px;
+}
+
+.instructor-form-section-title {
+  margin: 0;
+  color: #dfe6f3;
+  font-size: 22px;
+  line-height: 1.25;
+  font-weight: 400;
+}
+
+.instructor-form-section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.instructor-form-section-header p,
+.instructor-edit-tools p {
+  margin: 8px 0 0;
+  color: #d7e8ff;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.instructor-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  align-items: start;
+}
+
+.instructor-field {
+  display: grid;
+  gap: 10px;
+}
+
+.instructor-field span {
+  color: #dfe6f3;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.instructor-field input,
+.instructor-field select,
+.instructor-field textarea {
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 14px;
+  color: #ffffff;
+  background: #151720;
+  border: 1px solid rgba(125, 150, 214, .36);
+  border-radius: 0;
+  box-shadow: none;
+  font: inherit;
+  appearance: none;
+}
+
+.instructor-field input::-webkit-outer-spin-button,
+.instructor-field input::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+.instructor-field textarea {
+  resize: vertical;
+  min-height: 170px;
+}
+
+.instructor-field input:focus,
+.instructor-field select:focus,
+.instructor-field textarea:focus {
+  outline: 2px solid rgba(4, 226, 255, .24);
+  border-color: #04e2ff;
+}
+
+.instructor-price-field {
+  max-width: 420px;
+}
+
+.instructor-cover-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  align-items: stretch;
+}
+
+.instructor-cover-card {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  padding: 20px;
+  background: rgba(21, 23, 32, .42);
+  border: 1px solid rgba(125, 150, 214, .28);
+}
+
+.instructor-cover-card h4 {
+  margin: 0;
+  color: #04e2ff;
+  font-size: 19px;
+  line-height: 1.25;
+  font-weight: 400;
+}
+
+.instructor-cover-card p {
+  margin: 0;
+  color: #d7e8ff;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.instructor-dropzone {
+  min-height: 138px;
+  padding: 22px;
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  text-align: center;
+  color: #04e2ff;
+  background: rgba(4, 226, 255, .04);
+  border: 1px dashed rgba(4, 226, 255, .55);
+  cursor: pointer;
+}
+
+.instructor-dropzone span {
+  color: #04e2ff;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.instructor-dropzone small {
+  max-width: 340px;
+  color: #d7e8ff;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.instructor-dropzone.drag-over {
+  background: rgba(4, 226, 255, .10);
+  border-color: #04e2ff;
+}
+
+#instructorCursoPortadaArchivo {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.instructor-file-name {
+  margin: 0;
+  color: #d7e8ff;
+  font-size: 14px;
+}
+
+.instructor-cover-preview[hidden] {
+  display: none !important;
+}
+
+.instructor-cover-preview {
+  width: min(100%, 520px);
+  max-height: 240px;
+  object-fit: cover;
+  border: 1px solid rgba(125, 150, 214, .36);
+}
+
+.instructor-edit-tools[hidden] {
+  display: none !important;
+}
+
+.instructor-edit-tools {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  background: rgba(4, 226, 255, .045);
+  border: 1px solid rgba(4, 226, 255, .24);
+}
+
+.instructor-edit-tools-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 28px;
+  align-items: center;
+}
+
+.instructor-edit-tools-grid a {
+  color: #04e2ff;
+  text-decoration: none;
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.instructor-edit-tools-grid a:hover {
+  color: #7ef2ff;
+}
+
+.instructor-review-status {
+  margin: 14px 0 0;
+  color: #d7e8ff;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.instructor-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 34px;
+  align-items: center;
+  padding-top: 4px;
+}
+
+.instructor-form-text-button {
+  min-height: auto;
+  padding: 0;
+  margin: 0;
+  color: #04e2ff;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  font: inherit;
+  font-size: 18px;
+  line-height: 1.35;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.instructor-form-text-button:hover,
+.instructor-form-text-button:focus {
+  color: #7ef2ff;
+  outline: 0;
+}
+
+.instructor-form-text-button:disabled {
+  color: rgba(4, 226, 255, .45);
+  cursor: wait;
+}
+
+@media (max-width: 920px) {
+  .instructor-form-grid,
+  .instructor-cover-options {
+    grid-template-columns: 1fr;
+  }
+
+  .instructor-price-field {
+    max-width: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .instructor-form-actions {
+    display: grid;
+    gap: 18px;
+  }
+}
+
+
+/* Paso 21.9 - Siguiente a módulos dentro del mismo flujo */
+.instructor-modules-step[hidden] {
+  display: none !important;
+}
+
+.instructor-modules-step {
+  display: grid;
+  gap: 22px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(125, 150, 214, .22);
+}
+
+.instructor-module-current-course {
+  padding: 12px 14px;
+  color: #d7e8ff;
+  background: rgba(4, 226, 255, .045);
+  border: 1px solid rgba(4, 226, 255, .22);
+}
+
+.instructor-module-count-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 360px) auto;
+  gap: 28px;
+  align-items: end;
+}
+
+.instructor-modules-fields {
+  display: grid;
+  gap: 16px;
+  max-width: 720px;
+}
+
+.instructor-module-field input {
+  min-height: 50px;
+}
+
+.instructor-module-actions {
+  padding-top: 2px;
+}
+
+@media (max-width: 760px) {
+  .instructor-module-count-row {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+}
+
+/* Paso 21.10 - Validaciones rojas y vista previa de portada */
+.instructor-field .error-message {
+  display: none;
+  margin-top: -2px;
+  color: #ff8f8f;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.instructor-field.has-error .error-message {
+  display: block;
+}
+
+.instructor-field input.is-invalid,
+.instructor-field select.is-invalid,
+.instructor-field textarea.is-invalid {
+  border-color: #ff5b5b !important;
+  box-shadow: 0 0 0 2px rgba(255, 91, 91, .12) !important;
+}
+
+.instructor-field select {
+  background-image:
+    linear-gradient(45deg, transparent 50%, #ffffff 50%),
+    linear-gradient(135deg, #ffffff 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) 50%,
+    calc(100% - 12px) 50%;
+  background-size:
+    6px 6px,
+    6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 42px;
+}
+
+.instructor-cover-preview-wrap[hidden] {
+  display: none !important;
+}
+
+.instructor-cover-preview-wrap {
+  margin-top: 24px;
+  display: grid;
+  gap: 12px;
+  max-width: 760px;
+}
+
+.instructor-cover-preview-wrap h4 {
+  margin: 0;
+  color: #dfe6f3;
+  font-size: 20px;
+  line-height: 1.25;
+  font-weight: 400;
+}
+
+.instructor-cover-preview-wrap p {
+  margin: 0;
+  color: #d7e8ff;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.instructor-cover-preview {
+  display: block;
+  width: 100%;
+  max-height: 360px;
+  object-fit: contain;
+  object-position: center;
+  background: #151720;
+  border: 1px solid rgba(125, 150, 214, .36);
+}
+
+/* Paso 21.11 - Validación en tiempo real e imagen bloqueada */
+.instructor-cover-preview-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 22px;
+}
+
+.instructor-cover-clear {
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+
+.instructor-dropzone.is-locked {
+  opacity: .55;
+  cursor: not-allowed;
+  border-color: rgba(125, 150, 214, .28);
+  background: rgba(255, 255, 255, .035);
+}
+
+.instructor-dropzone.is-locked span,
+.instructor-dropzone.is-locked small {
+  color: #9ca8c5;
+}
+
+.instructor-field input:disabled,
+.instructor-field select:disabled,
+.instructor-field textarea:disabled {
+  opacity: .58;
+  cursor: not-allowed;
+  color: #9ca8c5;
+  border-color: rgba(125, 150, 214, .22);
+  background: rgba(21, 23, 32, .52);
+}
+
+@media (max-width: 720px) {
+  .instructor-cover-preview-header {
+    display: grid;
+  }
+}
+
+/* Paso 21.12 - Imagen única y botón borrar acomodado */
+.instructor-cover-preview-header {
+  display: grid;
+  gap: 4px;
+}
+
+.instructor-cover-preview-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 2px;
+}
+
+.instructor-cover-preview-footer p {
+  margin: 0;
+  color: #d7e8ff;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.instructor-cover-clear {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.instructor-field input.is-locked,
+.instructor-field input:disabled,
+#instructorCursoPortada.is-locked {
+  opacity: .58;
+  cursor: not-allowed;
+}
+
+@media (max-width: 720px) {
+  .instructor-cover-preview-footer {
+    display: grid;
+    gap: 12px;
+  }
+}
+
+/* Paso 21.13 - Mensaje de imagen arriba y aviso inferior de formulario */
+.instructor-cover-single-note[hidden],
+.instructor-form-status[hidden] {
+  display: none !important;
+}
+
+.instructor-cover-single-note {
+  margin: 2px 0 18px;
+  padding: 12px 14px;
+  color: #d8f7ff;
+  background: rgba(4, 226, 255, .06);
+  border: 1px solid rgba(4, 226, 255, .24);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.instructor-form-status {
+  margin: -6px 0 0;
+  padding: 12px 14px;
+  color: #ffb3b3;
+  background: rgba(255, 91, 91, .08);
+  border: 1px solid rgba(255, 91, 91, .28);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.instructor-cover-preview-footer {
+  justify-content: flex-start;
+  margin-top: 6px;
+}
+
+/* Paso 21.14 - Precio inmediato y mensaje de imagen antes de vista previa */
+.instructor-cover-options + .instructor-cover-single-note {
+  margin: 18px 0 0;
+}
+
+.instructor-cover-single-note + .instructor-cover-preview-wrap {
+  margin-top: 14px;
+}
+
+.instructor-form-status {
+  max-width: 720px;
+}
+
+
+
+/* Paso 21.42 - Formulario propio de cuenta para instructor */
+.instructor-module-current-course,
+.instructor-module-actions {
+  display: none !important;
+}
+
+.instructor-module-count-row {
+  display: grid !important;
+  grid-template-columns: minmax(240px, 340px) auto !important;
+  align-items: end !important;
+  column-gap: 24px !important;
+}
+
+#instructorPrepararModulos {
+  align-self: end !important;
+  justify-self: start !important;
+  margin: 0 0 14px !important;
+  color: #04e2ff !important;
+}
+
+#instructorPrepararModulos:hover,
+#instructorPrepararModulos:focus {
+  color: #7ef2ff !important;
+}
+
+.instructor-form-actions-final {
+  padding-top: 12px;
+  gap: 34px;
+}
+
+.instructor-account-box {
+  width: 100%;
+}
+
+.instructor-account-form {
+  margin-top: 28px;
+}
+
+.instructor-account-photo {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.instructor-account-preview {
+  width: 82px;
+  height: 82px;
+  border: 3px solid #04e2ff;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: rgba(4, 226, 255, .08);
+  color: #04e2ff;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.instructor-account-preview img,
+.instructor-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.instructor-account-photo-fields {
+  display: grid;
+  gap: 16px;
+}
+
+.instructor-account-file-input {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  padding: 0 !important;
+  margin: -1px !important;
+}
+
+.instructor-account-file-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  min-height: 48px;
+}
+
+.instructor-account-file-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid #04e2ff;
+  background: rgba(4, 226, 255, .08);
+  color: #04e2ff;
+  cursor: pointer;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.instructor-account-file-button:hover,
+.instructor-account-file-button:focus {
+  background: rgba(4, 226, 255, .16);
+  color: #7ef2ff;
+}
+
+.instructor-account-file-name {
+  color: #d9e7ff;
+  font-size: 14px;
+}
+
+.instructor-account-success {
+  display: none;
+  margin-top: 18px;
+}
+
+.instructor-avatar-has-image {
+  overflow: hidden;
+  padding: 0;
+}
+
+@media (max-width: 760px) {
+  .instructor-module-count-row {
+    grid-template-columns: 1fr !important;
+    row-gap: 12px !important;
+  }
+
+  #instructorPrepararModulos {
+    margin-bottom: 0 !important;
+  }
+
+  .instructor-account-photo {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Paso 21.43 - Panel interno Mi cuenta sin recarga */
+#panel-cuenta.instructor-panel.active {
+  display: block !important;
+  visibility: visible !important;
+}
+
+.instructor-module-count-row {
+  column-gap: 18px !important;
+}
+
+#instructorPrepararModulos {
+  margin-left: 0 !important;
+}
+
+
+/* Paso 21.44 - Editar perfil interno, sin recarga y con diseño limpio */
+#panel-cuenta.instructor-panel {
+  margin-top: 0 !important;
+}
+
+#panel-cuenta.instructor-panel.active {
+  display: block !important;
+  visibility: visible !important;
+}
+
+.instructor-account-box {
+  max-width: 980px;
+  margin: 0;
+  padding: 28px 28px 32px;
+}
+
+.instructor-account-form {
+  margin-top: 26px;
+  display: grid;
+  gap: 22px;
+}
+
+.instructor-account-form .mi-cuenta-form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.instructor-account-form .mi-cuenta-section-title {
+  margin: 4px 0 0;
+}
+
+.instructor-account-form .mi-cuenta-save-button {
+  justify-self: start;
+}
+
+.instructor-account-photo {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.instructor-account-photo-fields {
+  display: grid;
+  gap: 16px;
+}
+
+.instructor-module-count-row {
+  grid-template-columns: minmax(240px, 340px) auto !important;
+  column-gap: 18px !important;
+}
+
+#instructorPrepararModulos {
+  margin-left: 0 !important;
+}
+
+@media (max-width: 760px) {
+  .instructor-account-form .mi-cuenta-form-row,
+  .instructor-account-photo {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+
+
+/* Paso 21.46 - Reparación de estructura y diseño de instructor */
+#panel-examenes.instructor-panel.active,
+#panel-resultados.instructor-panel.active {
+  display: block !important;
+  visibility: visible !important;
+}
+
+#panel-examenes .instructor-empty-panel,
+#panel-resultados .instructor-empty-panel {
+  min-height: 220px;
+  margin: 0 0 36px;
+}
+
+#panel-crear .instructor-form-box {
+  overflow: visible;
+}
+
+#panel-crear .instructor-modules-step {
+  margin-top: 0;
+}
+
+#panel-crear .instructor-course-form > .instructor-modules-step {
+  border-top: 1px solid rgba(125, 150, 214, .22);
+  padding-top: 18px;
+}
+
+
+/* Paso 21.47 - Módulos sin línea superior y botones finales */
+#panel-crear .instructor-modules-step,
+#panel-crear .instructor-course-form > .instructor-modules-step {
+  border-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.instructor-form-actions-final {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 34px;
+  align-items: center;
+  padding-top: 28px;
+}
+
+.instructor-form-actions-final .instructor-form-text-button {
+  color: #04e2ff !important;
+  font-size: 18px;
+  line-height: 1.35;
+  font-weight: 400;
+  text-align: left;
+}
+
+.instructor-form-actions-final .instructor-form-text-button:hover,
+.instructor-form-actions-final .instructor-form-text-button:focus {
+  color: #7ef2ff !important;
+}
+
+
+/* Paso 21.48 - Espaciado visual coherente en Módulos del curso */
+#panel-crear .instructor-modules-step,
+#panel-crear .instructor-course-form > .instructor-modules-step {
+  margin-top: 34px !important;
+  border-top: 0 !important;
+  padding-top: 0 !important;
+  gap: 20px !important;
+}
+
+#panel-crear .instructor-modules-step .instructor-form-section-header {
+  margin-bottom: 2px !important;
+}
+
+#panel-crear .instructor-module-count-row {
+  margin-top: 4px !important;
+}
+
+#panel-crear .instructor-form-actions-final {
+  padding-top: 32px !important;
+}
+
+
+/* Paso 21.49 - Botones finales estables y acciones limpias de curso */
+.instructor-form-actions-final {
+  min-height: 58px;
+  align-items: center !important;
+}
+
+.instructor-form-actions-final .instructor-form-text-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-width: 138px;
+  min-height: 32px;
+  white-space: nowrap;
+  line-height: 1.35;
+}
+
+.instructor-form-actions-final .instructor-form-text-button:disabled {
+  color: rgba(4, 226, 255, .65) !important;
+  opacity: 1;
+  cursor: wait;
+}
+
+.instructor-course-actions {
+  gap: 18px;
+}
+
+.instructor-course-actions a {
+  white-space: nowrap;
+}
+
+
+/* Paso 21.50 - Perfil estable, errores que se limpian y botón de imagen centrado */
+.instructor-account-file-row {
+  align-items: center !important;
+  min-height: 50px;
+}
+
+.instructor-account-file-button {
+  min-height: 48px !important;
+  height: 48px;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.instructor-account-file-name {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.35;
+}
+
+.instructor-account-form .error-message {
+  display: block !important;
+  min-height: 18px;
+  margin-top: 7px;
+  visibility: hidden;
+}
+
+.instructor-account-form .instructor-field.has-error .error-message {
+  visibility: visible;
+}
+
+.instructor-account-form .instructor-field:not(.has-error) .error-message {
+  color: transparent;
+}
+
+.instructor-account-form .instructor-field:not(.has-error) input,
+.instructor-account-form .instructor-field:not(.has-error) select,
+.instructor-account-form .instructor-field:not(.has-error) textarea {
+  border-color: rgba(208, 225, 255, .22) !important;
+  box-shadow: none !important;
+}
+
+#instructorFormularioEstado {
+  margin-top: 18px !important;
+}
+
+
+/* Paso 22.1 - Lecciones dentro del formulario de Crear curso */
+.instructor-lessons-step {
+  margin-top: 38px;
+  padding-top: 0;
+}
+
+.instructor-lessons-fields {
+  display: grid;
+  gap: 22px;
+  margin-top: 18px;
+}
+
+.instructor-lesson-module-card {
+  border: 1px solid #34405f;
+  background: rgba(16, 19, 31, .38);
+  padding: 22px;
+}
+
+.instructor-lesson-module-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.instructor-lesson-module-header h4 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 19px;
+  font-weight: 400;
+}
+
+.instructor-lesson-module-header p {
+  margin: 6px 0 0;
+  color: #d9e7ff;
+  font-size: 14px;
+}
+
+.instructor-lesson-count-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 320px) auto;
+  align-items: end;
+  column-gap: 18px;
+  margin-bottom: 18px;
+}
+
+.instructor-lesson-list {
+  display: grid;
+  gap: 18px;
+}
+
+.instructor-lesson-card {
+  border: 1px solid rgba(125, 150, 214, .24);
+  background: rgba(13, 16, 28, .66);
+  padding: 18px;
+}
+
+.instructor-lesson-card h5 {
+  margin: 0 0 16px;
+  color: #04e2ff;
+  font-size: 17px;
+  font-weight: 400;
+}
+
+.instructor-lesson-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 20px;
+}
+
+.instructor-lesson-grid .instructor-field-full {
+  grid-column: 1 / -1;
+}
+
+.instructor-lesson-help {
+  margin: 10px 0 0;
+  color: #aebce0;
+  font-size: 13px;
+}
+
+.instructor-lesson-empty {
+  margin: 0;
+  color: #aebce0;
+}
+
+@media (max-width: 760px) {
+  .instructor-lesson-count-row,
+  .instructor-lesson-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .instructor-lesson-module-header {
+    flex-direction: column;
+  }
+}
+
+
+/* Paso 22.2 - Ajustes de lecciones, video local, filtros y fechas */
+.instructor-form-box .error-message {
+  display: block;
+  min-height: 18px;
+  margin-top: 6px;
+  visibility: hidden;
+}
+
+.instructor-form-box .instructor-field.has-error .error-message {
+  visibility: visible;
+}
+
+.instructor-lesson-count-row {
+  display: grid;
+  grid-template-columns: minmax(240px, 360px);
+  align-items: start;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.instructor-lesson-count-row .instructor-form-text-button {
+  justify-self: start;
+  margin-top: -2px;
+}
+
+.instructor-lesson-card input,
+.instructor-lesson-card select,
+.instructor-lesson-card textarea,
+.instructor-lesson-module-card input {
+  background-color: #111522;
+  border-color: #34405f;
+}
+
+.instructor-lesson-card input:focus,
+.instructor-lesson-card select:focus,
+.instructor-lesson-card textarea:focus,
+.instructor-lesson-module-card input:focus {
+  border-color: #04e2ff;
+  box-shadow: 0 0 0 2px rgba(4, 226, 255, .12);
+}
+
+.instructor-video-source-box {
+  display: grid;
+  gap: 14px;
+}
+
+.instructor-video-local-box[hidden],
+.instructor-video-link-box[hidden] {
+  display: none !important;
+}
+
+.instructor-video-local-box {
+  display: grid;
+  gap: 10px;
+}
+
+.instructor-video-dropzone {
+  min-height: 118px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 18px;
+  color: #dce7ff;
+  background: rgba(4, 226, 255, .045);
+  border: 1px dashed #04e2ff;
+  cursor: pointer;
+}
+
+.instructor-video-dropzone strong {
+  display: block;
+  color: #04e2ff;
+  font-weight: 400;
+  margin-bottom: 8px;
+}
+
+.instructor-video-dropzone span {
+  display: block;
+  max-width: 360px;
+  line-height: 1.45;
+}
+
+.instructor-video-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.instructor-video-file-name {
+  margin: 0;
+  color: #d9e7ff;
+  font-size: 14px;
+}
+
+.instructor-video-file-name.has-file {
+  color: #04e2ff;
+}
+
+.instructor-course-dates {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+  color: #b9c9e9;
+  font-size: 14px;
+}
+
+.instructor-course-dates p {
+  margin: 0;
+}
+
+.instructor-filter-row {
+  margin: 18px 0 22px;
+  max-width: 340px;
+}
+
+.instructor-filter-field {
+  margin: 0;
+}
+
+.instructor-filter-field select {
+  background-color: #111522;
+}
+
+.instructor-filter-empty {
+  margin: 0;
+  color: #d9e7ff;
+}
+
+@media (max-width: 760px) {
+  .instructor-lesson-count-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Paso 22.3 - Colores uniformes, video estable y recursos extra */
+.instructor-filter-field select,
+.instructor-course-form input,
+.instructor-course-form select,
+.instructor-course-form textarea,
+.instructor-lesson-card,
+.instructor-lesson-module-card,
+.instructor-resource-card,
+.instructor-video-dropzone,
+.instructor-resource-dropzone {
+  background-color: #1b1d26 !important;
+}
+
+.instructor-course-form input,
+.instructor-course-form select,
+.instructor-course-form textarea {
+  border-color: #34405f;
+}
+
+.instructor-course-form input:focus,
+.instructor-course-form select:focus,
+.instructor-course-form textarea:focus {
+  background-color: #1b1d26 !important;
+  border-color: #04e2ff !important;
+  box-shadow: 0 0 0 2px rgba(4, 226, 255, .12) !important;
+}
+
+.instructor-lesson-card {
+  overflow: visible;
+}
+
+.instructor-lesson-grid {
+  align-items: start;
+}
+
+.instructor-lesson-grid .instructor-video-field,
+.instructor-lesson-grid .instructor-duration-field {
+  align-self: start;
+  min-width: 0;
+}
+
+.instructor-video-source-box,
+.instructor-video-link-box,
+.instructor-video-local-box {
+  min-width: 0;
+}
+
+.instructor-video-dropzone,
+.instructor-resource-dropzone {
+  min-height: 118px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.instructor-extra-resources {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 16px;
+  margin-top: 2px;
+  padding-top: 2px;
+}
+
+.instructor-extra-resources-head {
+  display: grid;
+  grid-template-columns: minmax(220px, 340px) minmax(220px, 340px) auto;
+  gap: 16px;
+  align-items: end;
+}
+
+.instructor-extra-resources-body[hidden] {
+  display: none !important;
+}
+
+.instructor-extra-resources-body {
+  display: grid;
+  gap: 16px;
+}
+
+.instructor-resource-list {
+  display: grid;
+  gap: 16px;
+}
+
+.instructor-resource-card {
+  border: 1px solid rgba(125, 150, 214, .24);
+  padding: 16px;
+}
+
+.instructor-resource-card h6 {
+  margin: 0 0 14px;
+  color: #04e2ff;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.instructor-resource-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 18px;
+}
+
+.instructor-resource-grid .instructor-field-full {
+  grid-column: 1 / -1;
+}
+
+.instructor-resource-link-box[hidden],
+.instructor-resource-local-box[hidden] {
+  display: none !important;
+}
+
+.instructor-resource-local-box {
+  display: grid;
+  gap: 10px;
+}
+
+.instructor-resource-dropzone {
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  text-align: center;
+  color: #dce7ff;
+  border: 1px dashed #04e2ff;
+  cursor: pointer;
+}
+
+.instructor-resource-dropzone strong {
+  display: block;
+  color: #04e2ff;
+  font-weight: 400;
+  margin-bottom: 8px;
+}
+
+.instructor-resource-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.instructor-resource-file-name {
+  margin: 0;
+  color: #d9e7ff;
+  font-size: 14px;
+}
+
+.instructor-resource-file-name.has-file {
+  color: #04e2ff;
+}
+
+@media (max-width: 900px) {
+  .instructor-extra-resources-head,
+  .instructor-resource-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Paso 22.4 - Formulario estable sin descuadres */
+.instructor-module-count-row,
+.instructor-lesson-count-row {
+  display: grid !important;
+  grid-template-columns: minmax(240px, 340px) !important;
+  align-items: start !important;
+  justify-items: start !important;
+  gap: 8px !important;
+  margin-bottom: 18px !important;
+}
+
+.instructor-module-count-row .instructor-form-text-button,
+.instructor-lesson-count-row .instructor-form-text-button {
+  justify-self: start !important;
+  text-align: left !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  white-space: normal !important;
+}
+
+.instructor-course-form .instructor-field {
+  min-width: 0 !important;
+}
+
+.instructor-course-form .error-message,
+.instructor-lesson-card .error-message,
+.instructor-resource-card .error-message {
+  display: block !important;
+  min-height: 18px !important;
+  margin-top: 6px !important;
+  line-height: 1.35 !important;
+  visibility: hidden !important;
+}
+
+.instructor-course-form .instructor-field.has-error .error-message,
+.instructor-lesson-card .instructor-field.has-error .error-message,
+.instructor-resource-card .instructor-field.has-error .error-message {
+  visibility: visible !important;
+}
+
+.instructor-lesson-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 18px 18px !important;
+  align-items: start !important;
+}
+
+.instructor-lesson-grid .instructor-field-full,
+.instructor-extra-resources {
+  grid-column: 1 / -1 !important;
+}
+
+.instructor-video-field,
+.instructor-duration-field {
+  align-self: start !important;
+  min-width: 0 !important;
+}
+
+.instructor-video-source-box,
+.instructor-video-link-box,
+.instructor-video-local-box,
+.instructor-resource-link-box,
+.instructor-resource-local-box {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.instructor-video-dropzone,
+.instructor-resource-dropzone {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  min-height: 104px !important;
+  background-color: #1b1d26 !important;
+}
+
+.instructor-extra-resources {
+  display: grid !important;
+  gap: 14px !important;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.instructor-extra-resources-head {
+  display: grid !important;
+  grid-template-columns: minmax(240px, 340px) !important;
+  align-items: start !important;
+  gap: 8px !important;
+}
+
+.instructor-extra-resources-body[hidden] {
+  display: none !important;
+}
+
+.instructor-extra-resources-body {
+  display: grid !important;
+  gap: 16px !important;
+}
+
+.instructor-resource-count-row {
+  display: grid !important;
+  grid-template-columns: minmax(240px, 340px) !important;
+  align-items: start !important;
+  justify-items: start !important;
+  gap: 8px !important;
+}
+
+.instructor-resource-count-row .instructor-form-text-button {
+  justify-self: start !important;
+  text-align: left !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  white-space: normal !important;
+}
+
+.instructor-resource-list {
+  display: grid !important;
+  gap: 14px !important;
+}
+
+.instructor-resource-card {
+  padding: 14px 16px !important;
+  background-color: #1b1d26 !important;
+  border: 1px solid rgba(125, 150, 214, .22) !important;
+}
+
+.instructor-resource-card h6 {
+  margin: 0 0 14px !important;
+}
+
+.instructor-resource-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 16px 18px !important;
+  align-items: start !important;
+}
+
+.instructor-resource-grid .instructor-field-full {
+  grid-column: 1 / -1 !important;
+}
+
+.instructor-resource-origin-field,
+.instructor-resource-url-field {
+  align-self: start !important;
+  min-width: 0 !important;
+}
+
+.instructor-filter-field select,
+.instructor-course-form input,
+.instructor-course-form select,
+.instructor-course-form textarea {
+  background-color: #1b1d26 !important;
+}
+
+@media (max-width: 860px) {
+  .instructor-lesson-grid,
+  .instructor-resource-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .instructor-module-count-row,
+  .instructor-lesson-count-row,
+  .instructor-extra-resources-head,
+  .instructor-resource-count-row {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+/* Paso 22.5 - Layout final del formulario y botones al lado */
+.instructor-module-count-row,
+.instructor-lesson-count-row,
+.instructor-resource-count-row {
+  display: grid !important;
+  grid-template-columns: minmax(240px, 320px) auto !important;
+  align-items: start !important;
+  justify-items: stretch !important;
+  column-gap: 22px !important;
+  row-gap: 8px !important;
+  margin-bottom: 16px !important;
+}
+
+.instructor-module-count-row .instructor-form-text-button,
+.instructor-lesson-count-row .instructor-form-text-button,
+.instructor-resource-count-row .instructor-form-text-button {
+  align-self: start !important;
+  justify-self: start !important;
+  margin-top: 42px !important;
+  padding: 0 !important;
+  text-align: left !important;
+  white-space: normal !important;
+  min-width: 0 !important;
+}
+
+.instructor-modules-step {
+  gap: 18px !important;
+}
+
+.instructor-modules-step .instructor-form-section-header {
+  margin-bottom: 0 !important;
+}
+
+.instructor-modules-fields {
+  gap: 14px !important;
+  margin-top: 14px !important;
+}
+
+.instructor-lessons-step {
+  margin-top: 28px !important;
+}
+
+.instructor-lessons-fields {
+  margin-top: 14px !important;
+  gap: 18px !important;
+}
+
+.instructor-lesson-module-card {
+  padding: 18px !important;
+}
+
+.instructor-lesson-module-header {
+  margin-bottom: 14px !important;
+}
+
+.instructor-lesson-list {
+  gap: 16px !important;
+}
+
+.instructor-lesson-card {
+  padding: 16px !important;
+}
+
+.instructor-extra-resources {
+  gap: 12px !important;
+}
+
+.instructor-extra-resources-head {
+  grid-template-columns: minmax(240px, 320px) !important;
+  gap: 8px !important;
+}
+
+.instructor-extra-resources-body {
+  gap: 14px !important;
+}
+
+@media (max-width: 860px) {
+  .instructor-module-count-row,
+  .instructor-lesson-count-row,
+  .instructor-resource-count-row,
+  .instructor-extra-resources-head {
+    grid-template-columns: 1fr !important;
+  }
+
+  .instructor-module-count-row .instructor-form-text-button,
+  .instructor-lesson-count-row .instructor-form-text-button,
+  .instructor-resource-count-row .instructor-form-text-button {
+    margin-top: 0 !important;
+  }
+}
+
+
+/* Paso 22.6 - Botones centrados y cancelar recursos extra */
+.instructor-module-count-row,
+.instructor-lesson-count-row,
+.instructor-resource-count-row {
+  grid-template-columns: minmax(240px, 320px) auto !important;
+  align-items: start !important;
+  column-gap: 22px !important;
+}
+
+.instructor-module-count-row > .instructor-form-text-button,
+.instructor-lesson-count-row > .instructor-form-text-button,
+.instructor-resource-count-row > .instructor-form-text-button,
+.instructor-resource-actions-inline {
+  align-self: start !important;
+  margin-top: 31px !important;
+}
+
+.instructor-module-count-row > .instructor-form-text-button,
+.instructor-lesson-count-row > .instructor-form-text-button,
+.instructor-resource-count-row > .instructor-form-text-button {
+  min-height: 52px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  line-height: 1.3 !important;
+}
+
+.instructor-resource-actions-inline {
+  display: flex !important;
+  align-items: center !important;
+  gap: 18px !important;
+  min-height: 52px !important;
+  flex-wrap: wrap !important;
+}
+
+.instructor-resource-actions-inline .instructor-form-text-button {
+  min-height: 52px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  line-height: 1.3 !important;
+}
+
+.instructorCancelarRecursos {
+  color: #ffb7b7 !important;
+}
+
+.instructorCancelarRecursos:hover,
+.instructorCancelarRecursos:focus {
+  color: #ffdddd !important;
+}
+
+@media (max-width: 860px) {
+  .instructor-module-count-row > .instructor-form-text-button,
+  .instructor-lesson-count-row > .instructor-form-text-button,
+  .instructor-resource-count-row > .instructor-form-text-button,
+  .instructor-resource-actions-inline {
+    margin-top: 0 !important;
+  }
+
+  .instructor-resource-actions-inline {
+    min-height: auto !important;
+  }
+}
+
+
+/* Paso 22.7 - Alineación fina de botones y cancelar abajo */
+.instructor-module-count-row,
+.instructor-lesson-count-row,
+.instructor-resource-count-row {
+  display: grid !important;
+  grid-template-columns: minmax(240px, 320px) auto !important;
+  align-items: start !important;
+  column-gap: 22px !important;
+}
+
+.instructor-module-count-row > .instructor-form-text-button,
+.instructor-lesson-count-row > .instructor-form-text-button,
+.instructor-resource-count-row > .instructor-form-text-button {
+  align-self: start !important;
+  justify-self: start !important;
+  margin-top: 23px !important;
+  min-height: 52px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  line-height: 1.25 !important;
+  padding: 0 !important;
+  white-space: normal !important;
+  text-align: left !important;
+}
+
+.instructor-resource-actions-inline {
+  display: contents !important;
+}
+
+.instructor-resource-cancel-row[hidden] {
+  display: none !important;
+}
+
+.instructor-resource-cancel-row {
+  display: flex !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  min-height: 32px !important;
+  margin-top: 8px !important;
+  padding-left: 8px !important;
+}
+
+.instructor-resource-cancel-row .instructor-form-text-button {
+  min-height: auto !important;
+  line-height: 1.3 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.instructorCancelarRecursos {
+  color: #ffb7b7 !important;
+}
+
+.instructorCancelarRecursos:hover,
+.instructorCancelarRecursos:focus {
+  color: #ffdddd !important;
+}
+
+@media (max-width: 860px) {
+  .instructor-module-count-row,
+  .instructor-lesson-count-row,
+  .instructor-resource-count-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .instructor-module-count-row > .instructor-form-text-button,
+  .instructor-lesson-count-row > .instructor-form-text-button,
+  .instructor-resource-count-row > .instructor-form-text-button {
+    margin-top: 0 !important;
+    min-height: auto !important;
+  }
+}
+
+
+/* Paso 22.8 - Alineación real de botones con la fila del input */
+.instructor-module-count-row,
+.instructor-lesson-count-row,
+.instructor-resource-count-row {
+  display: grid !important;
+  grid-template-columns: minmax(240px, 320px) auto !important;
+  grid-template-rows: auto 52px auto !important;
+  column-gap: 22px !important;
+  row-gap: 6px !important;
+  align-items: center !important;
+  justify-items: stretch !important;
+  margin-bottom: 16px !important;
+}
+
+.instructor-module-count-row > .instructor-field,
+.instructor-lesson-count-row > .instructor-field,
+.instructor-resource-count-row > .instructor-field {
+  display: contents !important;
+}
+
+.instructor-module-count-row > .instructor-field > span,
+.instructor-lesson-count-row > .instructor-field > span,
+.instructor-resource-count-row > .instructor-field > span {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  align-self: end !important;
+}
+
+.instructor-module-count-row > .instructor-field > input,
+.instructor-lesson-count-row > .instructor-field > input,
+.instructor-resource-count-row > .instructor-field > input {
+  grid-column: 1 !important;
+  grid-row: 2 !important;
+  height: 52px !important;
+  min-height: 52px !important;
+  align-self: stretch !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.instructor-module-count-row > .instructor-field > .error-message,
+.instructor-lesson-count-row > .instructor-field > .error-message,
+.instructor-resource-count-row > .instructor-field > .error-message {
+  grid-column: 1 !important;
+  grid-row: 3 !important;
+}
+
+.instructor-module-count-row > .instructor-form-text-button,
+.instructor-lesson-count-row > .instructor-form-text-button,
+.instructor-resource-count-row > .instructor-form-text-button,
+.instructor-resource-count-row > .instructor-resource-actions-inline {
+  grid-column: 2 !important;
+  grid-row: 2 !important;
+  align-self: center !important;
+  justify-self: start !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 52px !important;
+}
+
+.instructor-module-count-row > .instructor-form-text-button,
+.instructor-lesson-count-row > .instructor-form-text-button,
+.instructor-resource-count-row > .instructor-form-text-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  line-height: 1.25 !important;
+  white-space: nowrap !important;
+  text-align: left !important;
+}
+
+.instructor-resource-actions-inline {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 18px !important;
+  flex-wrap: wrap !important;
+}
+
+.instructor-resource-actions-inline .instructor-form-text-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-height: 52px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.25 !important;
+  white-space: nowrap !important;
+}
+
+.instructor-resource-cancel-row {
+  display: none !important;
+}
+
+.instructorCancelarRecursos[hidden] {
+  display: none !important;
+}
+
+.instructorCancelarRecursos {
+  color: #ffb7b7 !important;
+}
+
+.instructorCancelarRecursos:hover,
+.instructorCancelarRecursos:focus {
+  color: #ffdddd !important;
+}
+
+@media (max-width: 860px) {
+  .instructor-module-count-row,
+  .instructor-lesson-count-row,
+  .instructor-resource-count-row {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto 52px auto auto !important;
+  }
+
+  .instructor-module-count-row > .instructor-form-text-button,
+  .instructor-lesson-count-row > .instructor-form-text-button,
+  .instructor-resource-count-row > .instructor-form-text-button,
+  .instructor-resource-count-row > .instructor-resource-actions-inline {
+    grid-column: 1 !important;
+    grid-row: 4 !important;
+    min-height: auto !important;
+  }
+
+  .instructor-resource-actions-inline {
+    gap: 12px !important;
+  }
+}
+
+
+/* Paso 22.11 - Ajuste fino solo del botón de módulos */
+.instructor-module-count-row > .instructor-form-text-button {
+  transform: translateY(13px) !important;
+}
+
+
+/* Paso 22.12 - Ajuste fino adicional del botón de módulos */
+/* Se deja en 13px para bajarlo un poco más sin pasarlo demasiado. */
+
+
+/* Paso 22.13 - Cancelar recursos extra debajo de Archivo o link */
+.instructor-resource-actions-inline {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 18px !important;
+  flex-wrap: wrap !important;
+}
+
+.instructor-cancel-resource-under-field {
+  align-self: flex-start !important;
+  margin: 8px 0 0 0 !important;
+  padding: 0 !important;
+  min-height: auto !important;
+  height: auto !important;
+  line-height: 1.3 !important;
+  color: #ffb7b7 !important;
+}
+
+.instructor-cancel-resource-under-field:hover,
+.instructor-cancel-resource-under-field:focus {
+  color: #ffdddd !important;
+}
+
+
+/* Paso 22.14 - Cancelar recursos alineado debajo del campo */
+.instructor-resource-url-field {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+}
+
+.instructor-resource-url-field .instructor-resource-link-box,
+.instructor-resource-url-field .instructor-resource-local-box {
+  width: 100% !important;
+}
+
+.instructor-resource-url-field .error-message {
+  order: 3 !important;
+  min-height: 0 !important;
+  margin-top: 4px !important;
+}
+
+.instructor-cancel-resource-under-field {
+  order: 2 !important;
+  align-self: flex-start !important;
+  justify-self: flex-start !important;
+  margin: 6px 0 0 0 !important;
+  padding: 0 !important;
+  min-height: auto !important;
+  height: auto !important;
+  line-height: 1.25 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  text-align: left !important;
+  color: #ffb7b7 !important;
+}

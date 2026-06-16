@@ -1,0 +1,106 @@
+/* Solo modifica el pedazo de Mis Certificados dentro de mi-cuenta.html.
+   No cambia header, sidebar, footer, ni el resto de Mi cuenta.
+*/
+
+#panel-certificados .mi-cuenta-certificados-vista {
+  width: 100%;
+}
+
+#panel-certificados .mi-cuenta-certificados-titulo {
+  margin: 0 0 56px;
+  color: #d8deea;
+  font-size: 31px;
+  line-height: 1.25;
+  font-weight: 400;
+}
+
+#panel-certificados .mi-cuenta-certificados-lista {
+  width: 100%;
+}
+
+#panel-certificados .mi-cuenta-certificados-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(260px, 308px));
+  gap: 20px;
+  align-items: stretch;
+}
+
+#panel-certificados .mi-cuenta-certificado-item {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+#panel-certificados .mi-cuenta-certificado-card {
+  min-height: 100px;
+  width: 100%;
+  padding: 22px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #f8fafc;
+  text-align: center;
+  text-decoration: none;
+  background: transparent;
+  border: 1px solid #454a67;
+  border-radius: 10px;
+  box-shadow:
+    inset 0 0 0 2px rgba(125, 150, 214, .12),
+    0 0 0 1px rgba(12, 16, 32, .18);
+}
+
+#panel-certificados .mi-cuenta-certificado-card:hover {
+  border-color: rgba(125, 150, 214, .72);
+  background: rgba(31, 34, 48, .28);
+}
+
+#panel-certificados .mi-cuenta-certificado-titulo {
+  margin: 0;
+  color: #ffffff;
+  font-size: 15px;
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+#panel-certificados .mi-cuenta-certificado-fecha {
+  margin: 0;
+  color: #04e2ff;
+  font-size: 15px;
+  line-height: 1.3;
+  font-weight: 400;
+}
+
+#panel-certificados .mi-cuenta-certificados-vacio {
+  margin: 0;
+  color: #d8deea;
+}
+
+@media (max-width: 1120px) {
+  #panel-certificados .mi-cuenta-certificados-grid {
+    grid-template-columns: repeat(2, minmax(240px, 308px));
+  }
+}
+
+@media (max-width: 720px) {
+  #panel-certificados .mi-cuenta-certificados-titulo {
+    margin-bottom: 30px;
+    font-size: 28px;
+  }
+
+  #panel-certificados .mi-cuenta-certificados-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Paso 21.5 - Alineación comprobada con logo EduTech */
+.mi-cuenta-page .mi-cuenta-title,
+.mi-cuenta-page .mi-cuenta-nav {
+  margin-left: clamp(4px, calc((100vw - 1240px) / 2 + 4px), 44px);
+}
+
