@@ -756,11 +756,456 @@ const obtenerExamenPreviewAdmin = async (req, res) => {
 };
 
 
+const obtenerIdEstadoSolicitudInstructor = async (nombreEstado, cliente = pool) => {
+  const resultado = await cliente.query(
+    `SELECT id_estado_solicitud_instructor
+     FROM edutech.estado_solicitud_instructor
+     WHERE LOWER(nombre_estado_solicitud) = LOWER($1)`,
+    [nombreEstado]
+  );
+
+  if (resultado.rows.length === 0) {
+    throw new Error(`No existe el estado de solicitud de instructor: ${nombreEstado}.`);
+  }
+
+  return resultado.rows[0].id_estado_solicitud_instructor;
+};
+
+const crearSolicitudInstructor = async (req, res) => {
+  const cliente = await pool.connect();
+
+  try {
+    const idUsuario = Number(req.body.id_usuario || req.body.idUsuario || req.headers['x-edutech-user-id'] || 0);
+    const areaExperiencia = String(req.body.area_experiencia || req.body.areaExperiencia || '').trim();
+    const experiencia = String(req.body.experiencia || '').trim();
+    const evidencia = String(req.body.evidencia || req.body.evidencia_url || req.body.evidenciaUrl || '').trim();
+    const motivo = String(req.body.motivo || '').trim();
+
+    if (!Number.isInteger(idUsuario) || idUsuario < 1) {
+      return res.status(401).json({
+        ok: false,
+        message: 'Inicia sesión para enviar la solicitud de instructor.'
+      });
+    }
+
+    if (areaExperiencia.length < 3 || areaExperiencia.length > 60) {
+      return res.status(400).json({
+        ok: false,
+        message: 'El área de experiencia debe tener entre 3 y 60 caracteres.'
+      });
+    }
+
+    if (experiencia.length < 10 || experiencia.length > 500) {
+      return res.status(400).json({
+        ok: false,
+        message: 'La experiencia debe tener entre 10 y 500 caracteres.'
+      });
+    }
+
+    if (evidencia.length > 200 || !/^https?:\/\/[^\s]+\.[^\s]+$/i.test(evidencia)) {
+      return res.status(400).json({
+        ok: false,
+        message: 'Agrega un enlace válido como evidencia, de máximo 200 caracteres.'
+      });
+    }
+
+    if (motivo.length < 10 || motivo.length > 300) {
+      return res.status(400).json({
+        ok: false,
+        message: 'El motivo de solicitud debe tener entre 10 y 300 caracteres.'
+      });
+    }
+
+    await cliente.query('BEGIN');
+
+    const usuarioResultado = await cliente.query(
+      `SELECT
+        u.id_usuario,
+        u.nombre,
+        u.apellido_paterno,
+        u.apellido_materno,
+        u.correo,
+        u.esta_activo,
+        r.nombre_rol
+       FROM edutech.usuario u
+       INNER JOIN edutech.rol r
+        ON r.id_rol = u.id_rol
+       WHERE u.id_usuario = $1
+       FOR UPDATE`,
+      [idUsuario]
+    );
+
+    if (usuarioResultado.rows.length === 0) {
+      await cliente.query('ROLLBACK');
+      return res.status(404).json({
+        ok: false,
+        message: 'Usuario no encontrado.'
+      });
+    }
+
+    const usuario = usuarioResultado.rows[0];
+
+    if (!usuario.esta_activo) {
+      await cliente.query('ROLLBACK');
+      return res.status(403).json({
+        ok: false,
+        message: 'Tu cuenta está inactiva.'
+      });
+    }
+
+    if (String(usuario.nombre_rol || '').toLowerCase() === 'instructor') {
+      await cliente.query('ROLLBACK');
+      return res.status(400).json({
+        ok: false,
+        message: 'Tu cuenta ya tiene permisos de instructor.'
+      });
+    }
+
+    if (String(usuario.nombre_rol || '').toLowerCase() === 'administrador') {
+      await cliente.query('ROLLBACK');
+      return res.status(400).json({
+        ok: false,
+        message: 'Una cuenta administradora no necesita solicitud de instructor.'
+      });
+    }
+
+    const pendienteResultado = await cliente.query(
+      `SELECT si.id_solicitud_instructor
+       FROM edutech.solicitud_instructor si
+       INNER JOIN edutech.estado_solicitud_instructor esi
+        ON esi.id_estado_solicitud_instructor = si.id_estado_solicitud_instructor
+       WHERE si.id_usuario_solicitante = $1
+        AND LOWER(esi.nombre_estado_solicitud) = LOWER('pendiente')
+       LIMIT 1`,
+      [idUsuario]
+    );
+
+    if (pendienteResultado.rows.length > 0) {
+      await cliente.query('ROLLBACK');
+      return res.status(409).json({
+        ok: false,
+        message: 'Ya tienes una solicitud pendiente. Espera a que el administrador la revise.'
+      });
+    }
+
+    const idEstadoPendiente = await obtenerIdEstadoSolicitudInstructor('pendiente', cliente);
+
+    const solicitudResultado = await cliente.query(
+      `INSERT INTO edutech.solicitud_instructor
+        (id_usuario_solicitante, id_estado_solicitud_instructor, area_experiencia, experiencia, evidencia_url, motivo)
+       VALUES
+        ($1, $2, $3, $4, $5, $6)
+       RETURNING
+        id_solicitud_instructor,
+        id_usuario_solicitante,
+        id_estado_solicitud_instructor,
+        area_experiencia,
+        experiencia,
+        evidencia_url,
+        motivo,
+        fecha_solicitud`,
+      [idUsuario, idEstadoPendiente, areaExperiencia, experiencia, evidencia, motivo]
+    );
+
+    await cliente.query('COMMIT');
+
+    res.status(201).json({
+      ok: true,
+      message: 'Solicitud enviada correctamente. El administrador revisará tu cuenta.',
+      solicitud: {
+        ...solicitudResultado.rows[0],
+        nombre_estado_solicitud: 'pendiente',
+        usuario
+      }
+    });
+  } catch (error) {
+    await cliente.query('ROLLBACK');
+    res.status(500).json({
+      ok: false,
+      message: 'Error al enviar la solicitud de instructor.',
+      error: error.message
+    });
+  } finally {
+    cliente.release();
+  }
+};
+
+const listarSolicitudesInstructorAdmin = async (req, res) => {
+  try {
+    const idAdmin = obtenerIdAdmin(req);
+    const validacion = await validarAdmin(idAdmin);
+
+    if (!validacion.ok) {
+      return res.status(validacion.status).json({
+        ok: false,
+        message: validacion.message
+      });
+    }
+
+    const resultado = await pool.query(
+      `SELECT
+        si.id_solicitud_instructor,
+        si.id_usuario_solicitante,
+        si.id_usuario_revisor,
+        si.id_estado_solicitud_instructor,
+        esi.nombre_estado_solicitud,
+        si.area_experiencia,
+        si.experiencia,
+        si.evidencia_url,
+        si.motivo,
+        si.comentario_revision,
+        si.fecha_solicitud,
+        si.fecha_revision,
+        u.nombre,
+        u.apellido_paterno,
+        u.apellido_materno,
+        u.correo,
+        r.nombre_rol,
+        revisor.nombre AS revisor_nombre,
+        revisor.apellido_paterno AS revisor_apellido_paterno,
+        revisor.correo AS revisor_correo
+       FROM edutech.solicitud_instructor si
+       INNER JOIN edutech.estado_solicitud_instructor esi
+        ON esi.id_estado_solicitud_instructor = si.id_estado_solicitud_instructor
+       INNER JOIN edutech.usuario u
+        ON u.id_usuario = si.id_usuario_solicitante
+       INNER JOIN edutech.rol r
+        ON r.id_rol = u.id_rol
+       LEFT JOIN edutech.usuario revisor
+        ON revisor.id_usuario = si.id_usuario_revisor
+       ORDER BY
+        CASE WHEN LOWER(esi.nombre_estado_solicitud) = LOWER('pendiente') THEN 0 ELSE 1 END,
+        si.fecha_solicitud DESC,
+        si.id_solicitud_instructor DESC`
+    );
+
+    res.json({
+      ok: true,
+      solicitudes: resultado.rows
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: 'Error al cargar solicitudes de instructor.',
+      error: error.message
+    });
+  }
+};
+
+const revisarSolicitudInstructorAdmin = async (req, res) => {
+  const cliente = await pool.connect();
+
+  try {
+    const idAdmin = obtenerIdAdmin(req);
+    const idSolicitud = Number(req.params.idSolicitud);
+    const accion = String(req.body.accion || '').trim().toLowerCase();
+    const comentario = String(req.body.comentario || '').trim();
+
+    const validacion = await validarAdmin(idAdmin);
+
+    if (!validacion.ok) {
+      return res.status(validacion.status).json({
+        ok: false,
+        message: validacion.message
+      });
+    }
+
+    if (!Number.isInteger(idSolicitud) || idSolicitud < 1) {
+      return res.status(400).json({
+        ok: false,
+        message: 'Solicitud inválida.'
+      });
+    }
+
+    if (!['aceptar', 'rechazar'].includes(accion)) {
+      return res.status(400).json({
+        ok: false,
+        message: 'Acción de solicitud inválida.'
+      });
+    }
+
+    if (accion === 'rechazar' && comentario.length < 5) {
+      return res.status(400).json({
+        ok: false,
+        message: 'Para rechazar la solicitud escribe un motivo de al menos 5 caracteres.'
+      });
+    }
+
+    await cliente.query('BEGIN');
+
+    const solicitudResultado = await cliente.query(
+      `SELECT
+        si.id_solicitud_instructor,
+        si.id_usuario_solicitante,
+        esi.nombre_estado_solicitud
+       FROM edutech.solicitud_instructor si
+       INNER JOIN edutech.estado_solicitud_instructor esi
+        ON esi.id_estado_solicitud_instructor = si.id_estado_solicitud_instructor
+       WHERE si.id_solicitud_instructor = $1
+       FOR UPDATE`,
+      [idSolicitud]
+    );
+
+    if (solicitudResultado.rows.length === 0) {
+      await cliente.query('ROLLBACK');
+      return res.status(404).json({
+        ok: false,
+        message: 'Solicitud no encontrada.'
+      });
+    }
+
+    const solicitud = solicitudResultado.rows[0];
+
+    if (String(solicitud.nombre_estado_solicitud || '').toLowerCase() !== 'pendiente') {
+      await cliente.query('ROLLBACK');
+      return res.status(400).json({
+        ok: false,
+        message: 'Esta solicitud ya fue revisada.'
+      });
+    }
+
+    const aceptar = accion === 'aceptar';
+    const idEstadoSolicitud = await obtenerIdEstadoSolicitudInstructor(aceptar ? 'aceptada' : 'rechazada', cliente);
+    const comentarioFinal = comentario || (aceptar
+      ? 'Solicitud aceptada. La cuenta ahora tiene rol de instructor.'
+      : 'Solicitud rechazada por el administrador.');
+
+    await cliente.query(
+      `UPDATE edutech.solicitud_instructor
+       SET
+        id_estado_solicitud_instructor = $1,
+        id_usuario_revisor = $2,
+        comentario_revision = $3,
+        fecha_revision = CURRENT_TIMESTAMP
+       WHERE id_solicitud_instructor = $4`,
+      [idEstadoSolicitud, idAdmin, comentarioFinal, idSolicitud]
+    );
+
+    if (aceptar) {
+      const rolInstructorResultado = await cliente.query(
+        `SELECT id_rol
+         FROM edutech.rol
+         WHERE LOWER(nombre_rol) = LOWER('Instructor')`
+      );
+
+      if (rolInstructorResultado.rows.length === 0) {
+        throw new Error('No existe el rol Instructor.');
+      }
+
+      await cliente.query(
+        `UPDATE edutech.usuario
+         SET
+          id_rol = $1,
+          fecha_actualizacion = CURRENT_TIMESTAMP
+         WHERE id_usuario = $2`,
+        [rolInstructorResultado.rows[0].id_rol, solicitud.id_usuario_solicitante]
+      );
+    }
+
+    await cliente.query('COMMIT');
+
+    res.json({
+      ok: true,
+      message: aceptar
+        ? 'Solicitud aceptada. El alumno ahora es instructor.'
+        : 'Solicitud rechazada correctamente.'
+    });
+  } catch (error) {
+    await cliente.query('ROLLBACK');
+    res.status(500).json({
+      ok: false,
+      message: 'Error al revisar la solicitud de instructor.',
+      error: error.message
+    });
+  } finally {
+    cliente.release();
+  }
+};
+
+const listarPagosAdmin = async (req, res) => {
+  try {
+    const idAdmin = obtenerIdAdmin(req);
+    const validacion = await validarAdmin(idAdmin);
+
+    if (!validacion.ok) {
+      return res.status(validacion.status).json({
+        ok: false,
+        message: validacion.message
+      });
+    }
+
+    const resultado = await pool.query(
+      `SELECT
+        p.id_pago,
+        p.id_orden,
+        p.id_pago_externo,
+        p.monto_pagado,
+        p.fecha_pago,
+        pp.nombre_proveedor,
+        ep.nombre_estado_pago,
+        o.numero_orden,
+        o.total,
+        eo.nombre_estado_orden,
+        u.id_usuario,
+        u.nombre,
+        u.apellido_paterno,
+        u.apellido_materno,
+        u.correo,
+        COALESCE((
+          SELECT json_agg(
+            json_build_object(
+              'id_curso', c.id_curso,
+              'titulo', c.titulo,
+              'precio_unitario', od.precio_unitario,
+              'id_inscripcion', i.id_inscripcion
+            )
+            ORDER BY c.titulo ASC
+          )
+          FROM edutech.orden_detalle od
+          INNER JOIN edutech.curso c
+            ON c.id_curso = od.id_curso
+          LEFT JOIN edutech.inscripcion i
+            ON i.id_orden_detalle = od.id_orden_detalle
+          WHERE od.id_orden = o.id_orden
+        ), '[]'::json) AS cursos
+       FROM edutech.pago p
+       INNER JOIN edutech.proveedor_pago pp
+        ON pp.id_proveedor_pago = p.id_proveedor_pago
+       INNER JOIN edutech.estado_pago ep
+        ON ep.id_estado_pago = p.id_estado_pago
+       INNER JOIN edutech.orden o
+        ON o.id_orden = p.id_orden
+       INNER JOIN edutech.estado_orden eo
+        ON eo.id_estado_orden = o.id_estado_orden
+       INNER JOIN edutech.usuario u
+        ON u.id_usuario = o.id_usuario
+       ORDER BY p.fecha_pago DESC, p.id_pago DESC
+       LIMIT 80`
+    );
+
+    res.json({
+      ok: true,
+      pagos: resultado.rows
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: 'Error al cargar pagos.',
+      error: error.message
+    });
+  }
+};
+
+
 module.exports = {
   listarUsuariosAdmin,
   cambiarRolUsuarioAdmin,
   listarCursosRevisionAdmin,
   revisarCursoAdmin,
   obtenerCursoPreviewAdmin,
-  obtenerExamenPreviewAdmin
+  obtenerExamenPreviewAdmin,
+  crearSolicitudInstructor,
+  listarSolicitudesInstructorAdmin,
+  revisarSolicitudInstructorAdmin,
+  listarPagosAdmin
 };

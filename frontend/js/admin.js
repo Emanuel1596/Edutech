@@ -4,12 +4,17 @@
     usuarios: [],
     roles: [],
     cursosRevision: [],
+    solicitudesInstructor: [],
+    pagos: [],
     panelActual: 'dashboard',
     busqueda: '',
     filtroRol: 'todos',
     filtroCursosRevision: 'pendiente',
+    filtroSolicitudesInstructor: 'pendiente',
     cargandoUsuarios: false,
-    cargandoCursosRevision: false
+    cargandoCursosRevision: false,
+    cargandoSolicitudesInstructor: false,
+    cargandoPagos: false
   };
 
   const elementos = {
@@ -29,7 +34,12 @@
     totalAdministradores: document.getElementById('adminTotalAdministradores'),
     filtroCursosRevision: document.getElementById('adminFiltroCursosRevision'),
     recargarCursos: document.getElementById('adminRecargarCursos'),
-    cursosRevisionLista: document.getElementById('adminCursosRevisionLista')
+    cursosRevisionLista: document.getElementById('adminCursosRevisionLista'),
+    filtroSolicitudesInstructor: document.getElementById('adminFiltroSolicitudesInstructor'),
+    recargarSolicitudes: document.getElementById('adminRecargarSolicitudes'),
+    solicitudesInstructorLista: document.getElementById('adminSolicitudesInstructorLista'),
+    recargarPagos: document.getElementById('adminRecargarPagos'),
+    pagosLista: document.getElementById('adminPagosLista')
   };
 
   const normalizarTexto = (valor) => String(valor || '')
@@ -129,7 +139,7 @@
     });
 
     if (actualizarHash && window.location.hash !== `#${panelSeguro}`) {
-      window.history.pushState({ panel: panelSeguro }, '', `#${panelSeguro}`);
+      window.history.replaceState({ panel: panelSeguro }, '', `#${panelSeguro}`);
     }
 
     if (panelSeguro === 'usuarios' && estado.usuarios.length === 0 && !estado.cargandoUsuarios) {
@@ -138,6 +148,14 @@
 
     if (panelSeguro === 'cursos' && estado.cursosRevision.length === 0 && !estado.cargandoCursosRevision) {
       cargarCursosRevision();
+    }
+
+    if (panelSeguro === 'solicitudes' && estado.solicitudesInstructor.length === 0 && !estado.cargandoSolicitudesInstructor) {
+      cargarSolicitudesInstructor();
+    }
+
+    if (panelSeguro === 'pagos' && estado.pagos.length === 0 && !estado.cargandoPagos) {
+      cargarPagos();
     }
   };
 
@@ -610,6 +628,293 @@
     }
   };
 
+
+  const obtenerEstadoSolicitud = (solicitud) => normalizarTexto(solicitud.nombre_estado_solicitud || '');
+
+  const obtenerSolicitudesFiltradas = () => {
+    const filtro = normalizarTexto(estado.filtroSolicitudesInstructor || 'pendiente');
+
+    return estado.solicitudesInstructor.filter((solicitud) => {
+      if (filtro === 'todos') {
+        return true;
+      }
+
+      return obtenerEstadoSolicitud(solicitud) === filtro;
+    });
+  };
+
+  const crearSolicitudInstructorCard = (solicitud) => {
+    const estadoSolicitud = solicitud.nombre_estado_solicitud || 'pendiente';
+    const estadoNormalizado = normalizarTexto(estadoSolicitud);
+    const nombreCompleto = obtenerNombreCompleto({
+      nombre: solicitud.nombre,
+      apellido_paterno: solicitud.apellido_paterno,
+      apellido_materno: solicitud.apellido_materno,
+      correo: solicitud.correo
+    });
+    const puedeRevisar = estadoNormalizado === 'pendiente';
+    const claseEstado = estadoNormalizado === 'aceptada'
+      ? 'is-accepted'
+      : estadoNormalizado === 'rechazada'
+        ? 'is-rejected'
+        : '';
+
+    return `
+      <article class="admin-request-card" data-id-solicitud="${solicitud.id_solicitud_instructor}">
+        <div class="admin-request-main">
+          <div>
+            <p class="admin-request-status ${claseEstado}">${escaparHtml(estadoSolicitud)}</p>
+            <h3>${escaparHtml(nombreCompleto)}</h3>
+            <p>${escaparHtml(solicitud.motivo || 'Sin motivo registrado.')}</p>
+          </div>
+        </div>
+
+        <div class="admin-request-meta">
+          <span>Correo: ${escaparHtml(solicitud.correo || 'Sin correo')}</span>
+          <span>Rol actual: ${escaparHtml(solicitud.nombre_rol || 'Sin rol')}</span>
+          <span title="Área de experiencia">Área: ${escaparHtml(solicitud.area_experiencia || 'Sin área')}</span>
+          <span>Fecha: ${formatearFecha(solicitud.fecha_solicitud)}</span>
+        </div>
+
+        <div class="admin-request-block">
+          <strong>Experiencia</strong>
+          <p>${escaparHtml(solicitud.experiencia || 'Sin experiencia registrada.')}</p>
+        </div>
+
+        <div class="admin-request-block">
+          <strong>Evidencia</strong>
+          ${solicitud.evidencia_url ? `
+            <p><a class="admin-link-button" href="${escaparHtml(solicitud.evidencia_url)}" target="_blank" rel="noopener noreferrer">Abrir evidencia</a></p>
+          ` : '<p>Sin evidencia registrada.</p>'}
+        </div>
+
+        ${solicitud.comentario_revision ? `
+          <div class="admin-request-block">
+            <strong>Comentario de revisión</strong>
+            <p>${escaparHtml(solicitud.comentario_revision)}</p>
+          </div>
+        ` : ''}
+
+        <label class="mi-cuenta-field admin-field admin-request-comment-field">
+          <span>Comentario para la solicitud</span>
+          <textarea class="adminSolicitudComentario" rows="3" placeholder="Para rechazar, escribe un motivo de mínimo 5 caracteres. Para aceptar, puedes dejar una observación opcional." ${puedeRevisar ? '' : 'disabled'}></textarea>
+          <small class="error-message"></small>
+        </label>
+
+        <div class="admin-request-actions">
+          <button type="button" class="admin-link-button adminAceptarSolicitud" data-id-solicitud="${solicitud.id_solicitud_instructor}" ${puedeRevisar ? '' : 'disabled'}>
+            Aceptar solicitud
+          </button>
+          <button type="button" class="admin-link-button adminRechazarSolicitud" data-id-solicitud="${solicitud.id_solicitud_instructor}" ${puedeRevisar ? '' : 'disabled'}>
+            Rechazar solicitud
+          </button>
+        </div>
+      </article>
+    `;
+  };
+
+  const pintarSolicitudesInstructor = () => {
+    if (!elementos.solicitudesInstructorLista) {
+      return;
+    }
+
+    if (estado.cargandoSolicitudesInstructor) {
+      elementos.solicitudesInstructorLista.innerHTML = '<p class="admin-empty-text">Cargando solicitudes de instructor...</p>';
+      return;
+    }
+
+    const solicitudes = obtenerSolicitudesFiltradas();
+
+    if (estado.solicitudesInstructor.length === 0) {
+      elementos.solicitudesInstructorLista.innerHTML = '<p class="admin-empty-text">No hay solicitudes de instructor registradas.</p>';
+      return;
+    }
+
+    if (solicitudes.length === 0) {
+      elementos.solicitudesInstructorLista.innerHTML = '<p class="admin-empty-text">No hay solicitudes con ese filtro.</p>';
+      return;
+    }
+
+    elementos.solicitudesInstructorLista.innerHTML = solicitudes.map(crearSolicitudInstructorCard).join('');
+  };
+
+  const cargarSolicitudesInstructor = async () => {
+    const usuario = validarAdmin();
+
+    if (!usuario || estado.cargandoSolicitudesInstructor) {
+      return;
+    }
+
+    try {
+      estado.cargandoSolicitudesInstructor = true;
+      pintarSolicitudesInstructor();
+      ocultarMensaje();
+
+      const datos = await window.EduTech.apiRequest(`/admin/solicitudes-instructor?idAdmin=${encodeURIComponent(usuario.id_usuario)}`);
+
+      estado.solicitudesInstructor = Array.isArray(datos.solicitudes) ? datos.solicitudes : [];
+      estado.cargandoSolicitudesInstructor = false;
+      pintarSolicitudesInstructor();
+    } catch (error) {
+      estado.cargandoSolicitudesInstructor = false;
+      mostrarMensaje(error.message || 'No se pudieron cargar las solicitudes de instructor.', true);
+      pintarSolicitudesInstructor();
+    }
+  };
+
+  const revisarSolicitudInstructor = async (idSolicitud, accion, boton) => {
+    const usuario = validarAdmin();
+
+    if (!usuario) {
+      return;
+    }
+
+    const tarjeta = elementos.solicitudesInstructorLista?.querySelector(`.admin-request-card[data-id-solicitud="${idSolicitud}"]`);
+    const comentarioCampo = tarjeta?.querySelector('.adminSolicitudComentario');
+    const comentario = comentarioCampo ? comentarioCampo.value.trim() : '';
+
+    const comentarioError = tarjeta?.querySelector('.admin-request-comment-field .error-message');
+
+    if (comentarioCampo) {
+      comentarioCampo.classList.remove('is-invalid');
+    }
+
+    if (comentarioError) {
+      comentarioError.textContent = '';
+      comentarioError.style.display = 'none';
+    }
+
+    if (accion === 'rechazar' && comentario.length < 5) {
+      const mensaje = 'Para rechazar la solicitud escribe un motivo de al menos 5 caracteres.';
+      mostrarMensaje(mensaje, true);
+
+      if (comentarioCampo) {
+        comentarioCampo.classList.add('is-invalid');
+        comentarioCampo.focus();
+      }
+
+      if (comentarioError) {
+        comentarioError.textContent = mensaje;
+        comentarioError.style.display = 'block';
+      }
+
+      return;
+    }
+
+    try {
+      if (boton) {
+        boton.disabled = true;
+        boton.dataset.textoOriginal = boton.textContent;
+        boton.textContent = accion === 'aceptar' ? 'Aceptando...' : 'Rechazando...';
+      }
+
+      ocultarMensaje();
+
+      const datos = await window.EduTech.apiRequest(`/admin/solicitudes-instructor/${encodeURIComponent(idSolicitud)}/revision`, {
+        method: 'PATCH',
+        body: {
+          id_admin: usuario.id_usuario,
+          accion,
+          comentario
+        }
+      });
+
+      mostrarMensaje(datos.message || 'Solicitud revisada correctamente.');
+      await cargarSolicitudesInstructor();
+      await cargarUsuarios();
+    } catch (error) {
+      if (boton) {
+        boton.disabled = false;
+        boton.textContent = boton.dataset.textoOriginal || (accion === 'aceptar' ? 'Aceptar solicitud' : 'Rechazar solicitud');
+      }
+
+      mostrarMensaje(error.message || 'No se pudo revisar la solicitud.', true);
+    }
+  };
+
+  const obtenerNombreClientePago = (pago) => obtenerNombreCompleto({
+    nombre: pago.nombre,
+    apellido_paterno: pago.apellido_paterno,
+    apellido_materno: pago.apellido_materno,
+    correo: pago.correo
+  });
+
+  const crearPagoCard = (pago) => {
+    const estadoPago = pago.nombre_estado_pago || 'sin estado';
+    const estadoNormalizado = normalizarTexto(estadoPago);
+    const claseEstado = estadoNormalizado.includes('aprob') || estadoNormalizado.includes('complet')
+      ? 'is-approved'
+      : estadoNormalizado.includes('rechaz') || estadoNormalizado.includes('cancel') || estadoNormalizado.includes('fall')
+        ? 'is-failed'
+        : '';
+    const cursos = Array.isArray(pago.cursos) ? pago.cursos : [];
+
+    return `
+      <article class="admin-payment-card" data-id-pago="${pago.id_pago}">
+        <div class="admin-payment-main">
+          <div>
+            <p class="admin-payment-status ${claseEstado}">${escaparHtml(estadoPago)} · ${escaparHtml(pago.nombre_estado_orden || 'orden sin estado')}</p>
+            <h3>${escaparHtml(pago.numero_orden || `Orden ${pago.id_orden}`)}</h3>
+            <p>Cliente: ${escaparHtml(obtenerNombreClientePago(pago))} · ${escaparHtml(pago.correo || 'Sin correo')}</p>
+          </div>
+          <div class="admin-payment-total">
+            <span>Total pagado</span>
+            <strong>${formatearDinero(pago.monto_pagado || pago.total)}</strong>
+          </div>
+        </div>
+
+        <div class="admin-payment-meta">
+          <span>Proveedor: ${escaparHtml(pago.nombre_proveedor || 'Sin proveedor')}</span>
+          <span>ID externo: ${escaparHtml(pago.id_pago_externo || 'Sin referencia')}</span>
+          <span>Fecha: ${formatearFecha(pago.fecha_pago)}</span>
+          <span>Cursos: ${escaparHtml(cursos.map((curso) => curso.titulo).filter(Boolean).join(', ') || 'Sin cursos')}</span>
+        </div>
+      </article>
+    `;
+  };
+
+  const pintarPagos = () => {
+    if (!elementos.pagosLista) {
+      return;
+    }
+
+    if (estado.cargandoPagos) {
+      elementos.pagosLista.innerHTML = '<p class="admin-empty-text">Cargando pagos...</p>';
+      return;
+    }
+
+    if (estado.pagos.length === 0) {
+      elementos.pagosLista.innerHTML = '<p class="admin-empty-text">No hay pagos registrados.</p>';
+      return;
+    }
+
+    elementos.pagosLista.innerHTML = estado.pagos.map(crearPagoCard).join('');
+  };
+
+  const cargarPagos = async () => {
+    const usuario = validarAdmin();
+
+    if (!usuario || estado.cargandoPagos) {
+      return;
+    }
+
+    try {
+      estado.cargandoPagos = true;
+      pintarPagos();
+      ocultarMensaje();
+
+      const datos = await window.EduTech.apiRequest(`/admin/pagos?idAdmin=${encodeURIComponent(usuario.id_usuario)}`);
+
+      estado.pagos = Array.isArray(datos.pagos) ? datos.pagos : [];
+      estado.cargandoPagos = false;
+      pintarPagos();
+    } catch (error) {
+      estado.cargandoPagos = false;
+      mostrarMensaje(error.message || 'No se pudieron cargar los pagos.', true);
+      pintarPagos();
+    }
+  };
+
   const configurarEventos = () => {
     elementos.navLinks.forEach((link) => {
       link.addEventListener('click', (evento) => {
@@ -680,6 +985,37 @@
           revisarCurso(botonRechazar.dataset.idCurso, 'rechazar', botonRechazar);
         }
       });
+    }
+
+    if (elementos.filtroSolicitudesInstructor) {
+      elementos.filtroSolicitudesInstructor.addEventListener('change', () => {
+        estado.filtroSolicitudesInstructor = elementos.filtroSolicitudesInstructor.value || 'pendiente';
+        pintarSolicitudesInstructor();
+      });
+    }
+
+    if (elementos.recargarSolicitudes) {
+      elementos.recargarSolicitudes.addEventListener('click', cargarSolicitudesInstructor);
+    }
+
+    if (elementos.solicitudesInstructorLista) {
+      elementos.solicitudesInstructorLista.addEventListener('click', (evento) => {
+        const botonAceptar = evento.target.closest('.adminAceptarSolicitud');
+        const botonRechazar = evento.target.closest('.adminRechazarSolicitud');
+
+        if (botonAceptar) {
+          revisarSolicitudInstructor(botonAceptar.dataset.idSolicitud, 'aceptar', botonAceptar);
+          return;
+        }
+
+        if (botonRechazar) {
+          revisarSolicitudInstructor(botonRechazar.dataset.idSolicitud, 'rechazar', botonRechazar);
+        }
+      });
+    }
+
+    if (elementos.recargarPagos) {
+      elementos.recargarPagos.addEventListener('click', cargarPagos);
     }
 
     if (elementos.cerrarSesion) {

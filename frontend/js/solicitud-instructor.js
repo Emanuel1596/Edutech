@@ -1,35 +1,53 @@
 const formularioInstructor = document.getElementById('instructorRequestForm');
 
+const correoBaseInstructor = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+const dominiosCorreoInstructor = ['com', 'net', 'org', 'edu', 'mx', 'com.mx', 'edu.mx', 'gob.mx', 'gov'];
+
+const correoInstructorValido = (correo) => {
+  const valor = String(correo || '').trim().toLowerCase();
+
+  if (!correoBaseInstructor.test(valor) || valor.includes('..')) {
+    return false;
+  }
+
+  const dominio = valor.split('@')[1] || '';
+  return dominiosCorreoInstructor.some((terminacion) => dominio === terminacion || dominio.endsWith(`.${terminacion}`));
+};
+
 const reglasInstructor = {
   instructorNombre: {
     patron: /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+$/,
-    mensajeVacio: 'Escribe tu nombre completo.',
+    mensajeVacio: 'Inicia sesión para cargar tu nombre.',
     mensajeInvalido: 'El nombre solo puede contener letras, espacios, acentos y ñ.'
   },
   instructorCorreo: {
-    patron: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-    mensajeVacio: 'Escribe tu correo electrónico.',
-    mensajeInvalido: 'Escribe un correo electrónico válido.'
+    validar: correoInstructorValido,
+    mensajeVacio: 'Inicia sesión para cargar tu correo electrónico.',
+    mensajeInvalido: 'Escribe un correo electrónico válido. Usa un dominio como .com, .net, .org o .mx.'
   },
   instructorArea: {
     minimo: 3,
+    maximo: 60,
     mensajeVacio: 'Escribe tu área de experiencia.',
-    mensajeInvalido: 'El área de experiencia debe tener al menos 3 caracteres.'
+    mensajeInvalido: 'El área de experiencia debe tener entre 3 y 60 caracteres.'
   },
   instructorExperiencia: {
     minimo: 10,
+    maximo: 500,
     mensajeVacio: 'Describe tu experiencia.',
-    mensajeInvalido: 'Describe tu experiencia con al menos 10 caracteres.'
+    mensajeInvalido: 'Describe tu experiencia con entre 10 y 500 caracteres.'
   },
   instructorEvidencia: {
     patron: /^(https?:\/\/)[^\s]+\.[^\s]+$/,
+    maximo: 200,
     mensajeVacio: 'Agrega un enlace como evidencia.',
-    mensajeInvalido: 'Agrega un enlace válido que empiece con http:// o https://.'
+    mensajeInvalido: 'Agrega un enlace válido de máximo 200 caracteres que empiece con http:// o https://.'
   },
   instructorMotivo: {
     minimo: 10,
+    maximo: 300,
     mensajeVacio: 'Escribe el motivo de tu solicitud.',
-    mensajeInvalido: 'El motivo debe tener al menos 10 caracteres.'
+    mensajeInvalido: 'El motivo debe tener entre 10 y 300 caracteres.'
   }
 };
 
@@ -108,6 +126,16 @@ const validarCampoInstructor = (campo, mostrarVacio = false) => {
     return false;
   }
 
+  if (regla.maximo && valor.length > regla.maximo) {
+    mostrarErrorInstructor(campo, regla.mensajeInvalido);
+    return false;
+  }
+
+  if (regla.validar && !regla.validar(valor)) {
+    mostrarErrorInstructor(campo, regla.mensajeInvalido);
+    return false;
+  }
+
   if (regla.patron && !regla.patron.test(valor)) {
     mostrarErrorInstructor(campo, regla.mensajeInvalido);
     return false;
@@ -121,7 +149,7 @@ const activarValidacionInstructor = () => {
   Object.keys(reglasInstructor).forEach((id) => {
     const campo = obtenerCampoInstructor(id);
 
-    if (!campo) {
+    if (!campo || campo.readOnly) {
       return;
     }
 
@@ -153,28 +181,92 @@ const limpiarFormularioInstructor = () => {
   });
 };
 
-const crearSolicitudInstructor = () => {
-  return {
-    nombre_completo: obtenerCampoInstructor('instructorNombre').value.trim(),
-    correo: obtenerCampoInstructor('instructorCorreo').value.trim(),
-    area_experiencia: obtenerCampoInstructor('instructorArea').value.trim(),
-    experiencia: obtenerCampoInstructor('instructorExperiencia').value.trim(),
-    evidencia: obtenerCampoInstructor('instructorEvidencia').value.trim(),
-    motivo: obtenerCampoInstructor('instructorMotivo').value.trim(),
-    estado: 'pendiente',
-    fecha: new Date().toISOString()
-  };
+const obtenerUsuarioSesionInstructor = () => {
+  if (window.EduTech && typeof window.EduTech.obtenerUsuarioSesion === 'function') {
+    return window.EduTech.obtenerUsuarioSesion();
+  }
+
+  try {
+    return JSON.parse(localStorage.getItem('edutech_usuario') || 'null');
+  } catch (error) {
+    return null;
+  }
 };
+
+const obtenerNombreCompletoUsuario = (usuario) => [
+  usuario?.nombre,
+  usuario?.apellido_paterno,
+  usuario?.apellido_materno
+].filter(Boolean).join(' ').trim();
+
+const bloquearFormularioInstructor = (bloqueado) => {
+  if (!formularioInstructor) {
+    return;
+  }
+
+  Array.from(formularioInstructor.elements).forEach((campo) => {
+    campo.disabled = bloqueado;
+  });
+};
+
+const prepararSesionInstructor = () => {
+  const usuario = obtenerUsuarioSesionInstructor();
+  const sesionActiva = window.EduTech && typeof window.EduTech.haySesionActiva === 'function'
+    ? window.EduTech.haySesionActiva()
+    : localStorage.getItem('edutech_sesion_activa') === 'true';
+
+  if (!usuario || !sesionActiva) {
+    if (window.EduTech && typeof window.EduTech.guardarRedirectDespuesLogin === 'function') {
+      window.EduTech.guardarRedirectDespuesLogin('solicitud-instructor.html');
+    } else {
+      sessionStorage.setItem('edutech_redirect_post_login', 'solicitud-instructor.html');
+    }
+
+    sessionStorage.setItem('edutech_mensaje_acceso', 'Inicia sesión para enviar la solicitud de instructor.');
+    window.location.replace('login.html');
+    return null;
+  }
+
+  const nombreCampo = obtenerCampoInstructor('instructorNombre');
+  const correoCampo = obtenerCampoInstructor('instructorCorreo');
+
+  if (nombreCampo) {
+    nombreCampo.value = obtenerNombreCompletoUsuario(usuario) || usuario.correo || '';
+  }
+
+  if (correoCampo) {
+    correoCampo.value = usuario.correo || '';
+  }
+
+  return usuario;
+};
+
+const crearSolicitudInstructor = (usuario) => ({
+  id_usuario: usuario.id_usuario || usuario.id || usuario.idUsuario,
+  area_experiencia: obtenerCampoInstructor('instructorArea').value.trim(),
+  experiencia: obtenerCampoInstructor('instructorExperiencia').value.trim(),
+  evidencia: obtenerCampoInstructor('instructorEvidencia').value.trim(),
+  motivo: obtenerCampoInstructor('instructorMotivo').value.trim()
+});
 
 if (formularioInstructor) {
   activarValidacionInstructor();
 
-  formularioInstructor.addEventListener('submit', (evento) => {
+  const usuarioSesion = prepararSesionInstructor();
+
+  formularioInstructor.addEventListener('submit', async (evento) => {
     evento.preventDefault();
 
+    const usuario = obtenerUsuarioSesionInstructor();
     const campos = Object.keys(reglasInstructor).map(obtenerCampoInstructor);
     const formularioValido = campos.every((campo) => validarCampoInstructor(campo, true));
     const mensajeExito = document.getElementById('instructorSuccess');
+    const boton = formularioInstructor.querySelector('button[type="submit"]');
+
+    if (!usuario || !usuarioSesion) {
+      prepararSesionInstructor();
+      return;
+    }
 
     if (!formularioValido) {
       if (mensajeExito) {
@@ -185,19 +277,38 @@ if (formularioInstructor) {
       return;
     }
 
-    const solicitud = crearSolicitudInstructor();
-    const solicitudesGuardadas = JSON.parse(localStorage.getItem('edutech_solicitudes_instructor') || '[]');
+    try {
+      if (boton) {
+        boton.disabled = true;
+        boton.dataset.textoOriginal = boton.textContent;
+        boton.textContent = 'Enviando solicitud...';
+      }
 
-    solicitudesGuardadas.push(solicitud);
-    localStorage.setItem('edutech_solicitudes_instructor', JSON.stringify(solicitudesGuardadas));
+      const datos = await window.EduTech.apiRequest('/solicitudes-instructor', {
+        method: 'POST',
+        body: crearSolicitudInstructor(usuario)
+      });
 
-    formularioInstructor.reset();
-    limpiarFormularioInstructor();
+      formularioInstructor.reset();
+      limpiarFormularioInstructor();
+      prepararSesionInstructor();
 
-    if (mensajeExito) {
-      mensajeExito.classList.add('is-visible');
-      mensajeExito.style.display = 'block';
-      mensajeExito.textContent = 'Solicitud enviada para revisión. El administrador revisará la información antes de habilitar el modo instructor.';
+      if (mensajeExito) {
+        mensajeExito.classList.add('is-visible');
+        mensajeExito.style.display = 'block';
+        mensajeExito.textContent = datos.message || 'Solicitud enviada para revisión. El administrador revisará la información.';
+      }
+    } catch (error) {
+      if (mensajeExito) {
+        mensajeExito.classList.add('is-visible');
+        mensajeExito.style.display = 'block';
+        mensajeExito.textContent = error.message || 'No se pudo enviar la solicitud. Intenta nuevamente.';
+      }
+    } finally {
+      if (boton) {
+        boton.disabled = false;
+        boton.textContent = boton.dataset.textoOriginal || 'Enviar solicitud';
+      }
     }
   });
 }

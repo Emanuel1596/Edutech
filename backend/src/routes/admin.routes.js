@@ -5,13 +5,22 @@ const {
   listarCursosRevisionAdmin,
   revisarCursoAdmin,
   obtenerCursoPreviewAdmin,
-  obtenerExamenPreviewAdmin
+  obtenerExamenPreviewAdmin,
+  crearSolicitudInstructor,
+  listarSolicitudesInstructorAdmin,
+  revisarSolicitudInstructorAdmin,
+  listarPagosAdmin
 } = require('../controllers/admin.controller');
 
 const router = express.Router();
 
 router.get('/admin/usuarios', listarUsuariosAdmin);
 router.patch('/admin/usuarios/:idUsuario/rol', cambiarRolUsuarioAdmin);
+
+router.post('/solicitudes-instructor', crearSolicitudInstructor);
+router.get('/admin/solicitudes-instructor', listarSolicitudesInstructorAdmin);
+router.patch('/admin/solicitudes-instructor/:idSolicitud/revision', revisarSolicitudInstructorAdmin);
+router.get('/admin/pagos', listarPagosAdmin);
 
 router.get('/admin/cursos-revision', listarCursosRevisionAdmin);
 router.get('/admin/cursos/:idCurso/preview', obtenerCursoPreviewAdmin);

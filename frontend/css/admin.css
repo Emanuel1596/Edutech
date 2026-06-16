@@ -434,3 +434,316 @@
 .adminPreviewCurso {
   text-decoration: none !important;
 }
+
+/* Paso 27.7 - Admin: navegación limpia, solicitudes y pagos reales */
+.admin-site .header-container {
+  max-width: 1280px;
+}
+
+.admin-site .main-navigation {
+  margin-left: auto;
+}
+
+.admin-site .admin-main-menu {
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.admin-site .admin-main-menu a {
+  color: #04e2ff;
+}
+
+.admin-site .admin-main-menu a:hover,
+.admin-site .admin-main-menu a:focus {
+  color: #ffffff;
+}
+
+.admin-request-list,
+.admin-payments-list {
+  display: grid;
+  gap: 18px;
+}
+
+.admin-request-card,
+.admin-payment-card {
+  border: 1px solid #34405f;
+  background: rgba(16, 19, 31, .42);
+  padding: 20px;
+}
+
+.admin-request-main,
+.admin-payment-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: start;
+}
+
+.admin-request-main h3,
+.admin-payment-main h3 {
+  margin: 0 0 8px;
+  color: #ffffff;
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 400;
+}
+
+.admin-request-main p,
+.admin-payment-main p {
+  margin: 0;
+  color: #d9e7ff;
+  line-height: 1.5;
+}
+
+.admin-request-status,
+.admin-payment-status {
+  margin: 0 0 8px;
+  color: #04e2ff;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.admin-request-status.is-rejected,
+.admin-payment-status.is-failed {
+  color: #ff6f8a;
+}
+
+.admin-request-status.is-accepted,
+.admin-payment-status.is-approved {
+  color: #7dffa2;
+}
+
+.admin-request-meta,
+.admin-payment-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin: 16px 0 0;
+  color: #c8dcf6;
+  font-size: 14px;
+}
+
+.admin-request-meta span,
+.admin-payment-meta span {
+  border: 1px solid rgba(125, 150, 214, .24);
+  padding: 7px 10px;
+  background: rgba(4, 226, 255, .035);
+}
+
+.admin-request-block {
+  margin-top: 16px;
+  padding: 14px;
+  border: 1px solid rgba(125, 150, 214, .22);
+  background: rgba(11, 14, 24, .45);
+}
+
+.admin-request-block strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #ffffff;
+}
+
+.admin-request-block p {
+  margin: 0;
+  color: #d9e7ff;
+  line-height: 1.55;
+}
+
+.admin-request-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  margin-top: 18px;
+}
+
+.admin-request-actions .admin-link-button[disabled] {
+  color: #7d849c;
+  cursor: not-allowed;
+}
+
+.admin-request-comment-field {
+  margin-top: 16px;
+}
+
+.admin-request-comment-field textarea {
+  width: 100%;
+  min-height: 92px;
+  color: #ffffff;
+  background: #1b1d26;
+  border: 1px solid #34405f;
+  padding: 12px 14px;
+  font: inherit;
+  outline: none;
+  resize: vertical;
+}
+
+.admin-request-comment-field textarea:focus {
+  border-color: #04e2ff;
+  box-shadow: 0 0 0 2px rgba(4, 226, 255, .12);
+}
+
+.admin-payment-total {
+  border: 1px solid rgba(4, 226, 255, .25);
+  background: rgba(4, 226, 255, .045);
+  padding: 12px 14px;
+  min-width: 140px;
+  text-align: right;
+}
+
+.admin-payment-total span {
+  display: block;
+  color: #d9e7ff;
+  font-size: 13px;
+}
+
+.admin-payment-total strong {
+  display: block;
+  color: #04e2ff;
+  font-size: 24px;
+  font-weight: 400;
+}
+
+@media (max-width: 720px) {
+  .admin-request-main,
+  .admin-payment-main {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-payment-total {
+    text-align: left;
+  }
+}
+
+
+/* Paso 27.8 - Ajustes finos del panel admin */
+.admin-site .header-container {
+  max-width: 1280px;
+  padding-left: 24px;
+  padding-right: 0;
+}
+
+.admin-site .main-navigation {
+  margin-left: auto;
+  transform: translateX(14px);
+}
+
+.admin-site .admin-main-menu {
+  width: 100%;
+  justify-content: flex-end;
+  gap: 0;
+}
+
+.admin-site .admin-main-menu li:not(.menu-account-item) {
+  display: none !important;
+}
+
+.admin-site .admin-main-menu .menu-account-item {
+  margin-left: auto;
+}
+
+.admin-site .admin-main-menu .menu-account-item a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  color: #04e2ff;
+}
+
+#panel-solicitudes .admin-review-tools {
+  margin-top: 46px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 920px) {
+  .admin-site .header-container {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  #panel-solicitudes .admin-review-tools {
+    margin-top: 32px;
+  }
+}
+
+
+/* Paso 27.8b - Ajuste pedido: Admin más a la derecha y filtro más abajo */
+.admin-site .header-container {
+  padding-right: 0 !important;
+}
+
+.admin-site .main-navigation {
+  transform: translateX(18px);
+}
+
+#panel-solicitudes .admin-review-tools {
+  margin-top: 46px !important;
+}
+
+@media (max-width: 920px) {
+  .admin-site .main-navigation {
+    transform: none;
+  }
+
+  #panel-solicitudes .admin-review-tools {
+    margin-top: 32px !important;
+  }
+}
+
+/* Paso 27.8c - Alinear Admin con el botón Recargar solicitudes */
+.admin-site .main-navigation {
+  transform: translateX(-78px) !important;
+}
+
+@media (max-width: 920px) {
+  .admin-site .main-navigation {
+    transform: none !important;
+  }
+}
+
+/* Paso 27.8d - Alinear el borde derecho de Admin con Recargar solicitudes */
+.admin-site .main-navigation {
+  transform: translateX(-5px) !important;
+}
+
+@media (max-width: 920px) {
+  .admin-site .main-navigation {
+    transform: none !important;
+  }
+}
+
+
+/* Paso 28.6 - Solicitudes: textos controlados y foco oscuro */
+.admin-request-meta span {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.admin-request-block p,
+.admin-request-main p {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.admin-request-comment-field .error-message {
+  display: none;
+  margin-top: 8px;
+  color: #ffb3b3;
+}
+
+.admin-request-comment-field textarea.is-invalid {
+  border-color: #ff4d5a !important;
+  box-shadow: none !important;
+}
+
+.admin-request-comment-field textarea:focus {
+  background: #1b1d26 !important;
+  color: #ffffff !important;
+}
+
+#panel-solicitudes select,
+#panel-solicitudes select:focus {
+  background: #111422 !important;
+  color: #ffffff !important;
+}
