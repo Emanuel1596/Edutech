@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Administrador - EduTech</title>
+  <script src="js/session-guard.js"></script>
+  <meta name="description" content="Escritorio del administrador para gestionar EduTech.">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/admin.css?v=23-1">
+</head>
+<body class="edutech-data-pending edutech-data-loading">
+  <div class="site student-site admin-site" id="page">
+    <header class="site-header">
+      <div class="header-container">
+        <a href="index.html" class="logo" aria-label="EduTech">
+          <span class="logo-main">Edu</span><span class="logo-accent">Tech</span>
+        </a>
+
+        <button class="menu-toggle" type="button" aria-label="Abrir menú">☰</button>
+
+        <nav class="main-navigation" aria-label="Menú principal">
+          <ul class="main-menu">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="cursos.html">Cursos</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="registro.html">Registro</a></li>
+            <li><a href="login.html">Iniciar sesión</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="mi-cuenta-page admin-page">
+      <section class="mi-cuenta-section">
+        <div class="mi-cuenta-container">
+          <h1 class="mi-cuenta-title">Administrador</h1>
+
+          <div class="mi-cuenta-layout">
+            <aside aria-label="Menú del administrador">
+              <nav class="mi-cuenta-nav admin-nav">
+                <a href="#dashboard" class="mi-cuenta-link active" data-panel="dashboard">Escritorio</a>
+                <a href="#usuarios" class="mi-cuenta-link" data-panel="usuarios">Usuarios</a>
+                <a href="#cursos" class="mi-cuenta-link" data-panel="cursos">Cursos por revisar</a>
+                <a href="#pagos" class="mi-cuenta-link" data-panel="pagos">Pagos</a>
+                <a href="index.html" class="mi-cuenta-link" id="adminCerrarSesion">Cerrar sesión</a>
+              </nav>
+            </aside>
+
+            <div class="mi-cuenta-content admin-content">
+              <p class="admin-message" id="adminMensaje" style="display: none;"></p>
+
+              <section class="mi-cuenta-panel admin-panel active" id="panel-dashboard">
+                <h2 class="mi-cuenta-panel-title">Escritorio</h2>
+
+                <div class="mi-cuenta-box admin-profile-box">
+                  <h3 class="mi-cuenta-box-title" id="adminNombre">Administrador</h3>
+                  <p class="mi-cuenta-plain-text" id="adminCorreo">Cargando datos...</p>
+                  <p class="mi-cuenta-plain-text">Desde este panel se administran usuarios, roles, cursos y pagos de EduTech.</p>
+                </div>
+
+                <div class="admin-dashboard-grid">
+                  <article class="admin-stat-card">
+                    <span>Total usuarios</span>
+                    <strong id="adminTotalUsuarios">—</strong>
+                  </article>
+                  <article class="admin-stat-card">
+                    <span>Alumnos</span>
+                    <strong id="adminTotalAlumnos">—</strong>
+                  </article>
+                  <article class="admin-stat-card">
+                    <span>Instructores</span>
+                    <strong id="adminTotalInstructores">—</strong>
+                  </article>
+                  <article class="admin-stat-card">
+                    <span>Administradores</span>
+                    <strong id="adminTotalAdministradores">—</strong>
+                  </article>
+                </div>
+
+                <div class="mi-cuenta-box">
+                  <h3 class="mi-cuenta-box-title">Siguiente módulo</h3>
+                  <p class="mi-cuenta-plain-text">Después de usuarios, sigue revisar cursos pendientes para aprobarlos o rechazarlos.</p>
+                </div>
+              </section>
+
+              <section class="mi-cuenta-panel admin-panel" id="panel-usuarios" hidden>
+                <div class="admin-panel-head">
+                  <div>
+                    <h2 class="mi-cuenta-panel-title">Usuarios</h2>
+                    <p class="mi-cuenta-plain-text">Consulta los usuarios registrados y cambia su rol sin usar comandos SQL.</p>
+                  </div>
+                  <button type="button" class="admin-link-button" id="adminRecargarUsuarios">Recargar usuarios</button>
+                </div>
+
+                <div class="admin-users-tools">
+                  <label class="mi-cuenta-field admin-field">
+                    <span>Buscar usuario</span>
+                    <input type="text" id="adminBuscarUsuario" autocomplete="off" placeholder="Nombre o correo">
+                    <small class="error-message"></small>
+                  </label>
+
+                  <label class="mi-cuenta-field admin-field">
+                    <span>Filtrar por rol</span>
+                    <select id="adminFiltroRol">
+                      <option value="todos">Todos</option>
+                      <option value="Alumno">Alumno</option>
+                      <option value="Instructor">Instructor</option>
+                      <option value="Administrador">Administrador</option>
+                    </select>
+                    <small class="error-message"></small>
+                  </label>
+                </div>
+
+                <div class="admin-table-wrap">
+                  <table class="admin-users-table">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Usuario</th>
+                        <th>Correo</th>
+                        <th>Rol actual</th>
+                        <th>Estado</th>
+                        <th>Cambiar rol</th>
+                        <th>Acción</th>
+                      </tr>
+                    </thead>
+                    <tbody id="adminUsuariosTabla">
+                      <tr>
+                        <td colspan="7">Cargando usuarios...</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+              <section class="mi-cuenta-panel admin-panel" id="panel-cursos" hidden>
+                <div class="admin-panel-head">
+                  <div>
+                    <h2 class="mi-cuenta-panel-title">Cursos por revisar</h2>
+                    <p class="mi-cuenta-plain-text">
+                      Revisa los cursos enviados por instructores. Puedes aprobarlos para publicarlos o rechazarlos con un motivo.
+                    </p>
+                  </div>
+                  <button type="button" class="admin-link-button" id="adminRecargarCursos">Recargar cursos</button>
+                </div>
+
+                <div class="admin-review-tools">
+                  <label class="mi-cuenta-field admin-field">
+                    <span>Filtrar cursos</span>
+                    <select id="adminFiltroCursosRevision">
+                      <option value="pendiente">Pendientes</option>
+                      <option value="todos">Todos</option>
+                      <option value="aprobada">Aprobados</option>
+                      <option value="rechazada">Rechazados</option>
+                    </select>
+                    <small class="error-message"></small>
+                  </label>
+                </div>
+
+                <div class="admin-review-list" id="adminCursosRevisionLista">
+                  <p class="admin-empty-text">Cargando cursos por revisar...</p>
+                </div>
+              </section>
+
+              <section class="mi-cuenta-panel admin-panel" id="panel-pagos" hidden>
+                <h2 class="mi-cuenta-panel-title">Pagos</h2>
+                <div class="mi-cuenta-box">
+                  <h3 class="mi-cuenta-box-title">Pendiente</h3>
+                  <p class="mi-cuenta-plain-text">Este módulo queda reservado para revisar pagos, pedidos y estados de compra.</p>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>EduTech - Plataforma Web de Cursos</p>
+    </footer>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

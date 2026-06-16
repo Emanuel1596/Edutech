@@ -1,0 +1,436 @@
+.admin-site .mi-cuenta-page {
+  background: #11131f;
+}
+
+.admin-message {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  color: #d8f7ff;
+  background: rgba(4, 226, 255, .08);
+  border: 1px solid rgba(4, 226, 255, .25);
+}
+
+.admin-message-error {
+  color: #ffd6d6;
+  background: rgba(255, 82, 82, .08);
+  border-color: rgba(255, 82, 82, .24);
+}
+
+.admin-panel[hidden] {
+  display: none !important;
+}
+
+.admin-panel-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.admin-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0 0 20px;
+}
+
+.admin-stat-card {
+  border: 1px solid #34405f;
+  background: rgba(16, 19, 31, .42);
+  padding: 18px;
+}
+
+.admin-stat-card span {
+  display: block;
+  color: #d9e7ff;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.admin-stat-card strong {
+  display: block;
+  color: #04e2ff;
+  font-size: 28px;
+  font-weight: 400;
+}
+
+.admin-users-tools {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(220px, 280px);
+  gap: 18px;
+  align-items: start;
+  margin: 0 0 20px;
+}
+
+.admin-field {
+  margin: 0;
+}
+
+.admin-field input,
+.admin-field select,
+.admin-role-select {
+  width: 100%;
+  min-height: 52px;
+  color: #ffffff;
+  background: #1b1d26;
+  border: 1px solid #34405f;
+  padding: 0 14px;
+  font: inherit;
+  outline: none;
+}
+
+.admin-field input:focus,
+.admin-field select:focus,
+.admin-role-select:focus {
+  border-color: #04e2ff;
+  box-shadow: 0 0 0 2px rgba(4, 226, 255, .12);
+}
+
+.admin-link-button,
+.admin-table-button {
+  border: 0;
+  background: transparent;
+  color: #04e2ff;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.admin-link-button:hover,
+.admin-link-button:focus,
+.admin-table-button:hover,
+.admin-table-button:focus {
+  color: #ffffff;
+}
+
+.admin-table-button:disabled,
+.admin-role-select:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #34405f;
+  background: rgba(16, 19, 31, .35);
+}
+
+.admin-users-table {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: collapse;
+  color: #ffffff;
+}
+
+.admin-users-table th,
+.admin-users-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(125, 150, 214, .22);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.admin-users-table th {
+  color: #d9e7ff;
+  font-weight: 700;
+  background: rgba(4, 226, 255, .045);
+}
+
+.admin-users-table tbody tr:hover {
+  background: rgba(4, 226, 255, .035);
+}
+
+.admin-role-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid rgba(4, 226, 255, .26);
+  color: #04e2ff;
+  background: rgba(4, 226, 255, .06);
+}
+
+.admin-current-user {
+  display: inline-block;
+  margin-top: 6px;
+  color: #ffdf9e;
+  font-size: 13px;
+}
+
+@media (max-width: 920px) {
+  .admin-dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-users-tools {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-panel-head {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 560px) {
+  .admin-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Paso 23.2 - Carga estable, rol sin cuadro y botón limpio */
+.admin-loading-row td {
+  background: #1b1d26 !important;
+}
+
+.admin-role-text {
+  color: #ffffff;
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+  font-weight: 400;
+}
+
+.admin-table-button {
+  white-space: nowrap !important;
+  min-width: 86px;
+  text-align: center;
+}
+
+.admin-users-table th:nth-child(7),
+.admin-users-table td:nth-child(7) {
+  width: 120px;
+}
+
+.admin-users-table th:nth-child(4),
+.admin-users-table td:nth-child(4),
+.admin-users-table th:nth-child(5),
+.admin-users-table td:nth-child(5) {
+  white-space: nowrap;
+}
+
+/* Por si el navegador trae CSS viejo en caché, esto deja el rol sin cuadro de todos modos. */
+.admin-role-pill {
+  border: 0 !important;
+  background: transparent !important;
+  color: #ffffff !important;
+  padding: 0 !important;
+}
+
+
+/* Paso 23.3 - Cursos por revisar */
+.admin-review-tools {
+  max-width: 320px;
+  margin: 0 0 20px;
+}
+
+.admin-review-list {
+  display: grid;
+  gap: 18px;
+}
+
+.admin-empty-text {
+  margin: 0;
+  padding: 18px;
+  color: #d9e7ff;
+  border: 1px solid #34405f;
+  background: #1b1d26;
+}
+
+.admin-review-card {
+  border: 1px solid #34405f;
+  background: rgba(16, 19, 31, .42);
+  padding: 20px;
+}
+
+.admin-review-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: start;
+}
+
+.admin-review-status {
+  margin: 0 0 8px;
+  color: #04e2ff;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.admin-review-main h3 {
+  margin: 0 0 8px;
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 400;
+}
+
+.admin-review-main p {
+  margin: 0;
+  color: #d9e7ff;
+  line-height: 1.5;
+}
+
+.admin-review-price {
+  border: 1px solid rgba(4, 226, 255, .25);
+  background: rgba(4, 226, 255, .045);
+  padding: 12px 14px;
+  min-width: 130px;
+}
+
+.admin-review-price span {
+  display: block;
+  color: #d9e7ff;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.admin-review-price strong {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.admin-review-meta,
+.admin-review-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.admin-review-meta span,
+.admin-review-metrics span {
+  border: 1px solid rgba(125, 150, 214, .22);
+  color: #ffffff;
+  background: #1b1d26;
+  padding: 10px 12px;
+}
+
+.admin-review-last-comment {
+  margin-top: 16px;
+  padding: 12px 14px;
+  color: #d9e7ff;
+  border: 1px solid rgba(125, 150, 214, .22);
+  background: #1b1d26;
+}
+
+.admin-review-last-comment strong {
+  color: #ffffff;
+}
+
+.admin-review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(125, 150, 214, .22);
+}
+
+.admin-review-actions .admin-link-button:disabled {
+  color: #7f879b;
+  cursor: not-allowed;
+}
+
+.admin-review-comment-field {
+  margin-top: 16px;
+}
+
+.admin-review-comment-field textarea {
+  width: 100%;
+  min-height: 90px;
+  color: #ffffff;
+  background: #1b1d26;
+  border: 1px solid #34405f;
+  padding: 12px 14px;
+  font: inherit;
+  resize: vertical;
+  outline: none;
+}
+
+.admin-review-comment-field textarea:focus {
+  border-color: #04e2ff;
+  box-shadow: 0 0 0 2px rgba(4, 226, 255, .12);
+}
+
+.admin-review-detail[hidden] {
+  display: none !important;
+}
+
+.admin-review-detail {
+  margin-top: 18px;
+  border-top: 1px solid rgba(125, 150, 214, .22);
+  padding-top: 16px;
+}
+
+.admin-review-modules {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-review-module {
+  border: 1px solid rgba(125, 150, 214, .22);
+  background: #1b1d26;
+  padding: 14px;
+}
+
+.admin-review-module h4 {
+  margin: 0 0 10px;
+  color: #04e2ff;
+  font-weight: 400;
+}
+
+.admin-review-module ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #d9e7ff;
+}
+
+.admin-review-module li + li {
+  margin-top: 6px;
+}
+
+.admin-review-muted {
+  color: #d9e7ff;
+  margin: 0;
+}
+
+@media (max-width: 760px) {
+  .admin-review-main {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-review-price {
+    width: fit-content;
+  }
+}
+
+
+/* Paso 23.4 - Ajustes panel revisión y vistas previas */
+.admin-review-price {
+  border: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+  min-width: auto !important;
+}
+
+.admin-review-price span {
+  color: #d9e7ff !important;
+}
+
+.admin-review-price strong {
+  color: #ffffff !important;
+}
+
+.admin-review-actions {
+  margin-bottom: 24px !important;
+}
+
+.admin-review-comment-field {
+  margin-top: 24px !important;
+}
+
+.adminPreviewCurso {
+  text-decoration: none !important;
+}
