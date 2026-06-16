@@ -1,3 +1,9 @@
+const marcarPaginaDatosLista = () => {
+  if (window.EduTechMarcarPaginaLista) {
+    window.EduTechMarcarPaginaLista();
+  }
+};
+
 const cursosGrid = document.getElementById('cursosGrid');
 const cursosMensaje = document.getElementById('cursosMensaje');
 
@@ -56,6 +62,52 @@ const obtenerIdCurso = (curso) => {
   return id;
 };
 
+
+const obtenerCursosCompradosIds = () => {
+  const idsGuardados = localStorage.getItem('edutech_cursos_comprados_ids');
+
+  if (idsGuardados) {
+    try {
+      const ids = JSON.parse(idsGuardados);
+
+      if (Array.isArray(ids)) {
+        return ids.map((id) => String(id));
+      }
+    } catch (error) {
+      return [];
+    }
+  }
+
+  const cursosGuardados = localStorage.getItem('edutech_mis_cursos');
+
+  if (!cursosGuardados) {
+    return [];
+  }
+
+  try {
+    const cursos = JSON.parse(cursosGuardados);
+
+    if (!Array.isArray(cursos)) {
+      return [];
+    }
+
+    return cursos
+      .map((curso) => curso.id_curso || curso.idCurso || curso.id)
+      .filter(Boolean)
+      .map((id) => String(id));
+  } catch (error) {
+    return [];
+  }
+};
+
+const cursoEstaComprado = (idCurso) => {
+  if (!idCurso) {
+    return false;
+  }
+
+  return obtenerCursosCompradosIds().includes(String(idCurso));
+};
+
 const guardarCursoSeleccionado = (idCurso) => {
   if (!idCurso) {
     return;
@@ -65,8 +117,10 @@ const guardarCursoSeleccionado = (idCurso) => {
 };
 
 const obtenerImagenCurso = (curso) => {
-  if (curso.imagen_portada && curso.imagen_portada.trim() !== '') {
-    return curso.imagen_portada;
+  const imagen = curso.imagen_portada ? String(curso.imagen_portada).trim() : '';
+
+  if (imagen !== '') {
+    return imagen;
   }
 
   return null;
@@ -93,8 +147,28 @@ const obtenerInstructor = (curso) => {
   return instructor || 'Instructor EduTech';
 };
 
+const normalizarTextoVisible = (valor) => {
+  const texto = String(valor || '').trim();
+
+  if (!texto) {
+    return '';
+  }
+
+  return texto
+    .toLowerCase()
+    .replace(/(^|[\s,\/])([a-záéíóúüñ])/g, (_, prefijo, letra) => `${prefijo}${letra.toUpperCase()}`);
+};
+
 const obtenerNivel = (curso) => {
-  return curso.nombre_nivel || 'Curso disponible';
+  return normalizarTextoVisible(
+    curso.nombre_nivel ||
+    curso.nivel ||
+    curso.dificultad ||
+    curso.nombre_dificultad ||
+    curso.dificultad_curso ||
+    curso.nivel_curso ||
+    'Curso disponible'
+  );
 };
 
 const prepararEnlaceDetalle = (enlace, idCurso) => {
@@ -166,9 +240,10 @@ const crearTarjetaCurso = (curso) => {
   const descripcion = curso.descripcion || 'Consulta la información completa del curso y revisa su contenido.';
   const instructor = obtenerInstructor(curso);
   const nivel = obtenerNivel(curso);
-  const precio = formatearPrecio(curso.precio_mxn);
+  const precio = formatearPrecio(curso.precio_mxn || curso.precio || curso.total || 0);
+  const comprado = cursoEstaComprado(idCurso);
 
-  const article = crearElemento('article', 'course-card-tc');
+  const article = crearElemento('article', comprado ? 'course-card-tc course-card-owned' : 'course-card-tc');
 
   if (idCurso) {
     article.dataset.idCurso = String(idCurso);
@@ -198,17 +273,20 @@ const crearTarjetaCurso = (curso) => {
 
   const meta = crearElemento('div', 'course-meta-tc');
   const nivelElemento = crearElemento('span', null, nivel);
-  const tipoElemento = crearElemento('span', null, 'Acceso en línea');
+  const modalidadElemento = crearElemento('span', comprado ? 'course-owned-label' : null, comprado ? 'Comprado' : 'Acceso en línea');
 
   meta.appendChild(nivelElemento);
-  meta.appendChild(tipoElemento);
+  meta.appendChild(modalidadElemento);
 
   const footer = crearElemento('div', 'course-footer-tc');
   const precioElemento = crearElemento('strong', null, precio);
-  const linkCurso = crearElemento('a', null, 'Ver curso');
+  const linkCurso = crearElemento('a', comprado ? 'course-entry-link' : null, comprado ? 'Entrar al curso' : 'Ver curso');
   prepararEnlaceDetalle(linkCurso, idCurso);
 
-  footer.appendChild(precioElemento);
+  if (!comprado) {
+    footer.appendChild(precioElemento);
+  }
+
   footer.appendChild(linkCurso);
 
   contenido.appendChild(h2);
@@ -250,24 +328,26 @@ const esperarCargaVisualCursos = async (promesas) => {
 };
 
 const cargarCursos = async () => {
-  if (!cursosGrid) {
-    return;
-  }
-
-  ocultarGridCursos();
-
-  if (!window.EduTech || typeof window.EduTech.apiRequest !== 'function') {
-    mostrarMensajeCursos('No se pudo conectar con la API. Revisa que js/api.js esté cargado antes de js/cursos.js.', true);
-    return;
-  }
-
   try {
+    if (!cursosGrid) {
+      return;
+    }
+
+    ocultarGridCursos();
+
+    if (!window.EduTech || typeof window.EduTech.apiRequest !== 'function') {
+      mostrarMensajeCursos('No se pudo conectar con la API. Revisa que js/api.js esté cargado antes de js/cursos.js.', true);
+      return;
+    }
+
     ocultarMensajeCursos();
 
     const respuesta = await window.EduTech.apiRequest('/cursos');
     const cursos = Array.isArray(respuesta.cursos) ? respuesta.cursos : [];
+    localStorage.setItem('edutech_catalogo_cursos', JSON.stringify(cursos));
 
     if (cursos.length === 0) {
+      cursosGrid.innerHTML = '';
       mostrarMensajeCursos('No hay cursos publicados por el momento.', true);
       return;
     }
@@ -284,7 +364,14 @@ const cargarCursos = async () => {
     ocultarMensajeCursos();
     mostrarGridCursos();
   } catch (error) {
+    if (cursosGrid) {
+      cursosGrid.innerHTML = '';
+    }
+
+    ocultarGridCursos();
     mostrarMensajeCursos('No se pudieron cargar los cursos desde el backend. Revisa que el backend esté encendido y que el puerto 3000 esté público.', true);
+  } finally {
+    marcarPaginaDatosLista();
   }
 };
 
