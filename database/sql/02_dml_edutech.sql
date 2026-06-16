@@ -25,6 +25,13 @@ INSERT INTO nivel_curso (nombre_nivel) VALUES
 ('intermedio'),
 ('avanzado');
 
+INSERT INTO categoria (nombre_categoria, descripcion) VALUES
+('Seguridad informática', 'Cursos relacionados con protección de información, seguridad web y buenas prácticas digitales.'),
+('Programación', 'Cursos relacionados con desarrollo de software, lógica y construcción de aplicaciones.'),
+('Bases de datos', 'Cursos relacionados con modelado, SQL, consultas y administración de datos.'),
+('Desarrollo web', 'Cursos relacionados con HTML, CSS, JavaScript y creación de sitios web.'),
+('Educación en línea', 'Cursos generales preparados para aprendizaje dentro de una plataforma digital.');
+
 INSERT INTO estado_curso (nombre_estado_curso) VALUES
 ('borrador'),
 ('pendiente_revision'),
@@ -136,6 +143,14 @@ VALUES
 (3, 1, 3, 'Bases de datos', 'Curso para aprender modelado, normalización y consultas SQL.', 'assets/img/curso-bd.jpg', 349.00),
 (3, 1, 3, 'Desarrollo Web', 'Curso introductorio de HTML, CSS y JavaScript.', 'assets/img/curso-web.jpg', 299.00);
 
+INSERT INTO curso_categoria (id_curso, id_categoria) VALUES
+(1, 1),
+(1, 2),
+(2, 3),
+(2, 2),
+(3, 4),
+(3, 2);
+
 INSERT INTO revision_curso
 (id_curso, id_estado_revision_curso, id_usuario_revisor, comentario)
 VALUES
@@ -149,18 +164,54 @@ VALUES
 -- =========================================================
 
 INSERT INTO modulo (id_curso, titulo, numero_orden) VALUES
-(1, 'Introducción a seguridad', 1),
-(1, 'Herramientas básicas', 2),
-(2, 'Modelo relacional', 1),
-(3, 'HTML y estructura', 1);
+(1, 'Conociendo la seguridad informática', 1),
+(1, 'Reconocimiento del entorno digital', 2),
+(1, 'Protección de cursos y evaluaciones', 3),
+(1, 'Proyecto de cierre', 4),
+(1, 'Examen Final', 5),
+(2, 'Fundamentos del modelo relacional', 1),
+(2, 'Diseño y normalización', 2),
+(2, 'Consultas SQL', 3),
+(3, 'HTML y estructura', 1),
+(3, 'CSS y diseño visual', 2),
+(3, 'JavaScript básico', 3);
 
 INSERT INTO leccion
 (id_modulo, id_tipo_video, titulo, numero_orden, texto_descriptivo, url_video, duracion_segundos, esta_activa)
 VALUES
-(1, 1, 'Conceptos básicos de seguridad', 1, 'Introducción general al curso.', 'https://youtube.com/watch?v=demo1', 600, TRUE),
-(1, 1, 'Buenas prácticas iniciales', 2, 'Revisión de prácticas básicas.', 'https://youtube.com/watch?v=demo2', 720, TRUE),
-(3, 1, 'Qué es una entidad', 1, 'Explicación de entidades y atributos.', 'https://youtube.com/watch?v=demo3', 540, TRUE),
-(4, 1, 'Estructura HTML', 1, 'Primer acercamiento a HTML.', 'https://youtube.com/watch?v=demo4', 480, TRUE);
+(1, 1, 'Bienvenida al curso', 1, 'Presentación general del curso de seguridad informática.', 'https://youtube.com/watch?v=seg-demo-1', 360, TRUE),
+(1, 1, '¿Qué es la seguridad informática?', 2, 'Conceptos principales de seguridad informática.', 'https://youtube.com/watch?v=seg-demo-2', 600, TRUE),
+(1, 1, 'Usuarios, contraseñas y control de acceso', 3, 'Revisión de accesos y protección básica de cuentas.', 'https://youtube.com/watch?v=seg-demo-3', 720, TRUE),
+(1, 1, 'Riesgos básicos dentro de una plataforma web', 4, 'Identificación de riesgos comunes en plataformas web.', 'https://youtube.com/watch?v=seg-demo-4', 640, TRUE),
+(2, 1, 'Elementos visibles de una pantalla web', 1, 'Reconocimiento de interfaz, formularios y navegación.', 'https://youtube.com/watch?v=seg-demo-5', 500, TRUE),
+(2, 1, 'Identificación de formularios y rutas de acceso', 2, 'Análisis de rutas, formularios y flujos de usuario.', 'https://youtube.com/watch?v=seg-demo-6', 520, TRUE),
+(2, 1, 'Buenas prácticas para proteger la información', 3, 'Buenas prácticas para reducir riesgos básicos.', 'https://youtube.com/watch?v=seg-demo-7', 680, TRUE),
+(2, 1, 'Errores comunes al configurar permisos', 4, 'Errores frecuentes en permisos y accesos.', 'https://youtube.com/watch?v=seg-demo-8', 620, TRUE),
+(3, 1, 'Acceso solo para alumnos inscritos', 1, 'Control de acceso a contenido comprado.', 'https://youtube.com/watch?v=seg-demo-9', 700, TRUE),
+(3, 1, 'Protección de exámenes y archivos', 2, 'Protección básica de recursos y evaluaciones.', 'https://youtube.com/watch?v=seg-demo-10', 760, TRUE),
+(3, 1, 'Revisión de avance y finalización', 3, 'Seguimiento de avance del alumno.', 'https://youtube.com/watch?v=seg-demo-11', 540, TRUE),
+(4, 1, 'Análisis visual de una plataforma educativa', 1, 'Actividad final de revisión visual.', 'https://youtube.com/watch?v=seg-demo-12', 650, TRUE),
+(4, 1, 'Recomendaciones finales de seguridad', 2, 'Cierre con recomendaciones prácticas.', 'https://youtube.com/watch?v=seg-demo-13', 480, TRUE),
+(5, 1, 'Examen final', 1, 'Evaluación final del curso.', 'https://youtube.com/watch?v=seg-demo-14', 900, TRUE),
+(6, 1, 'Qué es una base de datos', 1, 'Introducción a bases de datos.', 'https://youtube.com/watch?v=bd-demo-1', 500, TRUE),
+(6, 1, 'Tablas, campos y registros', 2, 'Elementos básicos del modelo relacional.', 'https://youtube.com/watch?v=bd-demo-2', 620, TRUE),
+(6, 1, 'Llaves primarias y foráneas', 3, 'Relación entre tablas mediante llaves.', 'https://youtube.com/watch?v=bd-demo-3', 700, TRUE),
+(7, 1, 'Primera forma normal', 1, 'Reglas básicas de normalización.', 'https://youtube.com/watch?v=bd-demo-4', 640, TRUE),
+(7, 1, 'Segunda forma normal', 2, 'Dependencias y separación de datos.', 'https://youtube.com/watch?v=bd-demo-5', 630, TRUE),
+(7, 1, 'Tercera forma normal', 3, 'Eliminación de dependencias transitivas.', 'https://youtube.com/watch?v=bd-demo-6', 650, TRUE),
+(8, 1, 'SELECT básico', 1, 'Consulta básica de datos.', 'https://youtube.com/watch?v=bd-demo-7', 560, TRUE),
+(8, 1, 'JOIN entre tablas', 2, 'Consulta de datos relacionados.', 'https://youtube.com/watch?v=bd-demo-8', 720, TRUE),
+(8, 1, 'Filtros y ordenamientos', 3, 'Uso de WHERE y ORDER BY.', 'https://youtube.com/watch?v=bd-demo-9', 610, TRUE),
+(9, 1, 'Estructura de una página HTML', 1, 'Etiquetas principales de HTML.', 'https://youtube.com/watch?v=web-demo-1', 480, TRUE),
+(9, 1, 'Textos, enlaces e imágenes', 2, 'Contenido básico de una página web.', 'https://youtube.com/watch?v=web-demo-2', 520, TRUE),
+(9, 1, 'Formularios básicos', 3, 'Campos y botones en HTML.', 'https://youtube.com/watch?v=web-demo-3', 580, TRUE),
+(10, 1, 'Selectores CSS', 1, 'Aplicación de estilos con selectores.', 'https://youtube.com/watch?v=web-demo-4', 600, TRUE),
+(10, 1, 'Colores, espacios y tamaños', 2, 'Estilos visuales básicos.', 'https://youtube.com/watch?v=web-demo-5', 610, TRUE),
+(10, 1, 'Diseño responsive básico', 3, 'Adaptación a diferentes pantallas.', 'https://youtube.com/watch?v=web-demo-6', 660, TRUE),
+(11, 1, 'Variables y funciones', 1, 'Primeros pasos con JavaScript.', 'https://youtube.com/watch?v=web-demo-7', 700, TRUE),
+(11, 1, 'Eventos del navegador', 2, 'Interacción con botones y formularios.', 'https://youtube.com/watch?v=web-demo-8', 680, TRUE),
+(11, 1, 'Proyecto final de página web', 3, 'Integración de HTML, CSS y JavaScript.', 'https://youtube.com/watch?v=web-demo-9', 780, TRUE);
+
 
 INSERT INTO recurso
 (id_tipo_recurso, titulo, descripcion, url_recurso)
