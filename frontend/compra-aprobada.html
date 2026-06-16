@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Compra aprobada - EduTech</title>
-  <meta name="description" content="Confirmación visual de compra aprobada en EduTech.">
+  <script src="js/session-guard.js"></script>
+  <meta name="description" content="Confirmación de compra aprobada en EduTech.">
 
   <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -46,17 +47,74 @@
     </header>
 
     <main class="site-content checkout-page">
-      <section class="checkout-section checkout-result-section">
-        <div class="checkout-result-card">
+      <section class="checkout-section checkout-result-section purchase-confirmation-section">
+
+        <article class="checkout-result-card purchase-confirmation-card" id="compraResultado" style="display: none;">
+          <p class="result-eyebrow">Pago aprobado</p>
           <h1>Compra registrada correctamente</h1>
-          <p>
-            En este prototipo se simula que la pasarela de pago confirmó la operación.
-            El curso quedaría activo dentro de la sección de cursos comprados del alumno.
+
+          <p id="compraMensaje">
+            Tu compra fue aprobada y el curso quedó listo para aparecer en Mis cursos.
           </p>
-          <div class="result-actions">
-            <a class="checkout-buy-button result-button" href="mis-cursos.html">Ir a mis cursos</a>
+
+          <div class="purchase-confirmation-summary" aria-label="Resumen de la compra aprobada">
+            <div class="purchase-confirmation-row">
+              <span>Número de orden</span>
+              <strong id="compraOrden">Por confirmar</strong>
+            </div>
+
+            <div class="purchase-confirmation-row">
+              <span>Curso</span>
+              <strong id="compraCurso">Curso EduTech</strong>
+            </div>
+
+            <div class="purchase-confirmation-row">
+              <span>Instructor</span>
+              <strong id="compraInstructor">Instructor EduTech</strong>
+            </div>
+
+            <div class="purchase-confirmation-row">
+              <span>Total pagado</span>
+              <strong id="compraTotal">$0 MXN</strong>
+            </div>
+
+            <div class="purchase-confirmation-row">
+              <span>Estado del pago</span>
+              <strong id="compraEstatus">Aprobada</strong>
+            </div>
+
+            <div class="purchase-confirmation-row">
+              <span>Correo</span>
+              <strong id="compraCorreo">Por definir</strong>
+            </div>
+
+            <div class="purchase-confirmation-row">
+              <span>Fecha</span>
+              <strong id="compraFecha">Por definir</strong>
+            </div>
           </div>
-        </div>
+
+          <div class="result-actions">
+            <a class="result-link" href="mis-cursos.html" id="btnMisCursos">Ir a mis cursos</a>
+            <a class="result-link" href="cursos.html">Volver al catálogo</a>
+          </div>
+        </article>
+
+        <article class="checkout-result-card purchase-confirmation-card" id="compraSinDatos" style="display: none;">
+          <p class="result-eyebrow">Sin compra reciente</p>
+          <h1>No encontramos una compra aprobada</h1>
+
+          <p>
+            Esta pantalla se muestra después de completar una compra. Vuelve al catálogo,
+            elige un curso y realiza el proceso de compra nuevamente.
+          </p>
+
+          <div class="result-actions">
+            <a class="result-link" href="cursos.html">Volver a cursos</a>
+            <a class="result-link" href="mis-cursos.html">Ir a mis cursos</a>
+          </div>
+        </article>
+
       </section>
     </main>
 
