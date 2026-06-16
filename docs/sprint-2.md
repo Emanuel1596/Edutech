@@ -1,4 +1,4 @@
-# Sprint 2 - Desarrollo de flujos principales e integración
+# Sprint 2 - Integración de API, Base de Datos y Flujos de Curso
 
 ## Proyecto
 
@@ -6,48 +6,51 @@ EduTech - Plataforma web de cursos.
 
 ## Duración del Sprint
 
- viernes 8 de mayo al jueves 4 de junio de 2026.
+Del viernes 8 de mayo al jueves 4 de junio de 2026.
 
 ## Objetivo del Sprint
 
-Finalizar la integración de las interfaces del sistema con el backend, implementando los flujos completos de autenticación, compra de cursos, gestión de roles (Administrador, Instructor, Alumno), visualización de contenido educativo y el sistema de evaluación y certificación.
+Estructurar el repositorio, configurar los entornos de desarrollo (Docker, Codespaces) e implementar los primeros flujos de conexión entre frontend y backend, incluyendo registro de usuarios, consultas dinámicas a la base de datos y simulación de pagos.
 
 ## Actividades, fechas y entregables
 
 | Fecha | Hora límite | Responsable | Actividad | Debe entregar |
 |---|---:|---|---|---|
-| Lunes 11 mayo | 8:00 p. m. | Edgar | Conectar frontend con backend | Login funcional y carga de cursos desde el servidor |
-| Jueves 14 mayo | 6:00 p. m. | Randy | Maquetar e integrar vistas core | Aula del alumno y escritorio del instructor funcionales |
-| Lunes 18 mayo | 8:00 p. m. | André | Desarrollar panel de administración | Vista administrativa para gestión de usuarios, roles y revisión de cursos |
-| Jueves 21 mayo | 5:00 p. m. | Rafa | Implementar lógica de perfil del alumno | Perfil mejorado con datos de persistencia de compra |
-| Lunes 25 mayo | 8:00 p. m. | André | Crear herramientas para el instructor | Formulario con módulos, lecciones, videos, recursos y validaciones |
-| Jueves 28 mayo | 5:00 p. m. | Rafa | Implementar pasarela de adquisición | Flujo de compra conectado con el curso seleccionado y confirmación aprobada |
-| Sábado 30 mayo | 6:00 p. m. | Rafa | Desarrollar tracking del estudiante | Área del alumno conectada con cursos comprados y progreso real de lecciones |
-| Lunes 1 junio | 8:00 p. m. | Edgar | Desarrollar sistema de evaluación | Flujo de examen final, cálculo de resultados y categorías reales en el detalle del curso |
-| Martes 2 junio | 5:00 p. m. | Edgar | Implementar acreditaciones | Sistema de certificados, vista de certificado y ajustes visuales |
-| Miércoles 3 junio | 6:00 p. m. | Valeria | Validar flujos en base de datos | Revisión de tablas de transacciones, progreso y certificados |
-| Jueves 4 junio | 12:00 p. m. | Emanuel | Pruebas de integración y control de roles | Corrección final de sesiones, historiales y vistas de alumno/instructor/admin |
-| Jueves 4 junio | 12:00 p. m. | Todos | Entrega interna final | Todos los flujos integrados en la rama principal revisados antes de la entrega |
+| Domingo 10 mayo | 8:00 p. m. | Emanuel | Actualizar documentos de seguimiento y Sprint 1. | Documentos actualizados |
+| Martes 12 mayo | 6:00 p. m. | Randy | Documentar tecnologías recomendadas para el proyecto. | Archivo de tecnologías |
+| Martes 12 mayo | 8:00 p. m. | Edgar | Subir estructura de carpetas y listado de pantallas. | Archivos .md listos |
+| Miércoles 13 mayo | 5:00 p. m. | Rafa | Crear carpetas base y estructura inicial para la base de datos. | Repositorio estructurado |
+| Viernes 15 mayo | 8:00 p. m. | Valeria | Validar integridad del modelo de base de datos definitivo. | Reporte de QA interno |
+| Martes 2 junio | 5:00 p. m. | Emanuel | Reorganizar frontend y base de datos fuera de la carpeta docs. | Carpetas limpias |
+| Miércoles 3 junio | 6:00 p. m. | Randy | Crear backend base con Express y Docker para PostgreSQL. | Servidor y contenedor funcional |
+| Miércoles 3 junio | 8:00 p. m. | André | Agregar registro e inicio de sesión. | Sistema de autenticación |
+| Miércoles 3 junio | 8:00 p. m. | Rafa | Agregar consulta dinámica de cursos. | Catálogo conectado a BD |
+| Miércoles 3 junio | 10:00 p. m. | Edgar | Preparar la estructura base final del proyecto. | Código organizado |
+| Jueves 4 junio | 12:00 p. m. | Edgar | Agregar lógica de compra y pago simulado. | Flujo de pago completo |
+| Jueves 4 junio | 2:00 p. m. | Rafa | Agregar vista de "Mis cursos" y progreso de lecciones. | Tracking de alumno |
+| Jueves 4 junio | 4:00 p. m. | André | Agregar base de conexión frontend con la API. | Vistas consumiendo datos |
+| Jueves 4 junio | 5:00 p. m. | Valeria | Realizar pruebas de integración de la API con el Frontend. | Aprobación de despliegue |
+| Jueves 4 junio | 6:00 p. m. | Todos | Resolución de conflictos y merges finales hacia la rama main. | Entrega estable |
 
 ## Estado al cierre del Sprint 2
 
-Al cierre del Sprint 2, el equipo logró integrar con éxito el frontend y el backend, logrando un prototipo completamente funcional para los flujos principales del sistema.
+Al cierre del Sprint 2, el equipo logró asentar la arquitectura del proyecto e integrar exitosamente las primeras conexiones entre el Frontend y la API.
 
 ### Entregas avanzadas
 
-- Conexión exitosa del login y carga de cursos desde la base de datos.
-- Integración de vistas para Alumno, Instructor y Administrador.
-- Formularios de creación de cursos con validación de recursos multimedia.
-- Flujo de compra completo, desde la selección hasta la confirmación.
-- Seguimiento funcional del progreso de las lecciones por alumno.
-- Implementación de exámenes finales y generación de certificados.
+- Creación del backend base utilizando Express y configuración de contenedores Docker para PostgreSQL.
+- Integración de consultas dinámicas para mostrar los cursos desde la base de datos.
+- Implementación del sistema de registro e inicio de sesión de usuarios.
+- Desarrollo del flujo de compra y simulación de pasarela de pago.
+- Configuración de la sección "Mis cursos" con tracking del progreso de lecciones.
+- Configuración de entornos de trabajo compartidos mediante Codespaces.
 
 ### Entregas pendientes o con correcciones
 
-- Optimización de tiempos de carga en la vista del catálogo de cursos.
-- Ajustes menores de diseño responsivo (CSS) en las vistas de certificados.
-- Pruebas de estrés para la confirmación de compras simultáneas.
+- Refinamiento de las interfaces del dashboard de administrador.
+- Conexión de métricas de evaluación avanzadas en el progreso de las lecciones.
+- Pruebas exhaustivas de validación de usuarios concurrentes en la pasarela de pago simulada.
 
 ### Nota de cierre
 
-El Sprint 2 se considera un éxito ya que se cubrió el "Happy Path" completo del sistema. El código ha sido integrado satisfactoriamente a través de múltiples commits en la rama principal, consolidando las bases operativas de EduTech para su presentación.
+El Sprint 2 permitió transformar la planeación inicial en un producto consumible. A través de múltiples aprobaciones (merges) en la rama principal, el equipo consolidó la estructura de EduTech, dejando una API robusta y vistas conectadas listas para la iteración final.
