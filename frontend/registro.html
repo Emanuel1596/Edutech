@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Registro - EduTech</title>
+  <script src="js/session-guard.js"></script>
   <meta name="description" content="Registro de alumno en EduTech. Crea una cuenta para comprar cursos, acceder a módulos, lecciones, exámenes y certificados.">
 
   <link rel="stylesheet" href="css/styles.css">
@@ -119,6 +120,8 @@
 
               <button type="submit" class="register-submit">Registrarse</button>
 
+              <p class="form-warning registro-warning" id="registroWarning" aria-live="polite"></p>
+
               <p class="login-link">
                 ¿Ya tienes cuenta?
                 <a href="login.html">Inicia sesión</a>
@@ -138,8 +141,6 @@
     </footer>
 
   </div>
-<script src="js/registro.js"></script>
-
   <script src="js/api.js"></script>
   <script src="js/main.js"></script>
   <script src="js/registro.js"></script>

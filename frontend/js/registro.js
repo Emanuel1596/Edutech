@@ -1,7 +1,8 @@
 const formRegistro = document.getElementById('registroForm');
 const registroSuccess = document.getElementById('registroSuccess');
+const registroWarning = document.getElementById('registroWarning');
 
-if (!formRegistro || !registroSuccess) {
+if (!formRegistro || !registroSuccess || !registroWarning) {
   console.error('No se encontró el formulario de registro.');
 } else {
   const nombreInput = document.getElementById('nombre');
@@ -79,14 +80,26 @@ if (!formRegistro || !registroSuccess) {
   };
 
   const mostrarMensajeGeneral = (mensaje, esError = false) => {
-    registroSuccess.textContent = mensaje;
-    registroSuccess.style.display = 'block';
-    registroSuccess.style.color = esError ? '#ff5c5c' : '#19d37d';
+    const mensajeActivo = esError ? registroWarning : registroSuccess;
+    const mensajeInactivo = esError ? registroSuccess : registroWarning;
+
+    mensajeInactivo.textContent = '';
+    mensajeInactivo.style.display = 'none';
+    mensajeInactivo.classList.remove('form-message-error', 'form-message-success');
+
+    mensajeActivo.textContent = mensaje;
+    mensajeActivo.style.display = 'block';
+    mensajeActivo.classList.toggle('form-message-error', esError);
+    mensajeActivo.classList.toggle('form-message-success', !esError);
+    mensajeActivo.setAttribute('role', esError ? 'alert' : 'status');
   };
 
   const ocultarMensajeGeneral = () => {
-    registroSuccess.textContent = '';
-    registroSuccess.style.display = 'none';
+    [registroSuccess, registroWarning].forEach((mensaje) => {
+      mensaje.textContent = '';
+      mensaje.style.display = 'none';
+      mensaje.classList.remove('form-message-error', 'form-message-success');
+    });
   };
 
   const limpiarDatosAlumnoAnterior = () => {
@@ -317,9 +330,26 @@ if (!formRegistro || !registroSuccess) {
     return true;
   };
 
+  const marcarCampoValidado = (campo) => {
+    if (campo) {
+      campo.dataset.validacionIniciada = 'true';
+    }
+  };
+
+  const campoYaFueValidado = (campo) => Boolean(
+    campo && campo.dataset.validacionIniciada === 'true'
+  );
+
   [nombreInput, apellidosInput, correoInput, confirmarCorreoInput, passwordInput, confirmarPasswordInput].forEach((campo) => {
     campo.addEventListener('focus', () => limpiarSiCampoVacio(campo));
-    campo.addEventListener('blur', () => limpiarSiCampoVacio(campo));
+    campo.addEventListener('blur', () => {
+      limpiarSiCampoVacio(campo);
+
+      if (campo === passwordInput) {
+        marcarCampoValidado(passwordInput);
+        validarPassword(false);
+      }
+    });
   });
 
   nombreInput.addEventListener('input', () => validarNombre(false));
@@ -333,7 +363,9 @@ if (!formRegistro || !registroSuccess) {
   });
   confirmarCorreoInput.addEventListener('input', () => validarConfirmarCorreo(false));
   passwordInput.addEventListener('input', () => {
-    validarPassword(false);
+    if (campoYaFueValidado(passwordInput) || passwordInput.classList.contains('is-invalid')) {
+      validarPassword(false);
+    }
 
     if (confirmarPasswordInput.value) {
       validarConfirmarPassword(false);
@@ -362,6 +394,7 @@ if (!formRegistro || !registroSuccess) {
 
     if (!formularioValido) {
       registrarIntento();
+      mostrarMensajeGeneral('Revisa los campos marcados en rojo antes de continuar.', true);
       return;
     }
 
@@ -402,19 +435,20 @@ if (!formRegistro || !registroSuccess) {
       mostrarMensajeGeneral('Registro correcto. Redirigiendo...', false);
 
       setTimeout(() => {
-        window.location.href = 'mi-cuenta.html';
+        window.location.replace('mi-cuenta.html#dashboard');
       }, 700);
     } catch (error) {
       desbloquearBotonRegistro();
       registrarIntento();
 
       const mensajeOriginal = String(error.message || error.error || '');
-      const errorCorreoExistente = /existe|registrado|correo|duplicate|duplicado|unique/i.test(mensajeOriginal);
-      const mensajeError = errorCorreoExistente
-        ? 'No se pudo completar el registro. Revisa los datos e intenta de nuevo.'
-        : (mensajeOriginal || 'No se pudo completar el registro. Revisa los datos e intenta de nuevo.');
+      const errorTecnico = /conectar|api|puerto|servidor|json/i.test(mensajeOriginal);
+      const mensajeError = errorTecnico
+        ? mensajeOriginal
+        : 'No se pudo completar el registro. Revisa los datos e inténtalo nuevamente.';
 
       mostrarMensajeGeneral(mensajeError, true);
+      registroWarning.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   });
 }
