@@ -82,7 +82,10 @@ const registrarUsuario = async (req, res) => {
     res.status(201).json({
       ok: true,
       message: 'Usuario registrado correctamente.',
-      usuario: resultado.rows[0]
+      usuario: {
+        ...resultado.rows[0],
+        nombre_rol: 'Alumno'
+      }
     });
   } catch (error) {
     res.status(500).json({
@@ -106,17 +109,20 @@ const iniciarSesion = async (req, res) => {
 
     const resultado = await pool.query(
       `SELECT
-        id_usuario,
-        id_rol,
-        nombre,
-        apellido_paterno,
-        apellido_materno,
-        correo,
-        password_hash,
-        telefono,
-        esta_activo
-       FROM edutech.usuario
-       WHERE LOWER(correo) = LOWER($1)`,
+        u.id_usuario,
+        u.id_rol,
+        r.nombre_rol,
+        u.nombre,
+        u.apellido_paterno,
+        u.apellido_materno,
+        u.correo,
+        u.password_hash,
+        u.telefono,
+        u.esta_activo
+       FROM edutech.usuario u
+       INNER JOIN edutech.rol r
+        ON r.id_rol = u.id_rol
+       WHERE LOWER(u.correo) = LOWER($1)`,
       [correo]
     );
 
