@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es" class="edutech-session-checking">
+<head>
+  <meta charset="utf-8">
+<style id="edutech-critical-guard">html.edutech-session-checking body{display:none!important;}</style>
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <title>Examen final del curso - EduTech</title>
+  <script src="js/preauth-guard.js"></script>
+<script src="js/session-guard.js"></script>
+  <meta content="Pantalla del instructor para configurar el examen final del curso." name="description">
+  <link href="css/styles.css" rel="stylesheet">
+  <link href="css/instructor.css" rel="stylesheet">
+  <link href="css/instructor-examen.css?v=27-5b" rel="stylesheet">
+</head>
+<body class="edutech-data-pending edutech-data-loading">
+  <div class="site student-site instructor-student-style" id="page">
+    <header class="site-header">
+      <div class="header-container">
+        <a aria-label="EduTech" class="logo" href="index.html">
+          <span class="logo-main">Edu</span><span class="logo-accent">Tech</span>
+        </a>
+        <button aria-label="Abrir menú" class="menu-toggle" type="button">☰</button>
+        <nav aria-label="Menú principal" class="main-navigation">
+          <ul class="main-menu">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="cursos.html">Cursos</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="instructor.html#dashboard">Instructor</a></li>
+            <li><a href="instructor.html#cursos">Mis cursos</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="instructor-exam-page">
+      <section class="instructor-exam-container">
+        <a class="instructor-exam-back" id="volverEditarCurso" href="instructor.html#cursos">Volver a editar curso</a>
+
+        <p class="instructor-exam-message" id="instructorExamenMensaje" hidden></p>
+
+        <header class="instructor-exam-header">
+          <div>
+            <p class="instructor-exam-kicker">Examen final del curso</p>
+            <h1 id="instructorExamenTituloCurso">Cargando curso...</h1>
+            <p id="instructorExamenDescripcionCurso">Primero guarda el curso, módulos y lecciones. Después configura el examen antes de enviarlo a revisión.</p>
+          </div>
+        </header>
+
+        <form class="instructor-exam-form" id="instructorExamenForm" novalidate>
+          <input type="hidden" id="instructorExamenCursoId">
+
+          <section class="instructor-exam-section">
+            <h2>Datos del examen</h2>
+            <p>Estos datos se usarán cuando el alumno presente la evaluación final.</p>
+
+            <div class="instructor-exam-grid">
+              <label class="mi-cuenta-field instructor-field" for="instructorExamenTitulo">
+                <span>Título del examen</span>
+                <input autocomplete="off" id="instructorExamenTitulo" maxlength="150" placeholder="Ejemplo: Examen final" type="text">
+                <small class="error-message" data-error-for="instructorExamenTitulo"></small>
+              </label>
+
+              <label class="mi-cuenta-field instructor-field" for="instructorExamenTiempo">
+                <span>Tiempo límite en minutos</span>
+                <input autocomplete="off" id="instructorExamenTiempo" inputmode="numeric" placeholder="Ejemplo: 30" type="text">
+                <small class="error-message" data-error-for="instructorExamenTiempo"></small>
+              </label>
+
+              <div class="mi-cuenta-field instructor-field instructor-attempts-field">
+                <span>¿Deseas intentos limitados?</span>
+                <select id="instructorExamenIntentosModo">
+                  <option value="limitados">Sí, limitar intentos</option>
+                  <option value="ilimitados">No, dejar intentos ilimitados</option>
+                </select>
+                <small class="instructor-field-help">Si eliges intentos ilimitados, el alumno podrá volver a presentar el examen sin límite.</small>
+                <small class="error-message" data-error-for="instructorExamenIntentosModo"></small>
+              </div>
+
+              <label class="mi-cuenta-field instructor-field instructor-attempts-count" for="instructorExamenIntentos" id="instructorIntentosWrap">
+                <span>Cantidad de intentos permitidos</span>
+                <input autocomplete="off" id="instructorExamenIntentos" inputmode="numeric" placeholder="Ejemplo: 2" type="text">
+                <small class="instructor-field-help">Solo se aceptan de 1 a 10 intentos si el examen es limitado.</small>
+                <small class="error-message" data-error-for="instructorExamenIntentos"></small>
+              </label>
+
+              <label class="mi-cuenta-field instructor-field instructor-grade-field" for="instructorExamenCalificacion">
+                <span>Calificación mínima para aprobar</span>
+                <input autocomplete="off" id="instructorExamenCalificacion" inputmode="decimal" placeholder="Ejemplo: 70" type="text">
+                <small class="error-message" data-error-for="instructorExamenCalificacion"></small>
+              </label>
+            </div>
+
+          </section>
+
+          <section class="instructor-exam-section">
+            <h2>Preguntas</h2>
+            <p>Crea el banco de preguntas del examen y define cuántas se mostrarán al alumno en cada intento.</p>
+            <p class="instructor-exam-helper">Cada pregunta acepta entre 2 y 6 opciones. Este examen usa una sola respuesta correcta por pregunta.</p>
+
+            <div class="instructor-exam-bank-grid">
+              <label class="mi-cuenta-field instructor-field instructor-bank-field" for="instructorCantidadPreguntas">
+                <span>¿Cuántas preguntas tendrá el banco?</span>
+                <input autocomplete="off" id="instructorCantidadPreguntas" inputmode="numeric" placeholder="Ejemplo: 5" type="text">
+                <small class="instructor-field-help">Mínimo 2 preguntas para que el banco pueda ser aleatorio.</small>
+                <small class="error-message" data-error-for="instructorCantidadPreguntas"></small>
+              </label>
+
+              <label class="mi-cuenta-field instructor-field instructor-bank-field" for="instructorPreguntasMostrar">
+                <span>¿Cuántas preguntas se mostrarán al alumno?</span>
+                <input autocomplete="off" id="instructorPreguntasMostrar" inputmode="numeric" placeholder="Ejemplo: 3" type="text">
+                <small class="instructor-field-help">Debe ser entre 1 y el total del banco de preguntas.</small>
+                <small class="error-message" data-error-for="instructorPreguntasMostrar"></small>
+              </label>
+
+              <div class="instructor-exam-bank-actions">
+                <button class="instructor-form-text-button instructor-exam-inline-button" id="instructorCrearPreguntas" type="button">Crear espacios de preguntas</button>
+              </div>
+            </div>
+
+            <div class="instructor-exam-questions" id="instructorPreguntasCampos"></div>
+          </section>
+
+          <section class="instructor-exam-section instructor-exam-intro-section">
+            <h2>Texto para la pantalla del examen</h2>
+            <p>Este texto aparecerá antes de que el alumno empiece el examen final.</p>
+
+            <label class="mi-cuenta-field instructor-field" for="instructorExamenModuloTexto">
+              <span>Texto descriptivo del examen</span>
+              <textarea id="instructorExamenModuloTexto" rows="5" placeholder="Explica qué debe saber el alumno antes de iniciar."></textarea>
+              <small class="error-message" data-error-for="instructorExamenModuloTexto"></small>
+            </label>
+          </section>
+
+          <p class="instructor-form-status" hidden id="instructorExamenEstado"></p>
+
+          <div class="instructor-exam-actions">
+            <a class="instructor-form-text-button instructor-exam-action-back" id="instructorVolverEditar" href="instructor.html#crear">Volver a editar curso</a>
+            <div class="instructor-exam-actions-buttons">
+              <button class="instructor-form-text-button" name="accion" type="submit" value="guardar_borrador">Guardar examen como borrador</button>
+              <button class="instructor-form-text-button instructor-next-exam-button" name="accion" type="submit" value="enviar_revision">Guardar y enviar curso a revisión</button>
+            </div>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>EduTech - Plataforma Web de Cursos</p>
+    </footer>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/instructor-examen.js"></script>
+</body>
+</html>

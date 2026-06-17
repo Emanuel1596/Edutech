@@ -63,6 +63,35 @@ const obtenerIdCurso = (curso) => {
 };
 
 
+const obtenerUsuarioCursos = () => {
+  if (window.EduTech && typeof window.EduTech.obtenerUsuarioSesion === 'function') {
+    return window.EduTech.obtenerUsuarioSesion();
+  }
+
+  try {
+    return JSON.parse(localStorage.getItem('edutech_usuario') || 'null');
+  } catch (error) {
+    return null;
+  }
+};
+
+const usuarioEsInstructorCursos = () => {
+  const usuario = obtenerUsuarioCursos();
+
+  if (!usuario) {
+    return false;
+  }
+
+  if (window.EduTech && typeof window.EduTech.usuarioTieneRol === 'function') {
+    return window.EduTech.usuarioTieneRol(usuario, 'Instructor');
+  }
+
+  const idRol = Number(usuario.id_rol || usuario.idRol || 0);
+  const rol = String(usuario.nombre_rol || usuario.rol || '').trim().toLowerCase();
+
+  return idRol === 2 || rol === 'instructor';
+};
+
 const obtenerCursosCompradosIds = () => {
   const idsGuardados = localStorage.getItem('edutech_cursos_comprados_ids');
 
@@ -279,6 +308,7 @@ const crearTarjetaCurso = (curso) => {
   const nivel = obtenerNivel(curso);
   const precio = formatearPrecio(curso.precio_mxn || curso.precio || curso.total || 0);
   const comprado = cursoEstaComprado(idCurso);
+  const esInstructor = usuarioEsInstructorCursos();
 
   const article = crearElemento('article', comprado ? 'course-card-tc course-card-owned' : 'course-card-tc');
 
@@ -323,7 +353,10 @@ const crearTarjetaCurso = (curso) => {
 
   if (!comprado) {
     footer.appendChild(precioElemento);
-    acciones.appendChild(crearBotonCarritoCursos(curso, idCurso));
+
+    if (!esInstructor) {
+      acciones.appendChild(crearBotonCarritoCursos(curso, idCurso));
+    }
   }
 
   acciones.appendChild(linkCurso);

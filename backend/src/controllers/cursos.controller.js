@@ -16,6 +16,7 @@ const obtenerCamposCurso = () => `
     c.fecha_actualizacion,
     u.nombre AS nombre_instructor,
     u.apellido_paterno AS apellido_paterno_instructor,
+    u.foto_perfil_url AS foto_perfil_instructor,
     COALESCE((
       SELECT COUNT(l.id_leccion)::int
       FROM edutech.modulo m

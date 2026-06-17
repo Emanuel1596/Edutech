@@ -161,6 +161,66 @@
 
   const limpiarTextoSimple = (valor) => String(valor || '').trim();
 
+  const normalizarIdInstructorLocal = (valor) => {
+    const numero = Number(valor || 0);
+    return Number.isInteger(numero) && numero > 0 ? numero : null;
+  };
+
+  const actualizarFotoInstructorEnCursosLocales = (foto, idInstructor) => {
+    const id = normalizarIdInstructorLocal(idInstructor);
+    const fotoFinal = limpiarTextoSimple(foto);
+
+    if (!id || !fotoFinal) {
+      return;
+    }
+
+    const coincideInstructor = (curso) => {
+      const posibles = [
+        curso?.id_instructor,
+        curso?.id_usuario_instructor,
+        curso?.id_usuario,
+        curso?.instructor_id
+      ].map((valor) => normalizarIdInstructorLocal(valor)).filter(Boolean);
+
+      return posibles.includes(id);
+    };
+
+    const actualizarLista = (clave) => {
+      try {
+        const lista = JSON.parse(localStorage.getItem(clave) || '[]');
+
+        if (!Array.isArray(lista)) {
+          return;
+        }
+
+        const nuevaLista = lista.map((curso) => coincideInstructor(curso)
+          ? {
+            ...curso,
+            foto_perfil_instructor: fotoFinal,
+            foto_instructor: fotoFinal,
+            foto_perfil_url_instructor: fotoFinal
+          }
+          : curso);
+
+        localStorage.setItem(clave, JSON.stringify(nuevaLista));
+      } catch (error) {
+        localStorage.removeItem(clave);
+      }
+    };
+
+    actualizarLista('edutech_catalogo_cursos');
+    actualizarLista('edutech_mis_cursos');
+
+    estado.cursos = estado.cursos.map((curso) => coincideInstructor(curso)
+      ? {
+        ...curso,
+        foto_perfil_instructor: fotoFinal,
+        foto_instructor: fotoFinal,
+        foto_perfil_url_instructor: fotoFinal
+      }
+      : curso);
+  };
+
   const ciudadesPorEstadoInstructor = {
     'Ciudad de México': [
       { id: 1, nombre: 'Ciudad de México' }
@@ -499,12 +559,15 @@
       estado.usuario = usuarioActualizado;
       guardarJSONInstructor('edutech_usuario', usuarioActualizado);
       guardarJSONInstructor('edutech_perfil_instructor', perfil);
+      actualizarFotoInstructorEnCursosLocales(usuarioActualizado.foto_perfil_url || foto, idInstructor);
 
-      actualizarPreviewFotoInstructor(foto);
+      actualizarPreviewFotoInstructor(usuarioActualizado.foto_perfil_url || foto);
       pintarPerfil();
+      pintarCursos();
 
       if (elementos.cuentaGuardada) {
         elementos.cuentaGuardada.textContent = 'Perfil actualizado correctamente.';
+        elementos.cuentaGuardada.hidden = false;
         elementos.cuentaGuardada.style.display = 'block';
       }
     } catch (error) {
@@ -856,6 +919,39 @@
   const campoYaFueValidado = (campo) => Boolean(
     campo && campo.dataset.validacionIniciada === 'true'
   );
+
+
+  const normalizarEntradaEntera = (campo) => {
+    if (!campo) {
+      return;
+    }
+
+    const anterior = campo.value;
+    campo.value = String(campo.value || '').replace(/\D/g, '');
+
+    if (campo.value.length > 1) {
+      campo.value = String(Number(campo.value));
+    }
+
+    if (anterior !== campo.value) {
+      campo.dispatchEvent(new Event('edutech-enteros-normalizados'));
+    }
+  };
+
+  const validarCantidadEnteraEnVivo = (campo) => {
+    normalizarEntradaEntera(campo);
+
+    if (!campo) {
+      return;
+    }
+
+    const valor = campo.value.trim();
+
+    if (valor === '0' || campoYaFueValidado(campo) || campo.classList.contains('is-invalid')) {
+      marcarCampoValidado(campo);
+      validarCampoCurso(campo, true);
+    }
+  };
 
   const formatearPrecioSiEsValido = () => {
     if (!elementos.precio) {
@@ -2318,7 +2414,23 @@
       elementos.leccionesCampos.appendChild(tarjeta);
 
       const cantidadCampo = tarjeta.querySelector('.instructorLeccionesCantidad');
-      cantidadCampo.addEventListener('input', ocultarEstadoFormulario);
+
+      if (cantidadCampo) {
+        cantidadCampo.addEventListener('input', () => {
+          normalizarEntradaEntera(cantidadCampo);
+          ocultarEstadoFormulario();
+
+          if (cantidadCampo.value.trim() === '0' || campoYaFueValidado(cantidadCampo) || cantidadCampo.classList.contains('is-invalid')) {
+            marcarCampoValidado(cantidadCampo);
+            validarCantidadLecciones(cantidadCampo);
+          }
+        });
+
+        cantidadCampo.addEventListener('blur', () => {
+          marcarCampoValidado(cantidadCampo);
+          validarCantidadLecciones(cantidadCampo);
+        });
+      }
 
       if (lecciones.length > 0) {
         pintarCamposLeccionesModulo(numeroOrden, lecciones.length, lecciones);
@@ -2449,6 +2561,7 @@
     const cantidad = validarCantidadLecciones(campoCantidad);
 
     if (!cantidad) {
+      marcarCampoValidado(campoCantidad);
       campoCantidad?.focus();
       return;
     }
@@ -3095,7 +3208,13 @@
       activarValidacionEnTiempoReal(campo);
 
       if (campo) {
-        campo.addEventListener('input', ocultarEstadoFormulario);
+        campo.addEventListener('input', () => {
+          if (campo === elementos.cantidadModulos) {
+            validarCantidadEnteraEnVivo(campo);
+          }
+
+          ocultarEstadoFormulario();
+        });
         campo.addEventListener('change', ocultarEstadoFormulario);
       }
     });

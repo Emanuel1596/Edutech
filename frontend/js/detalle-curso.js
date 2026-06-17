@@ -1,3 +1,10 @@
+const escaparHtml = (valor) => String(valor ?? '')
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#039;');
+
 const marcarPaginaDatosLista = () => {
   if (window.EduTechMarcarPaginaLista) {
     window.EduTechMarcarPaginaLista();
@@ -836,6 +843,7 @@ const combinarCursoConContenido = (base, contenido, idCurso) => {
     precio_mxn: cursoBase.precio_mxn || cursoContenido.precio_mxn,
     nombre_nivel: cursoBase.nombre_nivel || cursoBase.nivel || cursoContenido.nombre_nivel || cursoContenido.nivel,
     nivel: cursoBase.nivel || cursoBase.nombre_nivel || cursoContenido.nivel || cursoContenido.nombre_nivel,
+    foto_perfil_instructor: obtenerFotoInstructor(cursoBase) || obtenerFotoInstructor(cursoContenido),
     categorias: Array.isArray(cursoBase.categorias) && cursoBase.categorias.length > 0 ? cursoBase.categorias : cursoContenido.categorias,
     modulos: usarModulosBase ? modulosBase : modulosContenido
   };
@@ -1243,6 +1251,7 @@ const obtenerCursoParaCarritoDetalle = (curso) => {
     titulo: curso.titulo || curso.curso || 'Curso EduTech',
     instructor: obtenerInstructor(curso),
     nombre_nivel: curso.nombre_nivel || curso.nivel || '',
+    foto_perfil_instructor: obtenerFotoInstructor(curso),
     total_lecciones: curso.total_lecciones || curso.lecciones || contarLeccionesCurso(curso),
     precio_mxn: Number(curso.precio_mxn || curso.precio || 0)
   };
@@ -1303,19 +1312,20 @@ const prepararBotonCompra = (curso) => {
 
   prepararVistaCompra(comprado);
 
-  const botonCarrito = asegurarBotonCarritoDetalle();
-
   if (esInstructor && !comprado) {
+    const botonAnterior = document.getElementById('detalleBotonAgregarCarrito');
+
+    if (botonAnterior) {
+      botonAnterior.remove();
+    }
+
     detalleBotonCompra.removeAttribute('href');
     detalleBotonCompra.setAttribute('aria-disabled', 'true');
     detalleBotonCompra.textContent = '';
-
-    if (botonCarrito) {
-      botonCarrito.style.display = 'none';
-    }
-
     return;
   }
+
+  const botonCarrito = asegurarBotonCarritoDetalle();
 
   const enCarrito = window.EduTechCarrito && window.EduTechCarrito.contiene(idCurso);
 

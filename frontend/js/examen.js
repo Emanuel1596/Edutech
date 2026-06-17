@@ -76,6 +76,25 @@ const escaparHtml = (valor) => String(valor || '')
   .replace(/"/g, '&quot;')
   .replace(/'/g, '&#039;');
 
+
+const limpiarTextoExamen = (valor) => String(valor || '').trim();
+
+const obtenerDescripcionExamen = () => {
+  const candidatos = [
+    examenActual && examenActual.texto_introductorio,
+    examenActual && examenActual.texto_descriptivo,
+    examenActual && examenActual.descripcion_larga,
+    examenActual && examenActual.descripcion,
+    examenActual && examenActual.leccion && examenActual.leccion.texto_descriptivo
+  ];
+
+  const descripcion = candidatos
+    .map(limpiarTextoExamen)
+    .find((valor) => valor && valor.toLowerCase() !== 'null' && valor.toLowerCase() !== 'undefined');
+
+  return descripcion || '';
+};
+
 const obtenerParametroIdCurso = () => {
   const parametros = new URLSearchParams(window.location.search);
   const id = parametros.get('id') || parametros.get('idCurso') || sessionStorage.getItem('edutech_curso_detalle_id');
@@ -109,6 +128,74 @@ const obtenerUrlRegresoCurso = () => {
   }
 
   return `detalle-curso.html?id=${idCurso}`;
+};
+
+const crearUrlAulaExamenFinal = (motivo = '') => {
+  const parametros = new URLSearchParams();
+  const idCurso = idCursoActual || obtenerParametroIdCurso() || '';
+  const idInscripcion = obtenerParametroIdInscripcion();
+
+  if (idInscripcion) {
+    parametros.set('idInscripcion', String(idInscripcion));
+  }
+
+  if (idCurso) {
+    parametros.set('idCurso', String(idCurso));
+  }
+
+  // Si alguien intenta abrir examen.html directo y todavía no corresponde,
+  // lo regresamos al aula sin seleccionar el examen final ni mostrar pantalla de bloqueo.
+  // El aula escogerá la primera lección disponible.
+  return `aula.html?${parametros.toString()}`;
+};
+
+const redirigirAulaExamenFinal = () => {
+  window.location.replace(crearUrlAulaExamenFinal());
+};
+
+const accesoExamenAutorizadoDesdeAula = () => {
+  if (!obtenerParametroQuiz() || obtenerParametroResultado()) {
+    return true;
+  }
+
+  const idInscripcion = obtenerParametroIdInscripcion();
+  const idCurso = idCursoActual || obtenerParametroIdCurso() || '';
+
+  if (!idInscripcion) {
+    return true;
+  }
+
+  try {
+    const bruto = sessionStorage.getItem('edutech_acceso_examen_desde_aula');
+
+    if (!bruto) {
+      return false;
+    }
+
+    const datos = JSON.parse(bruto);
+    const mismoCurso = !datos.idCurso || !idCurso || String(datos.idCurso) === String(idCurso);
+    const mismaInscripcion = !datos.idInscripcion || String(datos.idInscripcion) === String(idInscripcion);
+    const reciente = !datos.creadoEn || (Date.now() - Number(datos.creadoEn)) <= 30 * 60 * 1000;
+
+    return mismoCurso && mismaInscripcion && reciente;
+  } catch (error) {
+    return sessionStorage.getItem('edutech_acceso_examen_desde_aula') === '1';
+  }
+};
+
+const redirigirSiEsAccesoDirectoNoAutorizado = () => {
+  if (!accesoExamenAutorizadoDesdeAula()) {
+    redirigirAulaExamenFinal('aula');
+    return true;
+  }
+
+  return false;
+};
+
+
+const esErrorExamenBloqueadoPorProgreso = (error) => {
+  const mensaje = String((error && error.message) || error || '').toLowerCase();
+  return /completa|lecciones|bloquead|progreso|finaliza|anteriores/.test(mensaje);
 };
 
 const obtenerParametroResultado = () => {
@@ -390,7 +477,9 @@ const obtenerTituloExamen = () => {
 };
 
 const obtenerMinima = () => `${Number((examenActual && examenActual.calificacion_minima) || 0).toFixed(0)}%`;
-const obtenerIntentos = () => Number((examenActual && (examenActual.intentos_restantes ?? examenActual.max_intentos)) || 0);
+const tieneIntentosIlimitados = (examen = examenActual) => Boolean(examen && (examen.intentos_ilimitados === true || examen.intentos_ilimitados === 'true' || Number(examen.max_intentos) <= 0));
+const obtenerTextoIntentos = (valor) => valor === Infinity ? 'Ilimitados' : String(valor || 0);
+const obtenerIntentos = () => tieneIntentosIlimitados() ? Infinity : Number((examenActual && (examenActual.intentos_restantes ?? examenActual.max_intentos)) || 0);
 const obtenerTiempoMinutos = () => Number((examenActual && examenActual.tiempo_limite_minutos) || 0);
 
 
@@ -401,6 +490,10 @@ const puedePresentarExamen = () => {
 
   if (examenActual.puede_presentar === false || examenActual.puede_presentar === 'false') {
     return false;
+  }
+
+  if (tieneIntentosIlimitados()) {
+    return true;
   }
 
   const intentosDisponibles = Number(
@@ -657,19 +750,22 @@ const pintarLeccion = (examen) => {
   }
 
   if (examenLeccionIntentos) {
-    examenLeccionIntentos.textContent = `${intentos || 2} intentos`;
+    examenLeccionIntentos.textContent = `${obtenerTextoIntentos(intentos || 2)} intentos`;
   }
 
   if (examenLeccionMinima) {
     examenLeccionMinima.textContent = `${obtenerMinima()} de respuestas correctas`;
   }
 
+  const descripcionExamen = obtenerDescripcionExamen();
+
   if (examenTextoIntroUno) {
-    examenTextoIntroUno.innerHTML = `¡Estamos llegando al final del curso! Con lo que aprendimos vas a poder tener un manejo básico de <strong>${escaparHtml(tituloCurso)}</strong> para realizar tus primeras actividades completas. No te olvides que, para seguir aprendiendo, te recomendamos repasar todas las lecciones del curso.`;
+    examenTextoIntroUno.textContent = descripcionExamen || 'Evaluación final del curso.';
   }
 
   if (examenTextoIntroDos) {
-    examenTextoIntroDos.textContent = 'Fue un largo camino, de mucho esfuerzo y práctica pero llegamos finalmente al examen final. Para rendirlo y obtener el correspondiente certificado tenés que tener en cuenta lo siguiente:';
+    examenTextoIntroDos.textContent = '';
+    examenTextoIntroDos.hidden = true;
   }
 
   pintarSyllabus();
@@ -960,6 +1056,14 @@ const empezarCuestionario = (opcionesInicio = {}) => {
   const forzarInicioVisual = opcionesInicio && opcionesInicio.forzarInicioVisual === true;
 
   if (!puedePresentarExamen()) {
+    if (obtenerParametroIdInscripcion()) {
+      const motivo = examenActual && (examenActual.bloqueado_por_progreso === true || examenActual.bloqueado_por_progreso === 'true')
+        ? 'examen'
+        : 'intentos';
+      redirigirAulaExamenFinal(motivo);
+      return;
+    }
+
     pintarEstadoBotonLeccion();
     mostrarMensaje('Ya alcanzaste el máximo de intentos disponibles. Revisa tu calificación en Mi cuenta > Mis calificaciones.', false);
     mostrarSoloVista(examenLeccion);
@@ -1021,12 +1125,13 @@ const obtenerRespuestasFormulario = () => {
 
 const pintarMetaEvaluacionResultado = (intentosRestantes = null) => {
   const intentos = intentosRestantes === null ? obtenerIntentos() : intentosRestantes;
+  const textoIntentos = obtenerTextoIntentos(intentos);
   const preguntas = obtenerPreguntas();
   return `
     <h2 class="llms-quiz-meta-title">Información de la Evaluación</h2>
     <ul class="llms-quiz-meta-info tdc-result-meta-bottom">
       <li class="llms-quiz-meta-item llms-passing-percent"><strong>Calificación mínima de aprobación:</strong> <span class="llms-pass-perc">${obtenerMinima()}</span></li>
-      <li class="llms-quiz-meta-item llms-attempts"><strong>Otros intentos:</strong> <span class="llms-attempts">${intentos}</span></li>
+      <li class="llms-quiz-meta-item llms-attempts"><strong>Otros intentos:</strong> <span class="llms-attempts">${textoIntentos}</span></li>
       <li class="llms-quiz-meta-item llms-question-count"><strong>Preguntas:</strong> <span class="llms-question-count">${preguntas.length || (examenActual && examenActual.cantidad_preguntas) || 0}</span></li>
       <li class="llms-quiz-meta-item llms-time-limit"><strong>Límite de tiempo:</strong> <span class="llms-time-limit">${obtenerTiempoMinutos()} minutos</span></li>
     </ul>
@@ -1137,6 +1242,26 @@ const crearOpcionIntentoResultado = (intento, resultadoActual) => {
   return `<option value="${escaparHtml(crearClaveIntentoResultado(intento))}"${seleccionado}>Intento # ${numero} - ${Math.max(0, Math.min(100, calificacion)).toFixed(0)}% ( ${estado} )</option>`;
 };
 
+const crearUrlCertificadoResultado = (resultado) => {
+  const certificado = resultado && resultado.certificado ? resultado.certificado : null;
+
+  if (certificado) {
+    const codigo = certificado.codigo_certificado || certificado.codigo || '';
+
+    if (codigo) {
+      return `certificado.html?codigo=${encodeURIComponent(String(codigo).trim())}`;
+    }
+
+    const idCertificado = certificado.id_certificado || certificado.idCertificado || '';
+
+    if (idCertificado) {
+      return `certificado.html?id=${encodeURIComponent(String(idCertificado).trim())}`;
+    }
+  }
+
+  return 'mi-cuenta.html#certificados';
+};
+
 const pintarResultado = (resultado) => {
   if (!examenResultado || !resultado) {
     return;
@@ -1156,7 +1281,7 @@ const pintarResultado = (resultado) => {
   const respuestas = Array.isArray(resultado.respuestas) ? resultado.respuestas : [];
   const titulo = obtenerTituloExamen();
   const numeroIntento = resultado.numero_intento || 1;
-  const intentosRestantes = Math.max(0, Number(resultado.intentos_restantes ?? (obtenerIntentos() - numeroIntento)));
+  const intentosRestantes = tieneIntentosIlimitados(resultado) ? Infinity : Math.max(0, Number(resultado.intentos_restantes ?? (obtenerIntentos() - numeroIntento)));
   const estadoTexto = aprobado ? '¡Aprobado!' : 'No aprobado';
   const historialIntentos = obtenerHistorialIntentosResultado(resultado);
 
@@ -1208,8 +1333,8 @@ const pintarResultado = (resultado) => {
     </section>
   `;
 
-  const botonIntento = intentosRestantes > 0
-    ? `<div class="llms-quiz-buttons llms-button-wrapper tdc-result-buttons"><button type="button" class="llms-button-action button tdc-main-button" id="examenNuevoIntentoResultado">Empezar cuestionario</button></div>`
+  const botonCertificados = aprobado
+    ? `<div class="tdc-result-certificate-wrap"><a class="tdc-result-certificate-link" id="examenIrCertificadosResultado" href="${escaparHtml(crearUrlCertificadoResultado(resultado))}">Ver certificado</a></div>`
     : '';
 
   examenResultado.className = `tdc-view tdc-quiz-result-view ${aprobado ? 'tdc-result-approved' : 'tdc-result-failed'}`;
@@ -1239,7 +1364,7 @@ const pintarResultado = (resultado) => {
                     </ul>
                     ${historial}
                     ${pintarMetaEvaluacionResultado(intentosRestantes)}
-                    ${botonIntento}
+                    ${botonCertificados}
                   </aside>
                   ${respuestasHtml}
                 </div>
@@ -1268,11 +1393,6 @@ const pintarResultado = (resultado) => {
         pintarResultado(intentoSeleccionado);
       }
     });
-  }
-
-  const botonNuevoIntento = byId('examenNuevoIntentoResultado');
-  if (botonNuevoIntento) {
-    botonNuevoIntento.addEventListener('click', () => empezarCuestionario({ forzarInicioVisual: false }));
   }
 
   mostrarSoloVista(examenResultado);
@@ -1370,6 +1490,26 @@ const cargarExamen = async () => {
 
     examenActual = examen;
 
+    if (!obtenerParametroResultado()) {
+      const esVistaQuiz = obtenerParametroQuiz();
+      const examenBloqueadoProgreso = examen.bloqueado_por_progreso === true || examen.bloqueado_por_progreso === 'true';
+
+      if (examenBloqueadoProgreso && obtenerParametroIdInscripcion()) {
+        redirigirAulaExamenFinal('examen');
+        return;
+      }
+
+      if (esVistaQuiz && !puedePresentarExamen() && obtenerParametroIdInscripcion()) {
+        redirigirAulaExamenFinal('intentos');
+        return;
+      }
+
+      if (!esVistaQuiz && obtenerParametroIdInscripcion()) {
+        redirigirAulaExamenFinal('aula');
+        return;
+      }
+    }
+
     if (obtenerParametroResultado()) {
       const resultadoLocal = obtenerResultadoLocalCurso();
 
@@ -1399,6 +1539,11 @@ const cargarExamen = async () => {
       pintarLeccion(examen);
     }
   } catch (error) {
+    if (obtenerParametroIdInscripcion() && esErrorExamenBloqueadoPorProgreso(error)) {
+      redirigirAulaExamenFinal('examen');
+      return;
+    }
+
     mostrarMensaje(error && error.message ? error.message : 'No se pudo cargar el examen final.', true);
   } finally {
     marcarPaginaExamenLista();

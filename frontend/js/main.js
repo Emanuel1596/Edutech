@@ -64,21 +64,8 @@
     }, 1600);
   };
 
-  const ocultarPaginaHistorial = () => {
-    const body = obtenerBody();
-
-    if (body && esPaginaConCargaControlada()) {
-      estado.listo = false;
-      body.classList.add('edutech-data-pending', 'edutech-data-loading');
-      body.classList.remove('edutech-data-ready');
-    }
-
-    document.documentElement.classList.add('edutech-session-checking', 'edutech-guard-pending');
-  };
-
   window.EduTechPrepararPagina = prepararPagina;
   window.EduTechMarcarPaginaLista = revelarPagina;
-  window.EduTechOcultarPaginaHistorial = ocultarPaginaHistorial;
 
   if (document.body && esPaginaConCargaControlada()) {
     prepararPagina();
@@ -101,11 +88,55 @@
 
 
 (() => {
-  const CLAVE_CARRITO = 'edutech_carrito';
+  const CLAVE_CARRITO_BASE = 'edutech_carrito';
+
+  const obtenerUsuarioCarrito = () => {
+    try {
+      return JSON.parse(localStorage.getItem('edutech_usuario') || 'null');
+    } catch (error) {
+      return null;
+    }
+  };
+
+  const obtenerIdUsuarioCarrito = () => {
+    const usuario = obtenerUsuarioCarrito();
+    const id = usuario && (usuario.id_usuario || usuario.id || usuario.idUsuario);
+    return id ? String(id) : '';
+  };
+
+  const obtenerClaveCarrito = () => {
+    const idUsuario = obtenerIdUsuarioCarrito();
+    return idUsuario ? `${CLAVE_CARRITO_BASE}_${idUsuario}` : CLAVE_CARRITO_BASE;
+  };
+
+  const haySesionCarrito = () => {
+    try {
+      const usuario = obtenerUsuarioCarrito();
+      return localStorage.getItem('edutech_sesion_activa') === 'true' && Boolean(usuario && (usuario.id_usuario || usuario.id || usuario.idUsuario));
+    } catch (error) {
+      return false;
+    }
+  };
 
   const leerCarrito = () => {
+    if (!haySesionCarrito()) {
+      return [];
+    }
+
     try {
-      const carrito = JSON.parse(localStorage.getItem(CLAVE_CARRITO) || '[]');
+      const clave = obtenerClaveCarrito();
+      let carrito = JSON.parse(localStorage.getItem(clave) || '[]');
+
+      if ((!Array.isArray(carrito) || carrito.length === 0) && clave !== CLAVE_CARRITO_BASE) {
+        const carritoAnterior = JSON.parse(localStorage.getItem(CLAVE_CARRITO_BASE) || '[]');
+
+        if (Array.isArray(carritoAnterior) && carritoAnterior.length > 0) {
+          carrito = carritoAnterior;
+          localStorage.setItem(clave, JSON.stringify(carritoAnterior));
+          localStorage.removeItem(CLAVE_CARRITO_BASE);
+        }
+      }
+
       return Array.isArray(carrito) ? carrito.filter((curso) => curso && curso.id_curso) : [];
     } catch (error) {
       return [];
@@ -113,6 +144,12 @@
   };
 
   const guardarCarrito = (carrito) => {
+    if (!haySesionCarrito()) {
+      localStorage.removeItem(CLAVE_CARRITO_BASE);
+      window.dispatchEvent(new CustomEvent('edutech-carrito-actualizado', { detail: { total: 0 } }));
+      return [];
+    }
+
     const cursosUnicos = [];
     const ids = new Set();
 
@@ -139,7 +176,11 @@
       });
     });
 
-    localStorage.setItem(CLAVE_CARRITO, JSON.stringify(cursosUnicos));
+    localStorage.setItem(obtenerClaveCarrito(), JSON.stringify(cursosUnicos));
+
+    if (obtenerClaveCarrito() !== CLAVE_CARRITO_BASE) {
+      localStorage.removeItem(CLAVE_CARRITO_BASE);
+    }
     window.dispatchEvent(new CustomEvent('edutech-carrito-actualizado', { detail: { total: cursosUnicos.length } }));
     return cursosUnicos;
   };
@@ -183,9 +224,31 @@
   };
 
   const actualizarIndicadorCarrito = () => {
-    const total = leerCarrito().length;
+    const sesion = haySesionCarrito();
+    const total = sesion ? leerCarrito().length : 0;
 
     document.querySelectorAll('.cart-button').forEach((enlace) => {
+      const itemMenu = enlace.closest('li');
+
+      if (!sesion) {
+        if (itemMenu) {
+          itemMenu.style.display = 'none';
+        } else {
+          enlace.style.display = 'none';
+        }
+
+        const badgeExistente = enlace.querySelector('.cart-count-badge');
+        if (badgeExistente) {
+          badgeExistente.textContent = '0';
+          badgeExistente.style.display = 'none';
+        }
+        return;
+      }
+
+      if (itemMenu) {
+        itemMenu.style.display = '';
+      }
+      enlace.style.display = '';
       enlace.href = 'carrito.html';
       enlace.setAttribute('aria-label', total > 0 ? `Carrito de compras, ${total} curso${total === 1 ? '' : 's'}` : 'Carrito de compras');
       enlace.classList.add('cart-button-with-count');
@@ -209,6 +272,11 @@
     limpiar: () => guardarCarrito([]),
     contiene: (idCurso) => leerCarrito().some((curso) => String(curso.id_curso) === String(idCurso)),
     agregar: (curso) => {
+      if (!haySesionCarrito()) {
+        actualizarIndicadorCarrito();
+        return { ok: false, requiereSesion: true, message: 'Inicia sesión para usar el carrito.' };
+      }
+
       const cursoNormalizado = normalizarCursoCarrito(curso);
 
       if (!cursoNormalizado) {
@@ -310,6 +378,21 @@ document.addEventListener('DOMContentLoaded', () => {
     return idRol === 2 || rol === 'instructor';
   };
 
+  const usuarioEsAdminMenu = (usuario) => {
+    if (!usuario) {
+      return false;
+    }
+
+    if (window.EduTech && typeof window.EduTech.usuarioTieneRol === 'function') {
+      return window.EduTech.usuarioTieneRol(usuario, 'Administrador') || window.EduTech.usuarioTieneRol(usuario, 'Admin');
+    }
+
+    const idRol = Number(usuario.id_rol || usuario.idRol || 0);
+    const rol = String(usuario.nombre_rol || usuario.rol || '').trim().toLowerCase();
+
+    return idRol === 3 || rol === 'administrador' || rol === 'admin';
+  };
+
   const obtenerRutaCuenta = (usuario) => {
     if (usuarioEsInstructorMenu(usuario)) {
       return estaEnPanelInstructor() ? '#dashboard' : 'instructor.html#dashboard';
@@ -322,7 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return 'mi-cuenta.html#dashboard';
   };
 
-  const obtenerTextoCuenta = (_usuario) => 'Mi cuenta';
+  const obtenerTextoCuenta = (usuario) => usuarioEsAdminMenu(usuario) ? 'Admin' : 'Mi cuenta';
 
   const crearItemCuenta = (usuario) => {
     const item = document.createElement('li');
@@ -419,7 +502,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.classList.remove('edutech-role-instructor');
 
       if (itemCarrito) {
-        itemCarrito.style.display = '';
+        itemCarrito.style.display = 'none';
       }
 
       if (itemSolicitudInstructor) {

@@ -2110,3 +2110,51 @@
   text-align: left !important;
   color: #ffb7b7 !important;
 }
+
+
+/* Paso 24 - Botón para continuar al examen */
+.instructor-next-exam-button {
+  color: #04e2ff;
+}
+
+.instructor-next-exam-button:hover,
+.instructor-next-exam-button:focus {
+  color: #ffffff;
+}
+
+
+/* Paso 24.2 - Botón eliminar borrador en tarjeta */
+.instructor-course-actions button[data-action="eliminar-borrador"] {
+  border: 0;
+  background: transparent;
+  color: #ffb8b8;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.instructor-course-actions button[data-action="eliminar-borrador"]:hover,
+.instructor-course-actions button[data-action="eliminar-borrador"]:focus {
+  color: #ffffff;
+}
+
+.instructor-account-form input:-webkit-autofill,
+.instructor-account-form input:-webkit-autofill:hover,
+.instructor-account-form input:-webkit-autofill:focus,
+.instructor-account-form textarea:-webkit-autofill,
+.instructor-account-form textarea:-webkit-autofill:hover,
+.instructor-account-form textarea:-webkit-autofill:focus,
+.instructor-account-form select:-webkit-autofill,
+.instructor-account-form select:-webkit-autofill:hover,
+.instructor-account-form select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #121827 inset !important;
+  -webkit-text-fill-color: #f8fbff !important;
+  caret-color: #f8fbff !important;
+  border-color: #3a4660 !important;
+  transition: background-color 9999s ease-out 0s !important;
+}
+
+.instructor-account-success {
+  color: #19d37d !important;
+  font-weight: 700 !important;
+}

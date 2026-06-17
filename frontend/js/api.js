@@ -215,7 +215,7 @@ const asegurarEpochSesion = () => {
 };
 
 const esClavePersistenteAlumno = (clave) => {
-  return /^edutech_perfil_alumno_\d+$/.test(clave) || clave === 'edutech_carrito';
+  return /^edutech_perfil_alumno_\d+$/.test(clave) || /^edutech_carrito_\d+$/.test(clave);
 };
 
 const limpiarClavesEdutech = (storage) => {
@@ -229,6 +229,8 @@ const limpiarClavesEdutech = (storage) => {
 };
 
 const cerrarSesion = () => {
+  localStorage.removeItem('edutech_carrito');
+  sessionStorage.removeItem('edutech_carrito');
   limpiarClavesEdutech(localStorage);
   limpiarClavesEdutech(sessionStorage);
 

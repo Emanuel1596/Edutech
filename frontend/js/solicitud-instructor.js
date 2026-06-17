@@ -2,6 +2,42 @@ const formularioInstructor = document.getElementById('instructorRequestForm');
 
 const correoBaseInstructor = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 const dominiosCorreoInstructor = ['com', 'net', 'org', 'edu', 'mx', 'com.mx', 'edu.mx', 'gob.mx', 'gov'];
+const contieneLetrasInstructor = (valor) => /[A-Za-zÁÉÍÓÚáéíóúÑñÜü]/.test(String(valor || ''));
+const enlacePerfilValidoInstructor = (valor) => {
+  const texto = String(valor || '').trim();
+
+  try {
+    const url = new URL(texto);
+
+    if (!['http:', 'https:'].includes(url.protocol)) {
+      return false;
+    }
+
+    const host = url.hostname.replace(/^www\./i, '').toLowerCase();
+    const partes = url.pathname.split('/').filter(Boolean);
+
+    if (partes.length === 0) {
+      return false;
+    }
+
+    if (host === 'github.com') {
+      const bloqueados = new Set(['features', 'pricing', 'enterprise', 'explore', 'topics', 'collections', 'login', 'signup', 'about', 'marketplace']);
+      return partes.length >= 1 && !bloqueados.has(partes[0].toLowerCase());
+    }
+
+    if (host === 'linkedin.com') {
+      return partes.length >= 2 && ['in', 'company', 'school'].includes(partes[0].toLowerCase());
+    }
+
+    if (['gitlab.com', 'bitbucket.org', 'behance.net', 'dribbble.com', 'youtube.com', 'vimeo.com'].includes(host)) {
+      return partes.length >= 1;
+    }
+
+    return partes.length >= 1;
+  } catch (error) {
+    return false;
+  }
+};
 
 const correoInstructorValido = (correo) => {
   const valor = String(correo || '').trim().toLowerCase();
@@ -28,26 +64,29 @@ const reglasInstructor = {
   instructorArea: {
     minimo: 3,
     maximo: 60,
+    validar: contieneLetrasInstructor,
     mensajeVacio: 'Escribe tu área de experiencia.',
-    mensajeInvalido: 'El área de experiencia debe tener entre 3 y 60 caracteres.'
+    mensajeInvalido: 'El área de experiencia debe tener texto; puede incluir números, pero no puede ser solo números.'
   },
   instructorExperiencia: {
     minimo: 10,
     maximo: 500,
+    validar: contieneLetrasInstructor,
     mensajeVacio: 'Describe tu experiencia.',
-    mensajeInvalido: 'Describe tu experiencia con entre 10 y 500 caracteres.'
+    mensajeInvalido: 'Describe tu experiencia con texto; puede incluir números, pero no puede ser solo números.'
   },
   instructorEvidencia: {
-    patron: /^(https?:\/\/)[^\s]+\.[^\s]+$/,
+    validar: enlacePerfilValidoInstructor,
     maximo: 200,
     mensajeVacio: 'Agrega un enlace como evidencia.',
-    mensajeInvalido: 'Agrega un enlace válido de máximo 200 caracteres que empiece con http:// o https://.'
+    mensajeInvalido: 'Agrega un enlace directo a tu perfil o portafolio, no solo la página de inicio del sitio.'
   },
   instructorMotivo: {
     minimo: 10,
     maximo: 300,
+    validar: contieneLetrasInstructor,
     mensajeVacio: 'Escribe el motivo de tu solicitud.',
-    mensajeInvalido: 'El motivo debe tener entre 10 y 300 caracteres.'
+    mensajeInvalido: 'El motivo debe tener texto; puede incluir números, pero no puede ser solo números.'
   }
 };
 

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>PayPal Sandbox - EduTech</title>
+  <script src="js/session-guard.js"></script>
+  <meta name="description" content="Pantalla sandbox para procesar pago y webhook de EduTech.">
+
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+  <div class="site" id="page">
+
+    <header class="site-header">
+      <div class="header-container">
+        <a href="index.html" class="logo" aria-label="EduTech">
+          <span class="logo-main">Edu</span><span class="logo-accent">Tech</span>
+        </a>
+
+        <nav class="main-navigation" aria-label="Menú principal">
+          <ul class="main-menu">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="cursos.html">Cursos</a></li>
+            <li><a href="mi-cuenta.html">Mi cuenta</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="site-content checkout-page">
+      <section class="checkout-section checkout-result-section purchase-confirmation-section">
+
+        <article class="checkout-result-card purchase-confirmation-card" id="paypalSandboxCard">
+          <p class="result-eyebrow">PayPal Sandbox</p>
+          <h1>Confirmar pago externo</h1>
+
+          <p id="paypalSandboxMensaje">
+            Esta pantalla simula la pasarela externa de PayPal Sandbox. Al aprobar el pago, se enviará un webhook a EduTech para liberar el curso.
+          </p>
+
+          <div class="purchase-confirmation-summary" aria-label="Resumen del pago sandbox">
+            <div class="purchase-confirmation-row">
+              <span>Número de orden</span>
+              <strong id="sandboxOrden">Por confirmar</strong>
+            </div>
+
+            <div class="purchase-confirmation-row">
+              <span>Curso</span>
+              <strong id="sandboxCurso">Curso EduTech</strong>
+            </div>
+
+            <div class="purchase-confirmation-row">
+              <span>Total</span>
+              <strong id="sandboxTotal">$0 MXN</strong>
+            </div>
+
+            <div class="purchase-confirmation-row">
+              <span>Estado</span>
+              <strong id="sandboxEstado">Pendiente de pago</strong>
+            </div>
+          </div>
+
+          <p class="payment-note" id="sandboxNota">
+            El curso todavía no se libera hasta que el webhook sea procesado correctamente por EduTech.
+          </p>
+
+          <div class="result-actions">
+            <button class="result-link" type="button" id="btnAprobarSandbox">Pagar con PayPal Sandbox</button>
+            <a class="result-link" href="cursos.html" id="btnCancelarSandbox">Cancelar</a>
+          </div>
+        </article>
+
+        <article class="checkout-result-card purchase-confirmation-card" id="paypalSandboxSinDatos" style="display: none;">
+          <p class="result-eyebrow">Sin orden pendiente</p>
+          <h1>No encontramos una orden pendiente</h1>
+
+          <p>
+            Esta pantalla se abre después de crear una orden de compra. Vuelve al catálogo y realiza el proceso nuevamente.
+          </p>
+
+          <div class="result-actions">
+            <a class="result-link" href="cursos.html">Volver a cursos</a>
+          </div>
+        </article>
+
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>EduTech - Plataforma Web de Cursos</p>
+    </footer>
+
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/pago-sandbox.js"></script>
+</body>
+</html>

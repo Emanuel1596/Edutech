@@ -34,6 +34,7 @@
     videoBox: document.getElementById('previewVideoBox'),
     leccionTexto: document.getElementById('previewLeccionTexto'),
     leccionRecursos: document.getElementById('previewLeccionRecursos'),
+    recursosBox: document.querySelector('.preview-resources-box'),
     leccionAnterior: document.getElementById('previewLeccionAnterior'),
     leccionSiguiente: document.getElementById('previewLeccionSiguiente'),
     examenTitulo: document.getElementById('previewExamenTitulo'),
@@ -111,31 +112,69 @@
     return usuario;
   };
 
-  const obtenerUrlEmbed = (url) => {
-    const texto = String(url || '').trim();
+  const obtenerEmbedYoutube = (url) => {
+    try {
+      const urlObj = new URL(String(url || '').trim());
+      const host = urlObj.hostname.replace(/^www\./, '').replace(/^m\./, '');
 
-    if (!texto) {
+      if (!host.includes('youtube.com') && host !== 'youtu.be') {
+        return '';
+      }
+
+      let id = '';
+
+      if (host === 'youtu.be') {
+        id = urlObj.pathname.split('/').filter(Boolean)[0] || '';
+      }
+
+      if (!id && host.includes('youtube.com')) {
+        id = urlObj.searchParams.get('v') || '';
+
+        if (!id) {
+          const partes = urlObj.pathname.split('/').filter(Boolean);
+          const indiceEmbed = partes.indexOf('embed');
+          const indiceShorts = partes.indexOf('shorts');
+          const indiceLive = partes.indexOf('live');
+
+          if (indiceEmbed >= 0 && partes[indiceEmbed + 1]) {
+            id = partes[indiceEmbed + 1];
+          } else if (indiceShorts >= 0 && partes[indiceShorts + 1]) {
+            id = partes[indiceShorts + 1];
+          } else if (indiceLive >= 0 && partes[indiceLive + 1]) {
+            id = partes[indiceLive + 1];
+          }
+        }
+      }
+
+      id = String(id || '').trim();
+
+      return id ? `https://www.youtube.com/embed/${encodeURIComponent(id)}?rel=0&modestbranding=1` : '';
+    } catch (error) {
       return '';
     }
-
-    const youtubeWatch = texto.match(/[?&]v=([^&]+)/);
-    const youtubeShort = texto.match(/youtu\.be\/([^?&/]+)/);
-    const vimeo = texto.match(/vimeo\.com\/(\d+)/);
-
-    if (youtubeWatch) {
-      return `https://www.youtube.com/embed/${encodeURIComponent(youtubeWatch[1])}`;
-    }
-
-    if (youtubeShort) {
-      return `https://www.youtube.com/embed/${encodeURIComponent(youtubeShort[1])}`;
-    }
-
-    if (vimeo) {
-      return `https://player.vimeo.com/video/${encodeURIComponent(vimeo[1])}`;
-    }
-
-    return texto;
   };
+
+  const obtenerEmbedVimeo = (url) => {
+    try {
+      const urlObj = new URL(String(url || '').trim());
+      const host = urlObj.hostname.replace(/^www\./, '');
+
+      if (!host.includes('vimeo.com')) {
+        return '';
+      }
+
+      const id = urlObj.pathname.split('/').filter(Boolean).pop();
+      return id ? `https://player.vimeo.com/video/${encodeURIComponent(id)}` : '';
+    } catch (error) {
+      return '';
+    }
+  };
+
+  const obtenerUrlEmbed = (url) => obtenerEmbedYoutube(url) || obtenerEmbedVimeo(url);
+
+  const crearEnlaceVideoPreview = () => '';
+
+  const cursoTieneExamen = () => estado.examen && Array.isArray(estado.examen.preguntas) && estado.examen.preguntas.length > 0;
 
   const prepararLecciones = (curso) => {
     estado.lecciones = [];
@@ -180,14 +219,36 @@
       </div>
     `;
 
-    elementos.contenidoPublico.innerHTML = (curso.modulos || []).map((modulo) => `
+    const modulosPublicos = (curso.modulos || []).map((modulo) => ({
+      titulo: modulo.titulo,
+      lecciones: (modulo.lecciones || []).map((leccion) => ({
+        titulo: leccion.titulo,
+        numero_orden: leccion.numero_orden,
+        total: (modulo.lecciones || []).length,
+        esExamen: false
+      }))
+    }));
+
+    if (cursoTieneExamen()) {
+      modulosPublicos.push({
+        titulo: 'Examen Final',
+        lecciones: [{
+          titulo: 'Examen final',
+          numero_orden: 1,
+          total: 1,
+          esExamen: true
+        }]
+      });
+    }
+
+    elementos.contenidoPublico.innerHTML = modulosPublicos.map((modulo) => `
       <article class="preview-public-module">
         <h3>${escaparHtml(modulo.titulo)}</h3>
         ${(modulo.lecciones || []).map((leccion) => `
-          <div class="preview-public-lesson">
-            <span>✓</span>
+          <div class="preview-public-lesson ${leccion.esExamen ? 'is-exam' : ''}">
+            <span class="preview-lesson-icon ${leccion.esExamen ? 'is-exam' : 'is-done'}" aria-hidden="true"></span>
             <p>${escaparHtml(leccion.titulo)}</p>
-            <small>${escaparHtml(leccion.numero_orden)} de ${escaparHtml((modulo.lecciones || []).length)}</small>
+            <small>${escaparHtml(leccion.numero_orden)} de ${escaparHtml(leccion.total)}</small>
           </div>
         `).join('')}
       </article>
@@ -195,22 +256,34 @@
   };
 
   const pintarMenuAula = () => {
-    elementos.aulaMenu.innerHTML = (estado.curso.modulos || []).map((modulo) => `
+    const modulosHtml = (estado.curso.modulos || []).map((modulo) => `
       <section class="preview-sidebar-module">
         <h4>${escaparHtml(modulo.titulo)}</h4>
         ${(modulo.lecciones || []).map((leccion) => {
           const indiceGlobal = estado.lecciones.findIndex((item) => Number(item.id_leccion) === Number(leccion.id_leccion));
-          const activo = indiceGlobal === estado.indiceLeccionActual;
+          const activo = estado.modo === 'aula' && indiceGlobal === estado.indiceLeccionActual;
 
           return `
             <button type="button" class="preview-sidebar-lesson ${activo ? 'active' : ''}" data-indice="${indiceGlobal}">
-              <span></span>
+              <span class="preview-sidebar-status" aria-hidden="true"></span>
               ${escaparHtml(leccion.titulo)}
             </button>
           `;
         }).join('')}
       </section>
     `).join('');
+
+    const examenHtml = cursoTieneExamen() ? `
+      <section class="preview-sidebar-module">
+        <h4>Examen Final</h4>
+        <button type="button" class="preview-sidebar-lesson ${estado.modo === 'examen' ? 'active' : ''}" data-open-examen="true">
+          <span class="preview-sidebar-status is-exam" aria-hidden="true"></span>
+          Examen final
+        </button>
+      </section>
+    ` : '';
+
+    elementos.aulaMenu.innerHTML = `${modulosHtml}${examenHtml}`;
   };
 
   const pintarLeccionActual = () => {
@@ -232,28 +305,49 @@
     const tipoVideo = String(leccion.nombre_tipo_video || '').toLowerCase();
     const urlVideo = leccion.url_video || '';
 
-    if (tipoVideo === 'local' || /^assets\/videos\//i.test(urlVideo)) {
+    const embed = obtenerUrlEmbed(urlVideo);
+
+    if (tipoVideo === 'local' || /^assets\/videos\//i.test(urlVideo) || /\.(mp4|webm|ogg|mov|m4v)(\?.*)?$/i.test(urlVideo)) {
       elementos.videoBox.innerHTML = `
-        <video controls>
+        <video controls preload="metadata">
           <source src="${escaparHtml(urlVideo)}">
           Tu navegador no puede reproducir este video.
         </video>
+        ${crearEnlaceVideoPreview(urlVideo)}
+      `;
+    } else if (embed) {
+      elementos.videoBox.innerHTML = `
+        <iframe
+          src="${escaparHtml(embed)}"
+          title="${escaparHtml(leccion.titulo)}"
+          loading="lazy"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen>
+        </iframe>
+        ${crearEnlaceVideoPreview(urlVideo)}
       `;
     } else {
       elementos.videoBox.innerHTML = `
-        <iframe
-          src="${escaparHtml(obtenerUrlEmbed(urlVideo))}"
-          title="${escaparHtml(leccion.titulo)}"
-          allowfullscreen>
-        </iframe>
+        <div class="preview-video-placeholder">
+          <span aria-hidden="true">▶</span>
+          <p>Video de la lección</p>
+          ${crearEnlaceVideoPreview(urlVideo) || '<small>Video no disponible</small>'}
+        </div>
       `;
     }
 
     const recursos = Array.isArray(leccion.recursos) ? leccion.recursos : [];
 
     if (recursos.length === 0) {
-      elementos.leccionRecursos.innerHTML = '<p>Sin recursos adicionales.</p>';
+      if (elementos.recursosBox) {
+        elementos.recursosBox.hidden = true;
+      }
+      elementos.leccionRecursos.innerHTML = '';
     } else {
+      if (elementos.recursosBox) {
+        elementos.recursosBox.hidden = false;
+      }
       elementos.leccionRecursos.innerHTML = recursos.map((recurso) => `
         <a class="preview-resource-item" href="${escaparHtml(recurso.url_recurso)}" target="_blank" rel="noopener">
           <strong>${escaparHtml(recurso.titulo)}</strong>
@@ -263,7 +357,16 @@
     }
 
     elementos.leccionAnterior.disabled = estado.indiceLeccionActual === 0;
-    elementos.leccionSiguiente.disabled = estado.indiceLeccionActual >= estado.lecciones.length - 1;
+    const esUltimaLeccion = estado.indiceLeccionActual >= estado.lecciones.length - 1;
+
+    if (esUltimaLeccion && cursoTieneExamen()) {
+      elementos.leccionSiguiente.disabled = false;
+      elementos.leccionSiguiente.textContent = 'Ir al examen final';
+    } else {
+      elementos.leccionSiguiente.disabled = esUltimaLeccion;
+      elementos.leccionSiguiente.textContent = 'Siguiente lección';
+    }
+
     pintarMenuAula();
   };
 
@@ -314,7 +417,7 @@
     const preguntas = Array.isArray(examen.preguntas) ? examen.preguntas : [];
 
     elementos.examenTitulo.textContent = examen.titulo || 'Examen final';
-    elementos.examenDescripcion.textContent = examen.descripcion || 'Revisión del examen sin límite de tiempo y sin guardar calificación.';
+    elementos.examenDescripcion.textContent = examen.texto_introductorio || examen.descripcion || 'Revisión del examen sin límite de tiempo y sin guardar calificación.';
 
     elementos.examenMeta.innerHTML = `
       <span>Preguntas configuradas: ${escaparHtml(preguntas.length)}</span>
@@ -505,8 +608,14 @@
     }
 
     try {
-      const datos = await window.EduTech.apiRequest(`/admin/cursos/${encodeURIComponent(idCurso)}/preview?idAdmin=${encodeURIComponent(usuario.id_usuario)}`);
-      estado.curso = datos.curso;
+      const [datosCurso, datosExamen] = await Promise.all([
+        window.EduTech.apiRequest(`/admin/cursos/${encodeURIComponent(idCurso)}/preview?idAdmin=${encodeURIComponent(usuario.id_usuario)}`),
+        window.EduTech.apiRequest(`/admin/cursos/${encodeURIComponent(idCurso)}/examen-preview?idAdmin=${encodeURIComponent(usuario.id_usuario)}`).catch(() => ({ examen: null }))
+      ]);
+
+      estado.curso = datosCurso.curso;
+      estado.examen = datosExamen.examen || null;
+      estado.examenCargado = true;
       pintarCurso();
     } catch (error) {
       mostrarMensaje(error.message || 'No se pudo cargar la vista previa del curso.', true);
@@ -532,6 +641,11 @@
       if (estado.indiceLeccionActual < estado.lecciones.length - 1) {
         estado.indiceLeccionActual += 1;
         pintarLeccionActual();
+        return;
+      }
+
+      if (cursoTieneExamen()) {
+        cambiarModo('examen');
       }
     });
 
@@ -542,7 +656,17 @@
         return;
       }
 
+      if (boton.dataset.openExamen === 'true') {
+        cambiarModo('examen');
+        return;
+      }
+
       estado.indiceLeccionActual = Number(boton.dataset.indice || 0);
+
+      if (estado.modo !== 'aula') {
+        cambiarModo('aula');
+      }
+
       pintarLeccionActual();
     });
   };

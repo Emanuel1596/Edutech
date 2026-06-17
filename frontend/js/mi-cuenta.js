@@ -299,8 +299,16 @@
   };
 
   const obtenerPerfilAlumno = () => {
+    const usuario = obtenerUsuario();
     const perfil = obtenerJSON('edutech_perfil_alumno', {});
-    return perfil && typeof perfil === 'object' && !Array.isArray(perfil) ? perfil : {};
+    const perfilPorUsuario = obtenerJSON(`edutech_perfil_alumno_${usuario.id_usuario || usuario.id || ''}`, {});
+    const ultimoPerfilCompra = obtenerJSON('edutech_ultimo_perfil_compra', {});
+
+    return {
+      ...(ultimoPerfilCompra && typeof ultimoPerfilCompra === 'object' && !Array.isArray(ultimoPerfilCompra) ? ultimoPerfilCompra : {}),
+      ...(perfil && typeof perfil === 'object' && !Array.isArray(perfil) ? perfil : {}),
+      ...(perfilPorUsuario && typeof perfilPorUsuario === 'object' && !Array.isArray(perfilPorUsuario) ? perfilPorUsuario : {})
+    };
   };
 
   const separarUsuarioNombre = (usuario) => {
@@ -1678,6 +1686,11 @@
 
     guardarJSON('edutech_usuario', nuevoUsuario);
     guardarJSON('edutech_perfil_alumno', perfilNuevo);
+    guardarJSON('edutech_ultimo_perfil_compra', perfilNuevo);
+
+    if (nuevoUsuario.id_usuario || nuevoUsuario.id) {
+      guardarJSON(`edutech_perfil_alumno_${nuevoUsuario.id_usuario || nuevoUsuario.id}`, perfilNuevo);
+    }
 
     if (mensajeCuentaGuardada) {
       mensajeCuentaGuardada.style.display = 'block';
@@ -1756,7 +1769,7 @@
       }
 
       Object.keys(storage)
-        .filter((clave) => clave.startsWith('edutech_'))
+        .filter((clave) => clave.startsWith('edutech_') && !/^edutech_perfil_alumno_\d+$/.test(clave))
         .forEach((clave) => storage.removeItem(clave));
     };
 

@@ -1,5 +1,140 @@
 const pool = require('../config/db');
 
+const normalizarTexto = (valor) => String(valor || '')
+  .trim()
+  .toLowerCase()
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '');
+
+const esLeccionExamenFinal = (leccion = {}) => {
+  const titulo = normalizarTexto(leccion.titulo);
+  const modulo = normalizarTexto(leccion.modulo_titulo);
+
+  return titulo.includes('examen final') || modulo.includes('examen final');
+};
+
+const ocultarContenidoLeccionBloqueada = (leccion) => ({
+  ...leccion,
+  texto_descriptivo: null,
+  url_video: null,
+  recursos: []
+});
+
+const aplicarBloqueoSecuencialLecciones = (lecciones = []) => {
+  let anterioresContenidoCompletadas = true;
+  const totalContenido = lecciones.filter((leccion) => !esLeccionExamenFinal(leccion)).length;
+  const contenidoCompletado = lecciones.filter((leccion) => !esLeccionExamenFinal(leccion) && Boolean(leccion.completada)).length;
+
+  return lecciones.map((leccion) => {
+    const esExamen = esLeccionExamenFinal(leccion);
+    const puedeAcceder = esExamen
+      ? totalContenido > 0 && contenidoCompletado >= totalContenido
+      : anterioresContenidoCompletadas;
+
+    const leccionConEstado = {
+      ...leccion,
+      es_examen_final: esExamen,
+      puede_acceder: puedeAcceder,
+      bloqueada: !puedeAcceder
+    };
+
+    if (!esExamen && !Boolean(leccion.completada)) {
+      anterioresContenidoCompletadas = false;
+    }
+
+    return leccionConEstado;
+  });
+};
+
+const validarLeccionDisponible = async (idInscripcion, idLeccion, idUsuario = null) => {
+  const resultado = await pool.query(
+    `SELECT
+      i.id_inscripcion,
+      o.id_usuario,
+      c.id_curso,
+      l.id_leccion,
+      l.titulo,
+      m.titulo AS modulo_titulo,
+      m.numero_orden AS modulo_orden,
+      l.numero_orden AS leccion_orden,
+      COALESCE(pl.completada, FALSE) AS completada,
+      (
+        SELECT COUNT(DISTINCT l_prev.id_leccion)::int
+        FROM edutech.modulo m_prev
+        INNER JOIN edutech.leccion l_prev
+          ON l_prev.id_modulo = m_prev.id_modulo
+        WHERE m_prev.id_curso = c.id_curso
+          AND l_prev.esta_activa = TRUE
+          AND NOT (
+            LOWER(m_prev.titulo) LIKE '%examen final%'
+            OR LOWER(l_prev.titulo) LIKE '%examen final%'
+          )
+          AND (
+            m_prev.numero_orden < m.numero_orden
+            OR (m_prev.numero_orden = m.numero_orden AND l_prev.numero_orden < l.numero_orden)
+          )
+      ) AS total_anteriores,
+      (
+        SELECT COUNT(DISTINCT l_prev.id_leccion)::int
+        FROM edutech.modulo m_prev
+        INNER JOIN edutech.leccion l_prev
+          ON l_prev.id_modulo = m_prev.id_modulo
+        INNER JOIN edutech.progreso_leccion pl_prev
+          ON pl_prev.id_leccion = l_prev.id_leccion
+          AND pl_prev.id_inscripcion = i.id_inscripcion
+          AND pl_prev.completada = TRUE
+        WHERE m_prev.id_curso = c.id_curso
+          AND l_prev.esta_activa = TRUE
+          AND NOT (
+            LOWER(m_prev.titulo) LIKE '%examen final%'
+            OR LOWER(l_prev.titulo) LIKE '%examen final%'
+          )
+          AND (
+            m_prev.numero_orden < m.numero_orden
+            OR (m_prev.numero_orden = m.numero_orden AND l_prev.numero_orden < l.numero_orden)
+          )
+      ) AS anteriores_completadas
+     FROM edutech.inscripcion i
+     INNER JOIN edutech.orden_detalle od
+      ON i.id_orden_detalle = od.id_orden_detalle
+     INNER JOIN edutech.orden o
+      ON od.id_orden = o.id_orden
+     INNER JOIN edutech.curso c
+      ON od.id_curso = c.id_curso
+     INNER JOIN edutech.modulo m
+      ON c.id_curso = m.id_curso
+     INNER JOIN edutech.leccion l
+      ON m.id_modulo = l.id_modulo
+     LEFT JOIN edutech.progreso_leccion pl
+      ON pl.id_inscripcion = i.id_inscripcion
+      AND pl.id_leccion = l.id_leccion
+     WHERE i.id_inscripcion = $1
+      AND l.id_leccion = $2
+      AND l.esta_activa = TRUE
+      AND ($3::integer IS NULL OR o.id_usuario = $3)
+     LIMIT 1`,
+    [idInscripcion, idLeccion, idUsuario || null]
+  );
+
+  const leccion = resultado.rows[0];
+
+  if (!leccion) {
+    return {
+      existe: false,
+      puedeAcceder: false,
+      leccion: null
+    };
+  }
+
+  const puedeAcceder = Number(leccion.anteriores_completadas || 0) >= Number(leccion.total_anteriores || 0);
+
+  return {
+    existe: true,
+    puedeAcceder,
+    leccion
+  };
+};
+
 const obtenerMisCursos = async (req, res) => {
   try {
     const { idUsuario } = req.params;
@@ -175,6 +310,8 @@ const obtenerCursoInscritoDetalle = async (req, res) => {
         l.id_modulo,
         l.id_tipo_video,
         tv.nombre_tipo_video,
+        m.titulo AS modulo_titulo,
+        m.numero_orden AS modulo_orden,
         l.titulo,
         l.numero_orden,
         l.texto_descriptivo,
@@ -184,17 +321,15 @@ const obtenerCursoInscritoDetalle = async (req, res) => {
         COALESCE(pl.completada, FALSE) AS completada,
         pl.fecha_completada
        FROM edutech.leccion l
+       INNER JOIN edutech.modulo m
+        ON l.id_modulo = m.id_modulo
        INNER JOIN edutech.tipo_video tv
         ON l.id_tipo_video = tv.id_tipo_video
        LEFT JOIN edutech.progreso_leccion pl
         ON pl.id_leccion = l.id_leccion
        AND pl.id_inscripcion = $1
-       WHERE l.id_modulo IN (
-        SELECT id_modulo
-        FROM edutech.modulo
-        WHERE id_curso = $2
-       )
-       ORDER BY l.id_modulo ASC, l.numero_orden ASC`,
+       WHERE m.id_curso = $2
+       ORDER BY m.numero_orden ASC, l.numero_orden ASC`,
       [idInscripcion, cursoInscrito.id_curso]
     );
 
@@ -223,19 +358,23 @@ const obtenerCursoInscritoDetalle = async (req, res) => {
       [cursoInscrito.id_curso]
     );
 
-    const modulos = modulosResultado.rows.map((modulo) => {
-      const lecciones = leccionesResultado.rows
-        .filter((leccion) => leccion.id_modulo === modulo.id_modulo)
-        .map((leccion) => {
-          const recursos = recursosResultado.rows.filter(
-            (recurso) => recurso.id_leccion === leccion.id_leccion
-          );
+    const leccionesConRecursos = leccionesResultado.rows.map((leccion) => {
+      const recursos = recursosResultado.rows.filter(
+        (recurso) => recurso.id_leccion === leccion.id_leccion
+      );
 
-          return {
-            ...leccion,
-            recursos
-          };
-        });
+      return {
+        ...leccion,
+        recursos
+      };
+    });
+
+    const leccionesConBloqueo = aplicarBloqueoSecuencialLecciones(leccionesConRecursos).map((leccion) => (
+      leccion.bloqueada ? ocultarContenidoLeccionBloqueada(leccion) : leccion
+    ));
+
+    const modulos = modulosResultado.rows.map((modulo) => {
+      const lecciones = leccionesConBloqueo.filter((leccion) => leccion.id_modulo === modulo.id_modulo);
 
       return {
         ...modulo,
@@ -271,9 +410,116 @@ const obtenerCursoInscritoDetalle = async (req, res) => {
   }
 };
 
+const obtenerContenidoLeccionInscrita = async (req, res) => {
+  try {
+    const { idUsuario, idInscripcion, idLeccion } = req.params;
+
+    const acceso = await validarLeccionDisponible(idInscripcion, idLeccion, idUsuario);
+
+    if (!acceso.existe) {
+      return res.status(404).json({
+        ok: false,
+        message: 'La lección no pertenece a esta inscripción o no está activa.'
+      });
+    }
+
+    if (!acceso.puedeAcceder) {
+      return res.status(403).json({
+        ok: false,
+        message: 'Esta lección está bloqueada. Completa primero la lección anterior.'
+      });
+    }
+
+    const resultado = await pool.query(
+      `SELECT
+        l.id_leccion,
+        l.id_modulo,
+        l.id_tipo_video,
+        tv.nombre_tipo_video,
+        m.titulo AS modulo_titulo,
+        m.numero_orden AS modulo_orden,
+        l.titulo,
+        l.numero_orden,
+        l.texto_descriptivo,
+        l.url_video,
+        l.duracion_segundos,
+        l.esta_activa,
+        COALESCE(pl.completada, FALSE) AS completada,
+        pl.fecha_completada
+       FROM edutech.leccion l
+       INNER JOIN edutech.modulo m
+        ON l.id_modulo = m.id_modulo
+       INNER JOIN edutech.tipo_video tv
+        ON l.id_tipo_video = tv.id_tipo_video
+       INNER JOIN edutech.curso c
+        ON m.id_curso = c.id_curso
+       INNER JOIN edutech.orden_detalle od
+        ON od.id_curso = c.id_curso
+       INNER JOIN edutech.inscripcion i
+        ON i.id_orden_detalle = od.id_orden_detalle
+       INNER JOIN edutech.orden o
+        ON od.id_orden = o.id_orden
+       LEFT JOIN edutech.progreso_leccion pl
+        ON pl.id_inscripcion = i.id_inscripcion
+        AND pl.id_leccion = l.id_leccion
+       WHERE i.id_inscripcion = $1
+        AND o.id_usuario = $2
+        AND l.id_leccion = $3
+        AND l.esta_activa = TRUE
+       LIMIT 1`,
+      [idInscripcion, idUsuario, idLeccion]
+    );
+
+    const leccion = resultado.rows[0];
+
+    if (!leccion) {
+      return res.status(404).json({
+        ok: false,
+        message: 'No se encontró el contenido de la lección.'
+      });
+    }
+
+    const recursosResultado = await pool.query(
+      `SELECT
+        lr.id_leccion,
+        r.id_recurso,
+        tr.nombre_tipo_recurso,
+        r.titulo,
+        r.descripcion,
+        r.url_recurso,
+        lr.numero_orden
+       FROM edutech.leccion_recurso lr
+       INNER JOIN edutech.recurso r
+        ON lr.id_recurso = r.id_recurso
+       INNER JOIN edutech.tipo_recurso tr
+        ON r.id_tipo_recurso = tr.id_tipo_recurso
+       WHERE lr.id_leccion = $1
+       ORDER BY lr.numero_orden ASC`,
+      [idLeccion]
+    );
+
+    res.json({
+      ok: true,
+      leccion: {
+        ...leccion,
+        puede_acceder: true,
+        bloqueada: false,
+        recursos: recursosResultado.rows
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: 'Error al obtener el contenido de la lección.',
+      error: error.message
+    });
+  }
+};
+
 const marcarLeccionCompletada = async (req, res) => {
   try {
     const { idInscripcion, idLeccion } = req.params;
+    const idUsuario = req.body && req.body.id_usuario ? Number(req.body.id_usuario) : null;
 
     const validacionResultado = await pool.query(
       `SELECT
@@ -285,6 +531,8 @@ const marcarLeccionCompletada = async (req, res) => {
        FROM edutech.inscripcion i
        INNER JOIN edutech.orden_detalle od
         ON i.id_orden_detalle = od.id_orden_detalle
+       INNER JOIN edutech.orden o
+        ON od.id_orden = o.id_orden
        INNER JOIN edutech.curso c
         ON od.id_curso = c.id_curso
        INNER JOIN edutech.modulo m
@@ -293,8 +541,9 @@ const marcarLeccionCompletada = async (req, res) => {
         ON m.id_modulo = l.id_modulo
        WHERE i.id_inscripcion = $1
         AND l.id_leccion = $2
-        AND l.esta_activa = TRUE`,
-      [idInscripcion, idLeccion]
+        AND l.esta_activa = TRUE
+        AND ($3::integer IS NULL OR o.id_usuario = $3)`,
+      [idInscripcion, idLeccion, idUsuario]
     );
 
     if (validacionResultado.rows.length === 0) {
@@ -407,5 +656,6 @@ const marcarLeccionCompletada = async (req, res) => {
 module.exports = {
   obtenerMisCursos,
   obtenerCursoInscritoDetalle,
+  obtenerContenidoLeccionInscrita,
   marcarLeccionCompletada
 };

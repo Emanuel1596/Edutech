@@ -67,6 +67,9 @@ const obtenerExamenActivoCurso = async (cliente, idCurso) => {
       e.id_curso,
       e.titulo,
       e.descripcion,
+      e.descripcion AS texto_introductorio,
+      e.descripcion AS texto_descriptivo,
+      e.descripcion AS descripcion_larga,
       e.tiempo_limite_minutos,
       e.max_intentos,
       e.calificacion_minima,
@@ -82,6 +85,37 @@ const obtenerExamenActivoCurso = async (cliente, idCurso) => {
   );
 
   return resultado.rows[0] || null;
+};
+
+const obtenerProgresoContenidoCurso = async (cliente, idInscripcion, idCurso) => {
+  const resultado = await cliente.query(
+    `SELECT
+      COUNT(DISTINCT l.id_leccion)::int AS total_lecciones,
+      COUNT(DISTINCT CASE WHEN pl.completada = TRUE THEN l.id_leccion END)::int AS lecciones_completadas
+     FROM edutech.modulo m
+     INNER JOIN edutech.leccion l
+      ON l.id_modulo = m.id_modulo
+     LEFT JOIN edutech.progreso_leccion pl
+      ON pl.id_leccion = l.id_leccion
+      AND pl.id_inscripcion = $1
+     WHERE m.id_curso = $2
+      AND l.esta_activa = TRUE
+      AND NOT (
+        LOWER(m.titulo) LIKE '%examen final%'
+        OR LOWER(l.titulo) LIKE '%examen final%'
+      )`,
+    [idInscripcion, idCurso]
+  );
+
+  const fila = resultado.rows[0] || { total_lecciones: 0, lecciones_completadas: 0 };
+  const total = convertirNumero(fila.total_lecciones, 0);
+  const completadas = convertirNumero(fila.lecciones_completadas, 0);
+
+  return {
+    total_lecciones: total,
+    lecciones_completadas: completadas,
+    contenido_completo: total === 0 || completadas >= total
+  };
 };
 
 const obtenerResumenIntentos = async (cliente, idExamen, idInscripcion) => {
@@ -217,13 +251,38 @@ const obtenerExamenCurso = async (req, res) => {
       });
     }
 
+    const progresoCurso = await obtenerProgresoContenidoCurso(cliente, inscripcion.id_inscripcion, idCurso);
     const resumenIntentos = await obtenerResumenIntentos(cliente, examen.id_examen, inscripcion.id_inscripcion);
-    const cantidadPreguntas = Math.max(1, convertirNumero(examen.cantidad_preguntas, 1));
-    const preguntas = await obtenerPreguntasExamen(cliente, examen.id_examen, cantidadPreguntas);
     const ultimoResultado = await obtenerUltimoResultado(cliente, examen.id_examen, inscripcion.id_inscripcion);
     const intentos = await obtenerIntentosExamen(cliente, examen.id_examen, inscripcion.id_inscripcion, examen);
     const maxIntentos = convertirNumero(examen.max_intentos, 1);
     const intentosRealizados = convertirNumero(resumenIntentos.intentos_realizados, 0);
+    const intentosIlimitados = maxIntentos <= 0;
+    const puedePorIntentos = intentosIlimitados ? true : intentosRealizados < maxIntentos;
+
+    if (!progresoCurso.contenido_completo) {
+      return res.json({
+        ok: true,
+        examen: {
+          ...examen,
+          id_inscripcion: inscripcion.id_inscripcion,
+          titulo_curso: inscripcion.titulo_curso,
+          intentos_realizados: intentosRealizados,
+          intentos_restantes: intentosIlimitados ? null : Math.max(0, maxIntentos - intentosRealizados),
+          puede_presentar: false,
+          intentos_ilimitados: intentosIlimitados,
+          bloqueado_por_progreso: true,
+          mensaje_bloqueo: 'Completa todas las lecciones anteriores antes de presentar el examen final.',
+          progreso_curso: progresoCurso,
+          ultimo_resultado: ultimoResultado,
+          intentos,
+          preguntas: []
+        }
+      });
+    }
+
+    const cantidadPreguntas = Math.max(1, convertirNumero(examen.cantidad_preguntas, 1));
+    const preguntas = await obtenerPreguntasExamen(cliente, examen.id_examen, cantidadPreguntas);
 
     res.json({
       ok: true,
@@ -232,8 +291,11 @@ const obtenerExamenCurso = async (req, res) => {
         id_inscripcion: inscripcion.id_inscripcion,
         titulo_curso: inscripcion.titulo_curso,
         intentos_realizados: intentosRealizados,
-        intentos_restantes: Math.max(0, maxIntentos - intentosRealizados),
-        puede_presentar: intentosRealizados < maxIntentos,
+        intentos_restantes: intentosIlimitados ? null : Math.max(0, maxIntentos - intentosRealizados),
+        puede_presentar: puedePorIntentos,
+        intentos_ilimitados: intentosIlimitados,
+        bloqueado_por_progreso: false,
+        progreso_curso: progresoCurso,
         ultimo_resultado: ultimoResultado,
         intentos,
         preguntas
@@ -446,11 +508,23 @@ const registrarIntentoExamen = async (req, res) => {
       });
     }
 
+    const progresoCurso = await obtenerProgresoContenidoCurso(cliente, inscripcion.id_inscripcion, idCurso);
+
+    if (!progresoCurso.contenido_completo) {
+      await cliente.query('ROLLBACK');
+      return res.status(409).json({
+        ok: false,
+        message: 'Completa todas las lecciones anteriores antes de presentar el examen final.',
+        progreso_curso: progresoCurso
+      });
+    }
+
     const resumenIntentos = await obtenerResumenIntentos(cliente, examen.id_examen, inscripcion.id_inscripcion);
     const maxIntentos = convertirNumero(examen.max_intentos, 1);
     const intentosRealizados = convertirNumero(resumenIntentos.intentos_realizados, 0);
+    const intentosIlimitados = maxIntentos <= 0;
 
-    if (intentosRealizados >= maxIntentos) {
+    if (!intentosIlimitados && intentosRealizados >= maxIntentos) {
       await cliente.query('ROLLBACK');
       return res.status(409).json({
         ok: false,

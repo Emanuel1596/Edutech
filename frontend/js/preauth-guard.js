@@ -20,12 +20,12 @@
   }
 
   const instalarOcultamiento = () => {
-    document.documentElement.classList.add('edutech-session-checking', 'edutech-preauth-checking');
+    document.documentElement.classList.add('edutech-preauth-checking');
 
     if (!document.getElementById('edutech-preauth-guard-style')) {
       const style = document.createElement('style');
       style.id = 'edutech-preauth-guard-style';
-      style.textContent = 'html.edutech-preauth-checking body,html.edutech-session-checking body{display:none!important;visibility:hidden!important;}';
+      style.textContent = 'html.edutech-preauth-checking body{display:none!important;visibility:hidden!important;}';
       document.head.appendChild(style);
     }
   };
@@ -135,5 +135,10 @@
     sessionStorage.removeItem('edutech_mensaje_acceso');
     sessionStorage.removeItem('edutech_mensaje_acceso_destino');
     remplazar(destinoPorRol(usuario), mensajePorPagina(pagina));
+    return;
   }
+
+  // El usuario sí tiene permiso. Quitamos solo el candado temprano.
+  // session-guard.js hará la validación final y quitará edutech-session-checking.
+  document.documentElement.classList.remove('edutech-preauth-checking');
 })();

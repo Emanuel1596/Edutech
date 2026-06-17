@@ -145,6 +145,7 @@ CREATE TABLE usuario (
   correo               VARCHAR(150) NOT NULL,
   password_hash        VARCHAR(255) NOT NULL,
   telefono             CHAR(10),
+  foto_perfil_url      TEXT,
   esta_activo          BOOLEAN NOT NULL DEFAULT TRUE,
   fecha_registro       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   fecha_actualizacion  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -623,13 +624,13 @@ CREATE TABLE examen (
     UNIQUE (id_curso),
 
   CONSTRAINT ck_examen_tiempo
-    CHECK (tiempo_limite_minutos > 0),
+    CHECK (tiempo_limite_minutos >= 30 AND tiempo_limite_minutos <= 180),
 
   CONSTRAINT ck_examen_max_intentos
-    CHECK (max_intentos > 0),
+    CHECK (max_intentos >= 0),
 
   CONSTRAINT ck_examen_calificacion
-    CHECK (calificacion_minima >= 0 AND calificacion_minima <= 100),
+    CHECK (calificacion_minima >= 60 AND calificacion_minima <= 100),
 
   CONSTRAINT ck_examen_cantidad
     CHECK (cantidad_preguntas > 0)
