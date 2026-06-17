@@ -10,6 +10,7 @@ const examenesRoutes = require('./routes/examenes.routes');
 const certificadosRoutes = require('./routes/certificados.routes');
 const instructoresRoutes = require('./routes/instructores.routes');
 const adminRoutes = require('./routes/admin.routes');
+const paypalRoutes = require('./routes/paypal.routes');
 
 const app = express();
 
@@ -32,5 +33,6 @@ app.use('/api', examenesRoutes);
 app.use('/api', certificadosRoutes);
 app.use('/api', instructoresRoutes);
 app.use('/api', adminRoutes);
+app.use('/api', paypalRoutes);
 
 module.exports = app;
